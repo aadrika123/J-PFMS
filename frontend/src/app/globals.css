@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  background-color: white !important;
+  -webkit-text-size-adjust: auto;
+}
+
+.flex-all-center {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px;
+}
+
+table tbody::-webkit-scrollbar {
+  /* Set display to none */
+  display: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+
+/* Shadow Bottom */
+.bottom-shadow{
+  /* box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.2); */
+  -webkit-box-shadow: 8px 11px 5px 8px rgba(0,0,0,0.75);
+-moz-box-shadow: 8px 11px 5px 8px rgba(0,0,0,0.75);
+box-shadow: 8px 11px 5px 8px rgba(0,0,0,0.75);
+}
+
+/* Hiding the select default arrow icon */
+.dropdown-container select { 
+  /* for Firefox */ 
+  -moz-appearance: none; 
+  /* for Safari, Chrome, Opera */ 
+  -webkit-appearance: none; 
+} 
+
+/* for IE10 */ 
+.dropdown-container select::-ms-expand { 
+  display: none; 
+} 

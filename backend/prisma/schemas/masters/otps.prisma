@@ -1,0 +1,9 @@
+//// OTPs
+model otps {
+  id            Int         @id   @default(autoincrement())
+  email         String?
+  mobile        String?
+  otp           Int
+  created_at    DateTime @default(now()) @map("created_at")
+  updated_at    DateTime @updatedAt @map("updated_at")
+}

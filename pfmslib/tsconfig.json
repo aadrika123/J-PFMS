@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    /* Language and Environment */
+    "target": "es2020",
+    "outDir": "./build", // Change the output directory if needed
+    "module": "commonjs",
+    "declaration": true,
+  },
+  "include": [
+    "src/**/*.ts" // Adjust the path pattern based on your project structure
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

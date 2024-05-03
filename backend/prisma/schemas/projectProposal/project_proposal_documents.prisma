@@ -1,0 +1,19 @@
+model project_proposal_documents {
+  id Int @id @default(autoincrement())
+
+  project_proposal_id Int
+  project_proposal    project_proposals @relation(fields: [project_proposal_id], references: [id])
+
+  description String
+  path        String
+  approved    String @default("pending")
+
+  approved_by_id Int?
+  approval_date  DateTime?
+  ref_doc_id     Int?
+  remarks        String?
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @updatedAt @map("updated_at")
+  @@unique([project_proposal_id, approved_by_id, ref_doc_id])
+}

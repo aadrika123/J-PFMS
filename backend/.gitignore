@@ -1,0 +1,22 @@
+# Keep environment variables out of version control
+.env
+/build
+/node_modules
+
+
+/prisma/migrations
+/prisma/schema.prisma
+
+
+/src/grpc/proto
+
+/magic/generated
+
+/magic
+/magic.js
+
+/logs
+
+logs
+
+/public

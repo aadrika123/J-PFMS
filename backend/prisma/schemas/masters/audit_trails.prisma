@@ -1,0 +1,16 @@
+
+model audit_trails {
+    id               Int      @id @default(autoincrement())
+    error            String?
+    message          String?
+    meta_data        Json
+    user             Json
+    payload          Json?
+    response         Json?
+    ram_usage        Int
+    request_no       Int
+    db_connection_no Int
+    cpu_usage        Int
+    created_at       DateTime @default(now()) @map("created_at")
+    updated_at       DateTime @updatedAt @map("updated_at")
+}
