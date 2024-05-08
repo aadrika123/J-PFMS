@@ -79,6 +79,11 @@ const EditViewProjectProposal = ({
     },
   });
 
+  //// Handle files
+  const handleFileData = (files: []): any[] =>{
+    return files.map((file: any) => ({...file, file_token: String(file.file_token)}));
+  }
+
   return (
     <>
       <Toaster />
@@ -108,14 +113,7 @@ const EditViewProjectProposal = ({
             ulb_id: data?.ulb_id,
             ward_id: data?.ward_id,
             user_id: 1,
-            files: [
-              {
-                ...data?.files.find((i: any) => i.document_type_id !== 0),
-              },
-              {
-                ...data?.files.find((i: any) => i.document_type_id === 0),
-              },
-            ],
+            files: handleFileData(data?.files),
           }}
           readonly={parma === "view"}
         />

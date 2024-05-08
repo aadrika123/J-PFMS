@@ -120,6 +120,7 @@ class project_proposalsDao {
     // });
     const newData = data[0];
     newData.files = doc;
+    console.log("first", newData)
     return newData;
   };
 

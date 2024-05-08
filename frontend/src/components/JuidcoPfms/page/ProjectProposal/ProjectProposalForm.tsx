@@ -237,7 +237,6 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                       name="summary"
                       placeholder="Enter Project Summary"
                       required
-                      // type="text"
                       readonly={readonly}
                     />
                     <TextArea
@@ -249,7 +248,6 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                       label="Project Description"
                       name="description"
                       placeholder="Enter Project Description"
-                      // type="text"
                       readonly={readonly}
                     />
                     <SelectForUpdateValueWithNoAPI
