@@ -1,15 +1,15 @@
 "use client";
 
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "@/lib/axiosConfig";
 import { useQuery } from "react-query";
 import Table, { ColumnProps } from "@/components/global/molecules/Table";
-import DebouncedSearch from "@/components/global/atoms/DebouncedSearch";
+// import DebouncedSearch from "@/components/global/atoms/DebouncedSearch";
 import LoaderSkeleton from "@/components/global/atoms/LoaderSkeleton";
 import NextPrevPagination from "@/components/global/molecules/NextPrevPagination";
-import Select from "@/components/global/atoms/nonFormik/Select";
-import { FINANCE_URL } from "@/utils/api/urls";
-import Input from "@/components/global/atoms/Input";
+// import Select from "@/components/global/atoms/nonFormik/Select";
+// import { PFMS_URL } from "@/utils/api/urls";
+// import Input from "@/components/global/atoms/Input";
 import { useUser } from "@/components/global/molecules/general/useUser";
 
 /**
@@ -94,19 +94,19 @@ const TableWithFeatures = <T,>({
     }
   };
 
-  const onSearchTextChange = (text: string) => {
-    setState((prev) => ({...prev, searchText: text, page: 1}))
-  };
+  // const onSearchTextChange = (text: string) => {
+  //   setState((prev) => ({...prev, searchText: text, page: 1}))
+  // };
 
-  ////// Handl Selecting ULBs ///////////
-  const handleUlb = (e: ChangeEvent<HTMLSelectElement>) => {
-    setState((prev) => ({...prev, ulbId: e.target.value}))
-  };
+  // ////// Handl Selecting ULBs ///////////
+  // const handleUlb = (e: ChangeEvent<HTMLSelectElement>) => {
+  //   setState((prev) => ({...prev, ulbId: e.target.value}))
+  // };
 
-  ////// Handl Selecting Date ///////////
-  const handleBill = (e: ChangeEvent<HTMLInputElement>) => {
-    setState((prev) => ({...prev, bill_no: e.target.value}))
-  };
+  // ////// Handl Selecting Date ///////////
+  // const handleBill = (e: ChangeEvent<HTMLInputElement>) => {
+  //   setState((prev) => ({...prev, bill_no: e.target.value}))
+  // };
 
   // ///// Getting the first selected value
   // const initUlbHandler = (value: number) => {
@@ -115,13 +115,13 @@ const TableWithFeatures = <T,>({
   
   return (
     <>
-      <div className="flex justify-between items-end">
+      {/* <div className="flex justify-between items-end">
         <div className="text-primary_bg_indigo rounded-md px-2 pb-1 text-sub_head font-semibold flex items-center">
           <Select
             label="ULB"
             name="ulb_id"
             className="w-48 text-primary_bg_indigo border-[#4338ca] mr-4"
-            api={`${FINANCE_URL.MUNICIPILATY_CODE_URL.get}`}
+            api={`${PFMS_URL.MUNICIPILATY_CODE_URL.get}`}
             value={ulbId}
             onChange={handleUlb}
             readonly={!user?.isUserAdmin()}
@@ -135,7 +135,7 @@ const TableWithFeatures = <T,>({
           />
         </div>
         <DebouncedSearch onChange={onSearchTextChange} />
-      </div>
+      </div> */}
 
       <div className="mt-8">
         {isFetching || isSearching ? (

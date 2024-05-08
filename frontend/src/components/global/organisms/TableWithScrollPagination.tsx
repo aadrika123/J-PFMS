@@ -7,7 +7,7 @@ import DebouncedSearch from "../atoms/DebouncedSearch";
 import { useQuery } from "react-query";
 import axios from "@/lib/axiosConfig";
 import LoaderSkeleton from "../atoms/LoaderSkeleton";
-import { FINANCE_URL } from "@/utils/api/urls";
+import { PFMS_URL } from "@/utils/api/urls";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Select from "../atoms/nonFormik/Select";
@@ -193,7 +193,7 @@ const TableWithScrollPagination = <T,>({
               label=""
               name="ulb_id"
               className="w-56 border-[#4338ca] text-primary_bg_indigo"
-              api={`${FINANCE_URL.MUNICIPILATY_CODE_URL.get}`}
+              api={`${PFMS_URL.MUNICIPILATY_CODE_URL.get}`}
               value={user?.user_type === "Admin" ? undefined : user?.ulb_id}
               readonly={user?.user_type === "Admin" ? false : true}
               onChange={handleUlb}

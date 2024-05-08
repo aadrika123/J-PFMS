@@ -1,10 +1,12 @@
 import express from "express";
 import AuthRoute from "./route/auth/Auth";
-import AuditTrailRoute from "./route/auditTrail/auditTrailRoute";
 import BillsRoute from "./route/payments/ProjectPerposalsRoute";
 import FileHandlerRoute from "./route/FileHandlerRoute";
 // import BillVerificationRoute from "./route/payments/BillVerificationRoute";
 import DashboardRoute from "./route/dashboard/dashboardRoute";
+import DistrictRoute from "./route/masters/districtRoute";
+import StateRoute from "./route/masters/stateRoute";
+import UlbRoute from "./route/masters/ulbRoute";
 
 /*
 |--------------------------------------------------------------------------
@@ -27,9 +29,14 @@ class FinanceRoute {
   constructor(app: express.Application) {
     (new FileHandlerRoute("0", app)).configure();
 
-    (new AuthRoute()).configure(app, "43");  // 43
+    (new AuthRoute()).configure(app, "1");  // 1
 
-    (new AuditTrailRoute().configure(app, "48"));
+    (new DistrictRoute("2", app)).configure();  // 2
+
+    (new StateRoute("3", app)).configure();  // 3
+
+    (new UlbRoute("4", app)).configure();  // 3
+
 
     (new BillsRoute("50", app)).configure();
 

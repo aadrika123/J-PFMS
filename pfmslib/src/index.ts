@@ -2,8 +2,7 @@
 
 import BankMasterValidation from "./validations/BankMasterValidation";
 import { AccountingCodeType } from "./standard/accounting_code_types";
-import BalanceTrackingsValidation from "./validations/BalanceTrackingsValidation";
-import { multiProjectProposalEntryValidationSchema, projectProposalEntryValidationSchema } from "./validations/ProjectProposalEntryValidation";
+import { multiProjectProposalValidationSchema, projectProposalValidationSchema } from "./validations/ProjectProposalValidation";
 import User from "./user/User";
 import {ROLES} from "./user";
 import {ProjectProposalStages} from "./standard/project_proposal_stages"
@@ -31,10 +30,9 @@ export {
   fc,
   AccountingCodeType,
   BankMasterValidation,
-  BalanceTrackingsValidation,
   User,
-  multiProjectProposalEntryValidationSchema,
-  projectProposalEntryValidationSchema,
+  multiProjectProposalValidationSchema,
+  projectProposalValidationSchema,
   ROLES,
   ProjectProposalStages
 };

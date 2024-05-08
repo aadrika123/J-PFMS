@@ -5,7 +5,7 @@ import Input from "@/components/global/atoms/Input";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import React, { useState } from "react";
-// import { FINANCE_URL } from "@/utils/api/urls";
+// import { PFMS_URL } from "@/utils/api/urls";
 // import axios from "@/lib/axiosConfig";
 import { useDispatch } from "react-redux";
 import { login } from "@/redux/reducers/authReducer";
@@ -43,7 +43,7 @@ const Login = () => {
         },
         );
         // const res = await axios({
-        //   url: FINANCE_URL.AUTH_URL.login,
+        //   url: PFMS_URL.AUTH_URL.login,
         //   method: "POST",
         //   data: {
         //     email: values.user_id,

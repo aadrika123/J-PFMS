@@ -10,7 +10,7 @@ if (userData) {
 }
 
 
-export const baseURL = `${process.env.backend}/api/finance/v1`;
+export const baseURL = `${process.env.backend}/api/pfms/v1`;
 export const Authorization = `Bearer ${user?.token}`;
 
 const instance = axios.create({

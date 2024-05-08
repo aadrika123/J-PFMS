@@ -11,7 +11,6 @@ class FileHandlerController {
 
     uploadSingleDocument = async (req: Request): Promise<APIv1Response> => {
         // console.log(req.headers);
-        console.log(req.files);
         // validate
         if(!req.files) throw new Error("a document is required.");
         const files: any = req.files as any;

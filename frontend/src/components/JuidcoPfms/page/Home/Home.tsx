@@ -8,7 +8,7 @@ import HomeHeader from "./Header";
 import HomeCard, { RactangleCard } from "./Card";
 import AllHomeButtons from "./AllButtons";
 import { useQuery } from "react-query";
-import { FINANCE_URL } from "@/utils/api/urls";
+import { PFMS_URL } from "@/utils/api/urls";
 import axios from "@/lib/axiosConfig";
 import LoaderSkeleton from "@/components/global/atoms/LoaderSkeleton";
 import { useSelector } from "react-redux";
@@ -32,7 +32,7 @@ const Home = () => {
   const fetchData = async () => {
     try {
       const res = await axios({
-        url: `${FINANCE_URL.RECEIPT_REGISTER.get}?limit=${limit}&page=${page}&order=-1&date=${new Date().toISOString().split("T")[0]}&module=${moduleId}&ulb=${user?.user_type === "Admin" ? undefined : user?.ulb_id}`,
+        url: `${PFMS_URL.RECEIPT_REGISTER.get}?limit=${limit}&page=${page}&order=-1&date=${new Date().toISOString().split("T")[0]}&module=${moduleId}&ulb=${user?.user_type === "Admin" ? undefined : user?.ulb_id}`,
         method: "GET",
       });
 

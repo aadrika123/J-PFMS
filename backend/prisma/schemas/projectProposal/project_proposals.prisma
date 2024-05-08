@@ -1,28 +1,23 @@
+//// Managed By :- Sanjiv
 model project_proposals {
-    id Int @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-    ulb_id Int
+  ulb_id Int
 
-    project_proposal_no   String
-    project_proposal_date DateTime @db.Date
+  project_proposal_no String
+  date                DateTime @db.Date
+  summary             String
+  description         String
+  state_id            Int
+  district_id         Int
+  ward_id             Int
+  address             String
+  pin_code            Int
+  user_id             Int
 
-    particulars String
-    amount      Float
+  project_proposal_checkings project_proposal_checkings[]
+  project_proposal_documents project_proposal_documents[]
 
-    authorizing_officer_name String?
-
-    sanction_date       DateTime @db.Date
-    voucher_no          String?
-    reason_for_delay    String?
-    outstanding_balance Float
-    discount_allowed    String?
-    sanctioned_amount   Float
-    status              String   @default("pending")
-    remarks             String
-
-    project_proposal_checkings project_proposal_checkings[]
-    project_proposal_documents project_proposal_documents[]
-
-    created_at DateTime @default(now()) @map("created_at")
-    updated_at DateTime @default(now()) @updatedAt @map("updated_at")
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @updatedAt @map("updated_at")
 }

@@ -31,7 +31,7 @@ export class APIv1 {
     this.routeId = routeId.padStart(2,"0");
     this.app = app;
     this.routeName = routeName;
-    this.baseUrl = `/api/finance/${this.apiVersion}/${this.routeName}`;
+    this.baseUrl = `/api/pfms/${this.apiVersion}/${this.routeName}`;
   }
 
   addGetRoute(path: string, handler: (req: Request) => Promise<APIv1Response>): void {

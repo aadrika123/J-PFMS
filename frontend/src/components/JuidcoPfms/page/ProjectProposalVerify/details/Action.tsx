@@ -6,7 +6,7 @@ import React, { ChangeEvent, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import axios from "@/lib/axiosConfig";
 import toast, { Toaster } from "react-hot-toast";
-import { FINANCE_URL } from "@/utils/api/urls";
+import { PFMS_URL } from "@/utils/api/urls";
 import { useUser } from "@/components/global/molecules/general/useUser";
 
 type StateType = {
@@ -29,7 +29,7 @@ const Action: React.FC<ActionPropsType> = (props) => {
 
   const handleApprove = async () => {
     const res = await axios({
-      url: `${FINANCE_URL.BILLS_VERIFICATION.approve}`,
+      url: `${PFMS_URL.BILLS_VERIFICATION.approve}`,
       method: "POST",
       data: {
         data: {
@@ -62,7 +62,7 @@ const Action: React.FC<ActionPropsType> = (props) => {
 
   const handleSendBack = async () => {
     const res = await axios({
-      url: `${FINANCE_URL.BILLS_VERIFICATION.sendBack}`,
+      url: `${PFMS_URL.BILLS_VERIFICATION.sendBack}`,
       method: "POST",
       data: {
         data: {

@@ -1,12 +1,11 @@
-
-import HeroBillsVerify from "@/components/JuidcoPfms/page/ProjectProposalVerify/Index";
+import HeroProjectProposal from "@/components/JuidcoPfms/page/ProjectProposal/Index";
 import PageLayout from "@/components/Layouts/PageLayout";
 import React from "react";
 
 const page = () => {
   return (
     <PageLayout>
-      <HeroBillsVerify />
+      <HeroProjectProposal />
     </PageLayout>
   );
 };

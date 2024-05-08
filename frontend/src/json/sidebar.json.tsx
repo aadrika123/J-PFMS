@@ -24,6 +24,11 @@ export const sidebarLinks: SidebarLinksProps = {
           path: "/home",
         },
         {
+          moduleName: "Project Proposal",
+          icon: <Image src={project} alt="home" width={100} height={100} />,
+          path: "/project-proposal",
+        },
+        {
           moduleName: "Project Management",
           icon: <Image src={project} alt="home" width={100} height={100} />,
           path: "/project-management",

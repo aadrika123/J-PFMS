@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import foreign_wrapper from "./seeder/foreign_wrappter";
 import project_proposal_seeder from "./seeder/projectProposal/project_proposal_seeder";
 import project_proposal_stages_seeder from "./seeder/projectProposal/project_proposal_stages_seeder";
+import doc_type_seeder from "./seeder/masters/doc_type_seeder";
 
 const prisma = new PrismaClient();
 
@@ -20,6 +21,8 @@ async function main() {
     await project_proposal_seeder();
 
     await project_proposal_stages_seeder();
+
+    await doc_type_seeder();
   }, 8000);
 
 

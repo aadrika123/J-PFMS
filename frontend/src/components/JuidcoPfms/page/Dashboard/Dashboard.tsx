@@ -4,7 +4,7 @@ import React from "react";
 import PieChart from "./PieChart";
 import BarChart from "./BarChart";
 import LineChart from "./LineChart";
-import { FINANCE_URL } from "@/utils/api/urls";
+import { PFMS_URL } from "@/utils/api/urls";
 import { useQuery } from "react-query";
 import axios from "@/lib/axiosConfig";
 import Loader from "@/components/global/atoms/Loader";
@@ -12,19 +12,19 @@ import Loader from "@/components/global/atoms/Loader";
 const Dashboard = () => {
   const allApi = [
     axios({
-      url: `${FINANCE_URL.DASHBOARD.getCollection}`,
+      url: `${PFMS_URL.DASHBOARD.getCollection}`,
       method: "GET",
     }),
     axios({
-      url: `${FINANCE_URL.DASHBOARD.getTopPaymentMode}`,
+      url: `${PFMS_URL.DASHBOARD.getTopPaymentMode}`,
       method: "GET",
     }),
     axios({
-      url: `${FINANCE_URL.DASHBOARD.getTopRevenueModules}`,
+      url: `${PFMS_URL.DASHBOARD.getTopRevenueModules}`,
       method: "GET",
     }),
     axios({
-      url: `${FINANCE_URL.DASHBOARD.getTopUlb}`,
+      url: `${PFMS_URL.DASHBOARD.getTopUlb}`,
       method: "GET",
     }),
   ];
@@ -35,15 +35,15 @@ const Dashboard = () => {
       const responses = await Promise.all(allApi);
       responses.forEach((res: any) => {
         if (res.data.status) {
-          if (res?.config?.url === `${FINANCE_URL.DASHBOARD.getCollection}`)
+          if (res?.config?.url === `${PFMS_URL.DASHBOARD.getCollection}`)
             dataList["collection"] = res.data.data;
-          if (res?.config?.url === `${FINANCE_URL.DASHBOARD.getTopPaymentMode}`)
+          if (res?.config?.url === `${PFMS_URL.DASHBOARD.getTopPaymentMode}`)
             dataList["paymentModes"] = res.data.data;
           if (
-            res?.config?.url === `${FINANCE_URL.DASHBOARD.getTopRevenueModules}`
+            res?.config?.url === `${PFMS_URL.DASHBOARD.getTopRevenueModules}`
           )
             dataList["revenueModules"] = res.data.data;
-          if (res?.config?.url === `${FINANCE_URL.DASHBOARD.getTopUlb}`)
+          if (res?.config?.url === `${PFMS_URL.DASHBOARD.getTopUlb}`)
             dataList["ulbs"] = res.data.data;
         }
       });

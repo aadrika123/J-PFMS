@@ -10,7 +10,7 @@ import Action from "./Action";
 import admi from "@/assets/svg/admi.svg";
 import axios from "@/lib/axiosConfig";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { FINANCE_URL } from "@/utils/api/urls";
+import { PFMS_URL } from "@/utils/api/urls";
 import Loader from "@/components/global/atoms/Loader";
 import { useSelector } from "react-redux";
 import { User } from "pfmslib";
@@ -53,12 +53,12 @@ const BillDetails: React.FC<BillDetailProps> = (props) => {
 
   const { data: billData, isFetching: isFetching } = useQuery(
     ["bill-details", billId],
-    () => fetch(`${FINANCE_URL.BILLS_VERIFICATION.getById}/${billId}`)
+    () => fetch(`${PFMS_URL.BILLS_VERIFICATION.getById}/${billId}`)
   );
 
   //////////// Getting documents
   const { data: docs } = useQuery(["documents", billId], () =>
-    fetch(`${FINANCE_URL.BILLS_VERIFICATION.getDoc}/${billId}`)
+    fetch(`${PFMS_URL.BILLS_VERIFICATION.getDoc}/${billId}`)
   );
 
   const { activeStep, showPopup, docData, showRemarkPopup, remarks } = state;
@@ -148,7 +148,7 @@ const BillDetails: React.FC<BillDetailProps> = (props) => {
   //////////////// handling Verify Documents ///////////////
   const handleVerifyDoc = async () => {
     const res = await axios({
-      url: `${FINANCE_URL.BILLS_VERIFICATION.approveDoc}`,
+      url: `${PFMS_URL.BILLS_VERIFICATION.approveDoc}`,
       method: "POST",
       data: {
         data: {
@@ -184,7 +184,7 @@ const BillDetails: React.FC<BillDetailProps> = (props) => {
   //////////////// handling reject Documents ///////////////
   const handleRejectDoc = async () => {
     const res = await axios({
-      url: `${FINANCE_URL.BILLS_VERIFICATION.rejectDoc}`,
+      url: `${PFMS_URL.BILLS_VERIFICATION.rejectDoc}`,
       method: "POST",
       data: {
         data: {

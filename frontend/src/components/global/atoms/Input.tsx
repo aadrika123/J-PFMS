@@ -22,6 +22,7 @@ interface InputProps {
   required?: boolean | false;
   icon?: ReactNode;
   iconAlign?: "left" | "right";
+  maxlength?: number;
 }
 
 const Input: React.FC<InputProps> = (props) => {
@@ -37,8 +38,18 @@ const Input: React.FC<InputProps> = (props) => {
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if(!props.readonly && props.onChange){
-      props.onChange(e)
+    if (!props.readonly && props.onChange) {
+      props.onChange(e);
+    }
+  };
+
+
+  ////// Handle OnInput 
+  const handleOnInput = (e: ChangeEvent<HTMLInputElement>) => {
+    if(props?.maxlength){
+      e.target.value = Math.max(0, parseInt(e.target.value))
+      .toString()
+      .slice(0, props?.maxlength);
     }
   }
 
@@ -50,7 +61,7 @@ const Input: React.FC<InputProps> = (props) => {
           {props.required ? <span className="text-red-600 pl-2">*</span> : ""}
         </label>
         <div
-          className={`flex items-center justify-between rounded border bg-transparent border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none ${props.icon && props.iconAlign === "left" && "flex-row-reverse"} ${props.readonly?`bg-gray-300`:''}`}
+          className={`flex items-center justify-between rounded border bg-transparent border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none ${props.icon && props.iconAlign === "left" && "flex-row-reverse"} ${props.readonly ? `bg-gray-300` : ""}`}
         >
           <input
             disabled={props.readonly}
@@ -61,6 +72,7 @@ const Input: React.FC<InputProps> = (props) => {
             onFocus={handleFocus}
             type={props.type}
             value={props?.value}
+            onInput={handleOnInput}
             className={`text-primary h-[40px] p-3 bg-transparent outline-none  w-full`}
             name={props.name}
             id={fieldId}

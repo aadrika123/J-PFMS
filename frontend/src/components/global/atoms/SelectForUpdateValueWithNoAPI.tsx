@@ -1,29 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useField } from "formik";
 
 /**
  * | Author- Sanjiv Kumar
- * | Created On- 10-02-2024
+ * | Created On- 06-05-2024
  * | Created for- Select Input Field
  * | Status- done
  */
-
-interface Option {
-  id: number;
-  value?: string | number;
-  name?: string;
-  type?: string;
-  code?: string;
-  ulbs?: string;
-  description?: string;
-}
 
 interface SelectProps {
   label: string;
   name: string;
   placeholder?: string;
   value?: number | string;
-  data: Option[] | [];
+  data: Select[];
   error?: string | undefined;
   type?: string;
   touched?: boolean | undefined;
@@ -34,26 +24,42 @@ interface SelectProps {
   handler?: (id: number | string) => void;
   onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLSelectElement>) => void;
+  setFieldValue?: (field: string, value: any) => void;
+  isNull?: any;
 }
 
-const SelectForNoApi: React.FC<SelectProps> = (props) => {
+interface Select {
+  id: number;
+  name: string;
+}
+
+const SelectForUpdateValueWithNoAPI: React.FC<SelectProps> = (props) => {
   const [, , helpers] = useField(props.name);
-  // const [, , helpers1] = useField(`${props.name}_name`);
+//   const [, , helpers1] = useField(`${props.name}_name`);
 
   const { setValue } = helpers;
-  // const { setValue: setValue1 } = helpers1;
+//   const { setValue: setValue1 } = helpers1;
 
   const fieldId = "id_" + props.name;
+
+  useEffect(() => {
+    if (props.setFieldValue) {
+      if (props.isNull) {
+        props.setFieldValue(`${props.name}`, 0);
+      } else {
+        props.setFieldValue(`${props.name}`, props.value);
+      }
+    }
+  }, [props.value, props.isNull]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (!props.readonly) {
       if (props.handler) {
         props.handler(parseInt(e.target.value));
       }
-
       setValue(parseInt(e.target.value));
-      // const selectedOption = e.target.options[e.target.selectedIndex].dataset;
-      // setValue1(selectedOption.name);
+    //   const selectedOption = e.target.options[e.target.selectedIndex].dataset;
+    //   setValue1(selectedOption.name);
     }
   };
 
@@ -73,30 +79,21 @@ const SelectForNoApi: React.FC<SelectProps> = (props) => {
           name={props.name}
           id={fieldId}
         >
-          {props.placeholder && <option selected value={0}>
+          <option selected value={0}>
             {props.placeholder}
-          </option>}
-          {props?.data?.length && props?.data.map((d: Option) => (
-            <option
-              key={d?.id}
-              value={d?.value ? d?.value : d?.id}
-              data-name={
-                d?.name ||
-                d?.type ||
-                (d?.code && d?.description
-                  ? `${d.code}-${d?.description}`
-                  : d?.code) ||
-                d?.ulbs
-              }
-            >
-              {d?.name ||
-                d?.type ||
-                (d?.code && d?.description
-                  ? `${d.code}-${d?.description}`
-                  : d?.code) ||
-                d?.ulbs}
-            </option>
-          ))}
+          </option>
+          {props.data.length > 0 &&
+            props.data.map((d: Select) => (
+              <option
+                key={d?.id}
+                value={d?.id}
+                data-name={
+                  d?.name
+                }
+              >
+                {d?.name}
+              </option>
+            ))}
         </select>
 
         {props.touched && props.error && (
@@ -107,4 +104,4 @@ const SelectForNoApi: React.FC<SelectProps> = (props) => {
   );
 };
 
-export default SelectForNoApi;
+export default SelectForUpdateValueWithNoAPI;
