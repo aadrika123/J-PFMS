@@ -3,13 +3,17 @@
 GITHUB_REPO="aadrika123/J-PFMS"
 GITHUB_BRANCH=sanjiv_dev
 
-
-GITHUB_USER=sanjivgit
-GT=
-
-
 cloneRepo(){
-    git clone -b $GITHUB_BRANCH https://$GITHUB_USER:$GT@github.com/$GITHUB_REPO
+    echo -n "Enter your username :"
+    read username
+
+    echo -n "Enter your branch :" 
+    read branch
+
+    echo -n "Enter your github token :"
+    read token
+    
+    git clone -b $branch https://$username:$token@github.com/$GITHUB_REPO
 }
 
 cd ..
