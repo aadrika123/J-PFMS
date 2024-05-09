@@ -41,7 +41,7 @@ const Login = () => {
           email: values.user_id,
           password: values.password,
         },
-        );
+        )
         // const res = await axios({
         //   url: FINANCE_URL.AUTH_URL.login,
         //   method: "POST",

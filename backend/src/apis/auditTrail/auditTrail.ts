@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { resObj } from "../../util/types";
-import { Prisma, PrismaClient, audit_trails } from "@prisma/client";
+import { Prisma, PrismaClient, audit_trails} from "@prisma/client";
 import { warnlogger } from "../../../loggerConfig";
 import CommonRes from "../../util/helper/commonResponse";
 import { resMessage } from "../responseMessage/commonMessage";

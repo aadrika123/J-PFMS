@@ -27,8 +27,8 @@ class project_proposalsDao {
     limit ${limit} offset ${offset};`;
 
 
-    const records = await prisma.$queryRawUnsafe<[]>(query);
-
+const records = await prisma.$queryRawUnsafe<any[]>(query);
+// 
     const c = await prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) from bills where ${searchCondition}`);
 
     const count = Number(c[0]?.count);
@@ -36,7 +36,7 @@ class project_proposalsDao {
     return generateRes(records, count, page, limit);
   }
 
-  create = async (data: any) => {
+  create = async (data: any[]) => {
     console.log(data);
     return await prisma.project_proposals.createMany({
       data: data,
@@ -46,7 +46,7 @@ class project_proposalsDao {
   createOne = async (data: any, docRecords: any) => {
 
     return prisma.$transaction(
-      async (tx) => {
+      async (tx:any) => {
 
         const project_proposals_record =  await tx.project_proposals.create({data: data});
         if(docRecords.length > 0){
