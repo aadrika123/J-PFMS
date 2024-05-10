@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
-import TableWithFeatures from "../ProjectProposalVerify/TableWithFeatures";
 import { HeaderWidget } from "@/components/Helpers/Widgets/HeaderWidget";
 import { PFMS_URL } from "@/utils/api/urls";
 import ViewButton from "@/components/global/atoms/ViewButton";
+import TableWithFeatures from "@/components/global/atoms/TableWithFeatures";
 
 const HeroProjectProposal = () => {
   const columns = [
