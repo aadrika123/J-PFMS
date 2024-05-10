@@ -135,13 +135,24 @@ class project_proposalsDao {
       if (docRecords.length > 0) {
         await Promise.all(
           docRecords.map(async (docRecord: any) => {
-            await tx.project_proposal_documents.updateMany({
-              where: {
-                project_proposal_id: id,
-                doc_type_id: docRecord.doc_type_id,
-              },
-              data: docRecord,
-            });
+            if(docRecord.doc_type_id === 0){
+              await tx.project_proposal_documents.updateMany({
+                where: {
+                  project_proposal_id: id,
+                  doc_type_id: docRecord.doc_type_id,
+                },
+                data: docRecord,
+              });
+            } else {
+              await tx.$queryRaw`
+              update project_proposal_documents
+              set description = ${docRecord.description},
+              path = ${docRecord.path},
+              doc_type_id = ${docRecord.doc_type_id}
+              where project_proposal_id = ${id} and doc_type_id != 0
+              `
+            }
+            
           })
         );
       }

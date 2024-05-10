@@ -33,6 +33,7 @@ type Urls = {
     getTopUlb?: string;
     getTopPaymentMode?: string;
     upload?: string;
+    getByAuth?: string;
   };
 };
 

@@ -27,6 +27,7 @@ import toast, { Toaster } from "react-hot-toast";
 import Loader from "@/components/global/atoms/Loader";
 import { docType } from "./docType";
 import TextArea from "@/components/global/atoms/Textarea";
+// import ConfirmationPopup from "@/components/global/molecules/ConfirmationPopup";
 
 type FileTypes = {
   document_type_id: number;
@@ -39,12 +40,12 @@ export type ProjectProposalSchema = {
   description: string;
   summary: string;
   state_id: number;
-  date: string;
+  date?: string;
   ulb_id: number;
   ward_id: number;
   user_id: number;
   address: string;
-  pin_code: number | undefined;
+  pin_code: number | string;
   files: FileTypes[];
 };
 
@@ -70,6 +71,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     inProgress2: false,
     showWarning: false,
     triggerFun: null,
+    validationError: null,
   });
   const {
     ulbId,
@@ -78,8 +80,8 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     inProgress2,
     showWarning,
     triggerFun,
+    validationError
   } = state;
-
   ////// Fetching data
   const fetch = async (endpoint: string, dependence?: any) => {
     if (!dependence || dependence === null) return [];
@@ -90,6 +92,8 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     });
 
     if (!res.data.status) throw "Something Went Wrong!!";
+
+    if (dependence === 5) return res.data.data.slice(0, 30);
 
     return res.data.data;
   };
@@ -142,6 +146,13 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     setFieldValue("ward_id", 0);
   };
 
+  ///////////// Checking File Type
+  const validateFileType = (file: any) => {
+    const fileType = ["jpeg", "jpg", "pdf"];
+
+    return fileType.some((type) => file?.type?.includes(type));
+  };
+
   ////// Handle Upload
   const handleUpload = async (
     e: ChangeEvent<HTMLInputElement>,
@@ -155,9 +166,18 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     });
     try {
       if (e.target.files) {
+        const file = e.target.files[0];
+        if (!validateFileType(file)) {
+          setState({
+            ...state,
+            validationError: `'${file.type.split("/")[1]}' file not allowed`,
+          });
+          return;
+        }
+
         const formData = new FormData();
 
-        formData.append("doc", e.target.files[0]);
+        formData.append("doc", file);
         const res = await axios({
           url: `${PFMS_URL.FILE_UPLOAD_URL.upload}`,
           method: "POST",
@@ -166,11 +186,15 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
         if (!res.data.status) throw "Something Went Wrong";
 
         setFieldValue(`files[${index}].file_token`, res.data.data.file_token);
-        setFieldValue(`files[${index}].file_name`, e.target.files[0].name);
+        setFieldValue(`files[${index}].file_name`, file.name);
+        setState({
+          ...state,
+          validationError: null,
+        });
       }
-    } catch (error) {
+    } catch (error: any) {
       setFieldValue(`files[${index}].file_token`, "");
-      toast.error("Something Went Wrong!!");
+      toast.error(error);
       console.log(error);
     } finally {
       setState((prev: any) => {
@@ -192,12 +216,50 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     }
   };
 
+  ///// Handle Select Document Type
+  const handleDocType = (
+    setFieldValue: (key: string, value: string) => void
+  ) => {
+    setFieldValue("files[0].file_token", "");
+    setFieldValue("files[0].file_name", "");
+  };
+
+  ///// handle Complete Reset
+  const handleCompleteReset = () => {
+    triggerFun();
+    setTimeout(() => {
+      setState((prev: any) => ({
+        ...prev,
+        districtId: initialValues.district_id,
+        ulbId: initialValues.ulb_id,
+      }));
+    }, 100);
+  };
+
+
+  //////// Handle Submit 
+  // const handleSubmit = (values: FormikValues) =>{
+  //   if(showConfirmation){
+  //     onSubmit(values)
+  //   }
+  //   setState({...state, showConfirmation: !showConfirmation})
+  // }
+
+
+  // //// Handle Cancel 
+  // const handleCancel = () => {
+  //   setState({...state, showConfirmation: !showConfirmation})
+  // }
+
   return (
     <>
       <Toaster />
+      {/* {showConfirmation && (
+        <ConfirmationPopup cancel={handleCancel} continue={handleSubmit} />
+      )} */}
       {showWarning && (
         <LosingDataConfirmPopup
-          continue={triggerFun}
+          continue={handleCompleteReset}
           cancel={handleBackAndReset}
         />
       )}
@@ -236,6 +298,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                       label="Project Summary"
                       name="summary"
                       placeholder="Enter Project Summary"
+                      maxlength={500}
                       required
                       readonly={readonly}
                     />
@@ -248,6 +311,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                       label="Project Description"
                       name="description"
                       placeholder="Enter Project Description"
+                      maxlength={500}
                       readonly={readonly}
                     />
                     <SelectForUpdateValueWithNoAPI
@@ -278,19 +342,6 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                       handler={(id: number | string) =>
                         handler(id, setFieldValue)
                       }
-                    />
-                    <Input
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.date}
-                      error={errors.date}
-                      touched={touched.date}
-                      label="Date"
-                      name="date"
-                      placeholder="Select the date"
-                      required
-                      type="date"
-                      readonly={readonly}
                     />
                     <SelectForNoApi
                       data={ulbs}
@@ -344,16 +395,15 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                       label="Address"
                       name="address"
                       placeholder="Enter Address"
+                      maxlength={500}
                       required
                       readonly={readonly}
                     />
-
-                    <div></div>
                     <div className="flex">
                       <div>
-                        <div className="flex">
+                        <div className="flex items-end">
                           <SelectForNoApi
-                            className="w-48 h-[32px] bg-[#4338ca] text-white border-[#4338ca]"
+                            className="h-[32px] bg-[#4338ca] text-white border-[#4338ca]"
                             data={docType}
                             onChange={handleChange}
                             value={values.files[0]?.document_type_id}
@@ -365,9 +415,10 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                               touched.files[0]?.document_type_id
                             }
                             readonly={readonly}
-                            label="Upload Document"
+                            label="Upload Document (jpeg, jpg, pdf)"
                             name="files[0].document_type_id"
                             required
+                            handler={() => handleDocType(setFieldValue)}
                           />
                           <input
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -377,6 +428,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                             type="file"
                             className="hidden"
                             disabled={readonly}
+                            accept={".jpg, .jpeg, .pdf"}
                           />
                           <label
                             className={`bg-primary_bg_indigo relative p-[6px] h-8 w-8 rounded mt-6 ml-1 ${readonly ? "bg-opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
@@ -403,17 +455,25 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                             )}
                           </label>
                         </div>
-                        {touched.files && errors.files ? (
+                        {!values?.files[0]?.file_token &&
+                        !validationError &&
+                        touched?.files &&
+                        errors?.files &&
+                        errors?.files[0]?.file_token ? (
                           <span className="text-red-500">
                             {errors.files[0]?.file_token}
                           </span>
+                        ) : validationError ? (
+                          <span className="text-red-500">
+                            {validationError}
+                          </span>
                         ) : (
-                          <span className="">{values.files[0]?.file_name}</span>
+                          <span>{values.files[0]?.file_name}</span>
                         )}
                       </div>
                       <div className="flex flex-col min-w-28 ml-2">
                         <span className="text-secondary text-sm mb-1 ml-2">
-                          Upload Letter
+                          Upload Letter (jpeg, jpg, pdf)
                           <span className="ml-2 text-red-500">*</span>
                         </span>
                         <input
@@ -424,12 +484,15 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                           onChange={(e: ChangeEvent<HTMLInputElement>) =>
                             handleUpload(e, setFieldValue, 1)
                           }
+                          accept={".jpg, .jpeg, .pdf"}
                         />
                         <label
                           className={`bg-primary_bg_indigo relative p-1 rounded ml-2 flex text-white justify-between px-2 ${readonly ? "bg-opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
                           htmlFor="letter"
                         >
-                          Upload
+                          {values.files[1]?.file_token && !inProgress2
+                            ? "Uploaded"
+                            : "Upload"}
                           {values.files[1]?.file_token && !inProgress2 ? (
                             <Image
                               src={Check}
@@ -450,7 +513,9 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                             />
                           )}
                         </label>
-                        {touched.files && errors.files ? (
+                        {!values.files[1].file_token &&
+                        touched.files &&
+                        errors.files[1]?.file_token ? (
                           <span className="text-red-500 ml-2">
                             {errors.files[1]?.file_token}
                           </span>
@@ -464,13 +529,13 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                   </div>
 
                   <div className="mt-4 flex items-center gap-5 justify-end">
-                    {!readonly ? (
+                    {!readonly && dirty ? (
                       <Button
                         onClick={() => handleBackAndReset(goBack)}
                         buttontype="button"
                         variant="cancel"
                       >
-                        Back
+                        Cancel
                       </Button>
                     ) : (
                       <Button
@@ -496,7 +561,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                           variant="primary"
                           className="animate-pulse"
                         >
-                          Save
+                          Submit
                         </Button>
                       </>
                     )}

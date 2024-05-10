@@ -39,19 +39,20 @@ const Input: React.FC<InputProps> = (props) => {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (!props.readonly && props.onChange) {
+      if((props?.maxlength && String(e.target.value).length <= props?.maxlength) || !props?.maxlength)
       props.onChange(e);
     }
   };
 
 
-  ////// Handle OnInput 
-  const handleOnInput = (e: ChangeEvent<HTMLInputElement>) => {
-    if(props?.maxlength){
-      e.target.value = Math.max(0, parseInt(e.target.value))
-      .toString()
-      .slice(0, props?.maxlength);
-    }
-  }
+  // ////// Handle OnInput 
+  // const handleOnInput = (e: ChangeEvent<HTMLInputElement>) => {
+  //   if(props?.maxlength){
+  //     e.target.value = Math.max(0, parseInt(e.target.value))
+  //     .toString()
+  //     .slice(0, props?.maxlength);
+  //   }
+  // }
 
   return (
     <>
@@ -72,7 +73,7 @@ const Input: React.FC<InputProps> = (props) => {
             onFocus={handleFocus}
             type={props.type}
             value={props?.value}
-            onInput={handleOnInput}
+            // onInput={handleOnInput}
             className={`text-primary h-[40px] p-3 bg-transparent outline-none  w-full`}
             name={props.name}
             id={fieldId}

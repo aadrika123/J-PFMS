@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Login from "./Login";
-import { GraphAnimation, RupeeAnimation } from "./LoginAnimation";
+import { LoginAnimation } from "./LoginAnimation";
 
 const HeroLoginPage = () => {
   return (
@@ -47,12 +47,7 @@ const HeroLoginPage = () => {
                 <div className="flex-shrink max-w-full px-4 w-full lg:w-1/2">
                   <div className="text-center  lg:mt-0">
                     {/* <AnimationHome /> */}
-                    <div className="relative">
-                      <GraphAnimation />
-                      <div className="absolute top-2/4 left-[30%]">
-                        <RupeeAnimation />
-                      </div>
-                    </div>
+                    <LoginAnimation/>
                   </div>
                 </div>
               </div>

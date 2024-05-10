@@ -77,7 +77,7 @@ class project_proposalsController {
     const destDir = `${rootDir}/${relativeDir}`;
 
     // generate bill numbers
-    record.date = new Date(record.date);
+    record.date = new Date();
     record.project_proposal_no =
       "PPN-" + this.generateUniqueRandomID(existingIDs);
 
@@ -153,7 +153,7 @@ class project_proposalsController {
     const destDir = `${rootDir}/${relativeDir}`;
 
     // generate bill numbers
-    record.date = new Date(record.date);
+    record.date = new Date();
 
     const docRecords = [];
     if (record?.files && record.files.length > 0) {
@@ -179,6 +179,7 @@ class project_proposalsController {
 
     }
     delete record.files;
+    console.log("first11111111111", docRecords)
     await this.dao.update(id, record, docRecords);
 
     // call dao

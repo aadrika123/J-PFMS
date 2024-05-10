@@ -4,13 +4,13 @@ import Popup from "./general/Popup";
 
 interface ConfirmationPopupProps {
   cancel: () => void;
-  continue: () => void;
-  message: string;
+  continue: (data?: any) => void;
+  message?: string;
 }
 
 const ConfirmationPopup: React.FC<ConfirmationPopupProps> = (props) => {
-  const handleContinueButton = () => {
-    props.continue();
+  const handleContinueButton = (data?: any) => {
+    props.continue(data);
     props.cancel();
   };
   return (
@@ -44,20 +44,22 @@ const ConfirmationPopup: React.FC<ConfirmationPopupProps> = (props) => {
           </defs>
         </svg>
         <span className="text-[20px] text-black my-8">
-          Are you sure you want to approve it?
+          {props.message
+            ? props.message
+            : "Are you sure you want to add proposal?"}
         </span>
         <div className="flex items-center">
           <Button className="mr-2" onClick={props.cancel} variant="cancel">
             Cancel
           </Button>
           <Button onClick={handleContinueButton} variant="primary">
-            Continue Anyway
+            Yes
           </Button>
         </div>
-        <div className="flex items-center mt-2">
+        {/* <div className="flex items-center mt-2">
           <span className="text-[#F00] mr-1">*</span>
           <span className="text-[11px] text-black">{props.message}</span>
-        </div>
+        </div> */}
       </div>
     </Popup>
   );

@@ -14,17 +14,18 @@ import SuccesfullConfirmPopup from "@/components/global/molecules/general/Succes
 import goBack from "@/utils/helper";
 import Loader from "@/components/global/atoms/Loader";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
+
 const AddProjectProposal = () => {
   const queryClient = new QueryClient();
-  const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] = useWorkingAnimation();
+  const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
+    useWorkingAnimation();
   const initialValues: ProjectProposalSchema = {
     district_id: 0,
     description: "",
     summary: "",
     state_id: 1,
     address: "",
-    date: "",
-    pin_code: undefined,
+    pin_code: "",
     ulb_id: 0,
     ward_id: 0,
     user_id: 1,
@@ -49,7 +50,7 @@ const AddProjectProposal = () => {
 
   ///////////////// Handling Submit /////////////
   const handleSubmit = async (values: FormikValues) => {
-    activateWorkingAnimation()
+    activateWorkingAnimation();
     const res = await axios({
       url: `${PFMS_URL.PROJ_RPOPOSAL_URL.create}`,
       method: "POST",
@@ -72,14 +73,27 @@ const AddProjectProposal = () => {
       console.log(error);
     },
     onSettled: () => {
-      hideWorkingAnimation()
+      hideWorkingAnimation();
       queryClient.invalidateQueries([`${PFMS_URL.PROJ_RPOPOSAL_URL.get}`]);
     },
   });
 
+  ////// Handle Cancel
+  // const handleCancel = () => {
+  //   setState({ ...state, showConfirmation: !showConfirmation });
+  // };
+
+  // //// Handle onSubmit
+  // const handleOnSubmit = (values: FormikValues) => {
+  //   mutate(values)
+  // }
+
   return (
     <>
       {workingAnimation}
+      {/* {showConfirmation && (
+        <ConfirmationPopup cancel={handleCancel} continue={mutate} />
+      )} */}
       {showNotification && (
         <SuccesfullConfirmPopup message="Recorded Successfully" />
       )}

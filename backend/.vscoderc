@@ -1,0 +1,1 @@
+curl --silent --output /dev/null localhost:3000 || npm run dev

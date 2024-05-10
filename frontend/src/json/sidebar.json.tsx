@@ -64,15 +64,9 @@ export const sidebarLinks: SidebarLinksProps = {
           icon: <Image src={technical} alt="engineering-section" width={100} height={100} />,
           path: "/engineering-section",
         //   roles: [ROLES.ACC_DEP_MANAGER, ROLES.ACC_DEP_ACCOUNTANT, ROLES.PROJECT_DIR_FINANCE],
-          subModules: [
-            {
-              moduleName: "Technical Section",
-              path: "/engineering-section/technical-section",
-            },
-          ],
         },
         {
-          moduleName: "E-Measurement",
+          moduleName: "e-Measurement",
           icon: (
             <Image src={measure} alt="e-measurement" width={100} height={100} />
           ),

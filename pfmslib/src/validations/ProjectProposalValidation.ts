@@ -12,13 +12,12 @@ export const projectProposalValidationSchema = Yup.object({
     .required("district is required")
     .integer()
     .min(1, "plsease select district"),
-  descripton: Yup.string(),
-  summary: Yup.string().required("summary is required."),
+  description: Yup.string().matches(/^[A-Za-z0-9_(),\s']*$/, "special character not allowed"),
+  summary: Yup.string().required("summary is required.").matches(/^[A-Za-z0-9_(),\s']*$/, "special character not allowed"),
   state_id: Yup.number()
     .required("state is required")
     .integer()
     .min(1, "plsease select state"),
-  date: Yup.string().required("date is required."),
   ulb_id: Yup.number()
     .required("ULB is required")
     .integer()
@@ -28,7 +27,7 @@ export const projectProposalValidationSchema = Yup.object({
     .integer()
     .min(1, "plsease select ward"),
   user_id: Yup.number().required("user is required"),
-  address: Yup.string().required("Address is required"),
+  address: Yup.string().required("Address is required").matches(/^[A-Za-z0-9_(),:-\s']*$/, "special character not allowed"),
   pin_code: Yup.string()
     .required("Pin Code is required")
     .test("pin_code", (value, validationContext) => {

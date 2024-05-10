@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 // import bill_payment_entry_seed from "./seeder/bill_payment_entry_seed";
-import foreign_wrapper from "./seeder/foreign_wrappter";
+import foreign_wrapper from "./seeder/foreign_wrapper";
 import project_proposal_seeder from "./seeder/projectProposal/project_proposal_seeder";
 import project_proposal_stages_seeder from "./seeder/projectProposal/project_proposal_stages_seeder";
 import doc_type_seeder from "./seeder/masters/doc_type_seeder";

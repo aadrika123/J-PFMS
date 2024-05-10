@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import TableWithFeatures from "./TableWithFeatures";
-import ViewButton from "./ViewButton";
+import ViewButton from "../../../global/atoms/ViewButton";
 import BillLayout from "./BillLayout";
 import Image from "next/image";
 import list from "@/assets/svg/list.svg";

@@ -9,6 +9,7 @@ class DistrictDao {
     const data = await prisma.$queryRaw`
         select id::int, district_name as name
         from district_masters 
+        order by name asc
         `;
 
     return generateRes(data);
@@ -21,6 +22,7 @@ class DistrictDao {
     select id::int, district_name as name
     from district_masters
     where state_id = ${stateId}
+    order by name asc
     `;
 
     return generateRes(data);

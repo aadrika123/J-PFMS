@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import TableWithFeatures from "../ProjectProposalVerify/TableWithFeatures";
-import ViewButton from "../ProjectProposalVerify/ViewButton";
+import ViewButton from "@/components/global/atoms/ViewButton";
 import { HeaderWidget } from "@/components/Helpers/Widgets/HeaderWidget";
 import { PFMS_URL } from "@/utils/api/urls";
 
