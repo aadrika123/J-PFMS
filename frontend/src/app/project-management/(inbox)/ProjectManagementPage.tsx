@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import list from "@/assets/svg/list.svg";
 import details from "@/assets/svg/details.svg";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import SimpleTable from "@/components/global/atoms/SimpleTable";
 
@@ -20,12 +20,15 @@ import SearchPanel from "./SearchPanel";
 import qs from "qs";
 import { usePagination } from "@/hooks/Pagination";
 import LoaderSkeleton from "@/components/global/atoms/LoaderSkeleton";
+import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 
 
 
 const ProjectManagementPage = () => {
-
-  const pathname = usePathname();
+    const router = useRouter();
+    const [workingAnimation, activateWorkingAnimation] = useWorkingAnimation();
+  
+  const pathName = usePathname();
 
   const { data: ulbList } = useUlbList();
 
@@ -51,7 +54,8 @@ const ProjectManagementPage = () => {
   ];
 
   const onViewButtonClick = (id: number) => {
-    console.log("View button click for id: ", id);
+    activateWorkingAnimation();
+    router.push(`${pathName}/view/${id}?mode=view`);
   };
 
 
@@ -95,7 +99,7 @@ const ProjectManagementPage = () => {
 
   return (
     <>
-    
+    {workingAnimation}
     <div className="flex items-center justify-between border-b-2 pb-4 mb-4">
         <Button
           variant="cancel"
@@ -113,16 +117,16 @@ const ProjectManagementPage = () => {
         <LinkWithLoader href={`/bills-verify`}>
           <Button
             variant="primary"
-            className={`mr-4 ${pathname.includes("outbox") && "bg-gray-200 text-gray-500"}`}
+            className={`mr-4 ${pathName.includes("outbox") && "bg-gray-200 text-gray-500"}`}
           >
             {Icons.outbox}
             Inbox
           </Button>
         </LinkWithLoader>
-        <LinkWithLoader href={`${pathname.includes('bills-verify/view') ? '/bills-verify/outbox' : pathname + '/outbox'}`}>
+        <LinkWithLoader href={`${pathName.includes('bills-verify/view') ? '/bills-verify/outbox' : pathName + '/outbox'}`}>
           <Button
             variant="primary"
-            className={`${!pathname.includes("outbox") && "bg-gray-200 text-gray-500"}`}
+            className={`${!pathName.includes("outbox") && "bg-gray-200 text-gray-500"}`}
           >
             {Icons.outbox}
             Outbox

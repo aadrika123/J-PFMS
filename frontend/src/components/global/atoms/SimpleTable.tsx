@@ -78,8 +78,6 @@ const SimpleTable = <T,>({ columns, data, onViewButtonClick }: SimpleTableProps<
           })}
           <td>
             <div className="flex justify-center">
-              {/* <ViewIconButton onClick={() => onViewButtonClick(row['id' as keyof typeof row])} variant="view"/> */}
-
               <Button
                 variant="primary"
                 className="py-2 px-4"
