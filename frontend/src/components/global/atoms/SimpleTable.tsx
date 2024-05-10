@@ -21,8 +21,8 @@ const SimpleTable = <T,>({ columns, data, onViewButtonClick }: SimpleTableProps<
 
   const headers = columns.map((column, index) => {
     return (
-      <th key={`headCell-${index}`} className="border border-zinc-400 bg-gray-200 text-black">
-        <div className="flex gap-2 font-medium text-center">
+      <th key={`headCell-${index}`} className="bg-gray-200 text-black">
+        <div className="flex gap-2 font-medium justify-center">
           {column.caption}
         </div>
       </th>
@@ -31,14 +31,14 @@ const SimpleTable = <T,>({ columns, data, onViewButtonClick }: SimpleTableProps<
 
   const rows = !data?.length ? (
     <tr>
-      <td colSpan={columns.length} className="text-center">
+      <td colSpan={columns.length+1} className="text-center">
         No data
       </td>
     </tr>
   ) : (
     data?.map((row, index) => {
       return (
-        <tr key={`row-${index}`} className="border border-zinc-400 text-secondary">
+        <tr key={`row-${index}`} className="border border-zinc-100 text-secondary">
           {columns.map((column, index2) => {
 
             let value;
@@ -56,13 +56,18 @@ const SimpleTable = <T,>({ columns, data, onViewButtonClick }: SimpleTableProps<
 
 
             if (value instanceof Date) {
+              // value = new Date();
               const value1 = dayjs(value).format("DD MMM YYYY");
-              return <td key={`cell-${index2}`}>{value1}</td>;
+              return <td key={`cell-${index2}`}>
+                <div className="flex justify-center">
+                    {value1}
+                  </div>
+                </td>;
             }
             else {
               const value1 = value as string;
               return (
-                <td key={`cell-${index2}`} className="border border-zinc-400">
+                <td key={`cell-${index2}`}>
                   <div className="flex justify-center">
                     {value1}
                   </div>
@@ -91,16 +96,16 @@ const SimpleTable = <T,>({ columns, data, onViewButtonClick }: SimpleTableProps<
 
   return (
     <>
-      <div className="overflow-x-auto border-[2px] border-zinc-400">
+      <div className="overflow-x-auto">
         <table className="table table-md">
 
-          <thead className="  text-[1rem] bg-primary_bg_indigo text-white border border-t-2 border-zinc-400 ">
+          <thead className="  text-[1rem] bg-primary_bg_indigo text-white">
             <tr>
 
               {headers}
 
-              <th className="border  border-zinc-400  font-medium bg-gray-200 text-black">
-                <div className="flex gap-2">
+              <th className="font-medium bg-gray-200 text-black">
+                <div className="flex justify-center">
                   <span>Actions</span>
                 </div>
               </th>

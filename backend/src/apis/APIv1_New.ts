@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import multerUpload from "./middleware/_multer";
-import {User} from "pfmslib";
+import { User } from "pfmslib";
 
 
 
@@ -19,7 +19,7 @@ export interface APIv1Response {
   data: any;
 }
 
-export class APIv1 {
+export class APIv1_New {
 
   protected apiVersion = "v1";
   protected baseUrl;
@@ -29,7 +29,7 @@ export class APIv1 {
   protected apiCount = 0;
 
   constructor(routeId: string, app: express.Application, routeName: string) {
-    this.routeId = routeId.padStart(3,"0");
+    this.routeId = routeId.padStart(3, "0");
     this.app = app;
     this.routeName = routeName;
     this.baseUrl = `${process.env.BASE_URL}/${this.apiVersion}/${this.routeName}`;
@@ -50,32 +50,27 @@ export class APIv1 {
       .post(async (req: Request, res: Response) => {
         multerUpload.fields(fields)(req, res, () => {
           this.apiWrapper(req, res, this.generateAPIId(), handler);
-        });        
+        });
       });
   }
 
   private generateAPIId = () => {
-    return `${this.routeId}`+`${++this.apiCount}`.padStart(3, "0");
+    return `${this.routeId}` + `${++this.apiCount}`.padStart(3, "0");
   }
 
   protected apiWrapper = async (req: Request, res: Response, apiId: string, handler: (req: Request) => Promise<APIv1Response>): Promise<Response> => {
-    try{
 
-        
-        console.log(`api call (${req.path})`);
+    return new Promise((resolve) => {
+      console.log(`api call (${req.path})`);
 
-        const user = new User(req.body.auth);
-        req.body.user = user;
-                
-        // invoke the before-middlewares if any
+      const user = new User(req.body.auth);
+      req.body.user = user;
 
-        const result: APIv1Response = await handler(req);
+      // invoke the before-middlewares if any
 
+      handler(req).then((result: APIv1Response) => {
         // invoke the after-middlewares if any
-
         console.log("api finished");
-
-
         if (result.code == 500) {
           console.log(result);
         }
@@ -88,27 +83,29 @@ export class APIv1 {
             action: req.method,
           },
         };
-        return res.status(result.code).json(finalResponse);
-  
-    } catch (err: any) {
-      
-      // log the err object and other information
+        res.status(result.code).json(finalResponse);
+        resolve(res);
+      }).catch((err: any) => {
 
-      // extract the error message and send to frontend
-      const error = err as Error;
+        // log the err object and other information
 
-      console.log(error);
-      
-      const finalResponse = {
-        status: false,
-        data: error.message,
-        "meta-data": {
-          apiId: apiId,
-          version: this.apiVersion,
-          action: req.method,
-        },
-      };
-      return res.status(500).json(finalResponse);  
-    }
+        // extract the error message and send to frontend
+        const error = err as Error;
+
+        console.log(error);
+
+        const finalResponse = {
+          status: false,
+          data: error.message,
+          "meta-data": {
+            apiId: apiId,
+            version: this.apiVersion,
+            action: req.method,
+          },
+        };
+        res.status(500).json(finalResponse);
+        resolve(res);
+      });
+    });
   }
 }

@@ -1,10 +1,11 @@
 import express from "express";
-import FinanceRoute from "./apis/router";
+import FinanceRoute from "./router";
 import cors from "cors";
 import {
   resourcesUsage,
   responseTime,
 } from "./apis/middleware/responseTime";
+import ViizzDevApis from "./apis/viizz_dev_apis";
 
 const app = express();
 app.use("/public/", express.static('public'));
@@ -16,5 +17,8 @@ app.use(resourcesUsage);
 
 /// JUIDCO_FINANCE ///
 new FinanceRoute(app);
+
+(new ViizzDevApis(app, 500, 600)).register();
+
 
 export default app;
