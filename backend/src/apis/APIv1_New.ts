@@ -36,20 +36,26 @@ export class APIv1_New {
   }
 
   addGetRoute(path: string, handler: (req: Request) => Promise<APIv1Response>): void {
+    const apiId = this.generateAPIId();
+  
     this.app.route(`${this.baseUrl}/${path}`)
-      .get((req: Request, res: Response) => this.apiWrapper(req, res, this.generateAPIId(), handler));
+      .get((req: Request, res: Response) => this.apiWrapper(req, res, apiId, handler));
   }
 
   addPostRoute(path: string, handler: (req: Request) => Promise<APIv1Response>): void {
+    
+    const apiId = this.generateAPIId();
     this.app.route(`${this.baseUrl}/${path}`)
-      .post((req: Request, res: Response) => this.apiWrapper(req, res, this.generateAPIId(), handler));
+      .post((req: Request, res: Response) => this.apiWrapper(req, res, apiId, handler));
   }
 
   addFormDataPostRoute(path: string, handler: (req: Request) => Promise<APIv1Response>, fields: any[]): void {
+    const apiId = this.generateAPIId();
+    
     this.app.route(`${this.baseUrl}/${path}`)
       .post(async (req: Request, res: Response) => {
         multerUpload.fields(fields)(req, res, () => {
-          this.apiWrapper(req, res, this.generateAPIId(), handler);
+          this.apiWrapper(req, res, apiId, handler);
         });
       });
   }
@@ -63,6 +69,7 @@ export class APIv1_New {
     return new Promise((resolve) => {
       console.log(`api call (${req.path})`);
 
+      console.log(req.body.auth);
       const user = new User(req.body.auth);
       req.body.user = user;
 

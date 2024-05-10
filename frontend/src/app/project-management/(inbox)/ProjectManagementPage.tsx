@@ -7,7 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 
 import SimpleTable from "@/components/global/atoms/SimpleTable";
 
-import { useProjectProposalList, useUlbList } from "@/hooks/data/ProjectProposalsHooks";
+import { useProjectProposalsInboxList, useUlbList } from "@/hooks/data/ProjectProposalsHooks";
 import StandaloneDropdownList from "@/components/global/atoms/StandAloneDropDownList";
 import { FilterButton } from "@/components/global/atoms/FilterButton";
 
@@ -34,13 +34,16 @@ const ProjectManagementPage = () => {
 
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const [limit, page, paginator] = usePagination();
+  const [limit, page, paginator, resetPaginator] = usePagination();
 
-  const { isFetching, isLoading, data: projectProposalData } = useProjectProposalList(searchQuery, limit, page);
+  const { isFetching, isLoading, data: projectProposalData } = useProjectProposalsInboxList(searchQuery, limit, page);
 
   const [projectProposals, setProjectProposals] = useState<[]>();
 
-  const searchPanelItems = [{ name: "project_proposal_no", caption: "Project Proposal Number" },];
+  const searchPanelItems = [
+    { name: "project_proposal_no", caption: "Project Proposal Number" },
+    { name: "ulb_name", caption: 'Ulb Name'}
+  ];
   const [searchPanelItemValues, setSearchPanelItemValues] = useState<any>({});
 
   const [totalResults, setTotalResults] = useState<number>();
@@ -49,8 +52,9 @@ const ProjectManagementPage = () => {
 
   const columns = [
     { name: "id", caption: "Sr. No.", width: "w-[5%]" },
-    { name: "project_proposal_no", caption: "Project Proposal No.", width: "w-[20%]" },
     { name: "date", caption: "Date", width: "w-[20%]", type: "date" },
+    { name: "project_proposal_no", caption: "Project Proposal No.", width: "w-[20%]" },
+    { name: "ulb_name", caption:"Ulb Name", width: "w-[20%]"}
   ];
 
   const onViewButtonClick = (id: number) => {
@@ -68,11 +72,20 @@ const ProjectManagementPage = () => {
     setProjectProposals(projectProposalData?.records);
 
     // populate the items to be displayed in the search panel
-    const project_proposal_nos = projectProposalData?.project_proposal_no?.map((item: any) => item.project_proposal_no);
-    if (project_proposal_nos) setSearchPanelItemValues({ ...searchPanelItemValues, project_proposal_no: project_proposal_nos });
 
+    let newSearchPanelItemValues = {...searchPanelItemValues};
+
+    const project_proposal_nos = projectProposalData?.project_proposal_no?.map((item: any) => item.project_proposal_no);
+    if (project_proposal_nos) newSearchPanelItemValues = {...newSearchPanelItemValues, project_proposal_no: project_proposal_nos }
+
+
+    const ulb_names = projectProposalData?.ulb_name?.map((item: any) => item.ulb_name);
+    if (ulb_names) newSearchPanelItemValues = { ...newSearchPanelItemValues, ulb_name: ulb_names }
+
+    setSearchPanelItemValues(newSearchPanelItemValues);
 
   }, [projectProposalData]);
+
 
 
 
@@ -90,11 +103,13 @@ const ProjectManagementPage = () => {
     // console.log("Filters updated: ", filters);
     const q = qs.stringify(filters);
     setSearchQuery(q);
+    resetPaginator();
   }
 
   const onRemoveFilter = () => {
     console.log("Filters removed!");
     setSearchQuery("");
+    resetPaginator();
   }
 
   return (
@@ -110,7 +125,7 @@ const ProjectManagementPage = () => {
           <b>Back</b>
         </Button>
         <h2 className="text-black">
-          <b>Bills Verify</b>
+          <b>Project Proposal List</b>
         </h2>
       </div>
       <div className="flex items-center mb-4">
@@ -170,7 +185,7 @@ const ProjectManagementPage = () => {
             {
             (isFetching || isLoading) ?
             <LoaderSkeleton rowCount={limit}/>:
-            <SimpleTable columns={columns} data={projectProposals} onViewButtonClick={onViewButtonClick} />
+            <SimpleTable columns={columns} data={projectProposals} onViewButtonClick={onViewButtonClick} rowIndexStart={(page-1)*limit+1}/>
             }
 
 

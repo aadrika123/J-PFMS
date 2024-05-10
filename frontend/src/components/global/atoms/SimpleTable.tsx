@@ -13,11 +13,12 @@ export interface ColumnProps {
 interface SimpleTableProps<T> {
   columns: Array<ColumnProps>;
   data?: T[];
+  rowIndexStart?: number;
   onViewButtonClick: (id: number) => void;
 }
 
 
-const SimpleTable = <T,>({ columns, data, onViewButtonClick }: SimpleTableProps<T>) => {
+const SimpleTable = <T,>({ columns, data, onViewButtonClick, rowIndexStart }: SimpleTableProps<T>) => {
 
   const headers = columns.map((column, index) => {
     return (
@@ -42,7 +43,10 @@ const SimpleTable = <T,>({ columns, data, onViewButtonClick }: SimpleTableProps<
           {columns.map((column, index2) => {
 
             let value;
-            if (column.nested) {
+            if(column.name == "id"){
+              value = (rowIndexStart || 0) + index;
+            }
+            else if (column.nested) {
               const ob = row[column.name as keyof typeof row] as object;
               if (column.member) {
                 value = ob[column.member as keyof typeof ob];

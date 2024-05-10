@@ -47,3 +47,5 @@ next-env.d.ts
 /magic.rar
 
 /prisma/migrations
+
+next.config.js
