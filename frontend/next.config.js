@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
-module.exports = {
+const nextConfig = {
     basePath: '/pfms',
     env: {
-      backend: 'http://localhost:8000',
+      backend: 'http://jharkhandegov.com:8000',
     },
      async redirects() {
       return [
@@ -15,3 +15,4 @@ module.exports = {
     },
   }
 
+module.exports = nextConfig;

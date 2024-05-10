@@ -8,7 +8,7 @@
   "main": "src/server.ts",
   "scripts": {
     "test": "jest",
-    "build": "rm -rf ./build && ./proto/build.sh && npx tsc && cp -R ./src/grpc/proto ./build/src/grpc",
+    "build": "rm -rf ./build && ./proto/build.sh && npx tsc",
     "lint": "eslint src/",
     "start": "node build/src/server.js",
     "dev": "nodemon src/server.ts",
@@ -16,15 +16,12 @@
     "migrate_win": "rmdir /s .\\prisma\\migrations &&  npx prisma migrate dev --name init",
     "magic": "node magic/index.js",
     "doc": "python3 magic/gen_doc.py",
-    "pdftest": "node typesettings/pdf.ts",
-    "buildgrpc": "./proto/build.sh",
-    "buildgrpc_win": ".\\proto\\build.bat"
+    "pdftest": "node typesettings/pdf.ts"
   },
   "author": "Aadrika Enterprises",
   "license": "ISC",
   "dependencies": {
     "@faker-js/faker": "^8.3.1",
-    "@grpc/grpc-js": "^1.10.1",
     "@prisma/client": "^5.8.1",
     "@types/crypto-js": "^4.2.2",
     "bcrypt": "^5.1.1",
@@ -37,8 +34,6 @@
     "dotenv": "^16.0.1",
     "escape-latex": "^1.2.0",
     "express": "^4.18.1",
-    "grpc_tools_node_protoc_ts": "^5.3.3",
-    "grpc-tools": "^1.12.4",
     "ip": "^2.0.1",
     "joi": "^17.12.0",
     "jsonwebtoken": "^9.0.2",

@@ -25,10 +25,15 @@ function Box({ children }: PropsWithChildren<unknown>) {
 }
 
 
-const LoaderSkeleton = () => {
+interface LoaderSkeletonProps{
+  rowCount?: number;
+}
+
+const LoaderSkeleton = (props: LoaderSkeletonProps) => {
+
   return (
     <>
-      <Skeleton wrapper={Box} count={10} duration={1}/>
+      <Skeleton wrapper={Box} count={props.rowCount || 10} duration={1}/>
     </>
   );
 };

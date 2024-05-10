@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <StoreProvider>
       <ReactQueryClientProvider>
-        <html lang="en">
+        <html lang="en" data-theme="sample">
           <body className={inter.className}>{children}</body>
         </html>
       </ReactQueryClientProvider>

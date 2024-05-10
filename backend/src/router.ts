@@ -1,12 +1,12 @@
 import express from "express";
-import AuthRoute from "./route/auth/Auth";
-import BillsRoute from "./route/payments/ProjectPerposalsRoute";
-import FileHandlerRoute from "./route/FileHandlerRoute";
+import AuthRoute from "./apis/route/auth/Auth";
+import BillsRoute from "./apis/route/payments/ProjectPerposalsRoute";
+import FileHandlerRoute from "./apis/route/FileHandlerRoute";
 // import BillVerificationRoute from "./route/payments/BillVerificationRoute";
-import DashboardRoute from "./route/dashboard/dashboardRoute";
-import DistrictRoute from "./route/masters/districtRoute";
-import StateRoute from "./route/masters/stateRoute";
-import UlbRoute from "./route/masters/ulbRoute";
+import DashboardRoute from "./apis/route/dashboard/dashboardRoute";
+import DistrictRoute from "./apis/route/masters/districtRoute";
+import StateRoute from "./apis/route/masters/stateRoute";
+import UlbRoute from "./apis/route/masters/ulbRoute";
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +27,7 @@ import UlbRoute from "./route/masters/ulbRoute";
 class FinanceRoute {
 
   constructor(app: express.Application) {
+
     (new FileHandlerRoute("0", app)).configure();
 
     (new AuthRoute()).configure(app, "1");  // 1
@@ -42,7 +43,8 @@ class FinanceRoute {
 
     // (new BillVerificationRoute("54", app).configure());
 
-    (new DashboardRoute("55", app).configure());
+    (new DashboardRoute("55", app)).configure();
+
   }
 }
 
