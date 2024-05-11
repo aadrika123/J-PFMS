@@ -5,6 +5,8 @@ import axios from "@/lib/axiosConfig";
 
 const projectProposalsApi = `${baseURL}/project-management/get`;
 const projectProposalsInboxApi = `${baseURL}/project-management/inbox`;
+const projectProposalsOutboxApi = `${baseURL}/project-management/outbox`;
+
 
 export const useProjectProposalList = (searchQuery: string, limit: number, page: number) => {
     return useQuery(["project-proposals", searchQuery, limit, page], (): Promise<any> => {
@@ -41,6 +43,23 @@ export const useProjectProposalList = (searchQuery: string, limit: number, page:
     });
   }
 
+
+  export const useProjectProposalsOutboxList = (searchQuery: string, limit: number, page: number) => {
+    return useQuery(["project-proposals", searchQuery, limit, page], (): Promise<any> => {
+      return new Promise((resolve, reject) => {
+        axios.get(`${projectProposalsOutboxApi}?limit=${limit}&page=${page}&order=-1&${searchQuery && searchQuery.length>0?`&${searchQuery}`:''}`).then(resp => {
+          console.log(resp.data.message);
+          if (!resp.data.status) {
+            reject(resp.data.message);
+          } else {
+            resolve(resp.data.data);
+          }
+        }).catch((reason) => {
+          reject(reason);
+        });
+      });
+    });
+  }
 
 
   export const useUlbList = () => {

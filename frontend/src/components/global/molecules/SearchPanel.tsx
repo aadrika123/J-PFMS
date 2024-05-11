@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from "react";
 
 import { Accordion, AccordionItem as Item } from '@szhsin/react-accordion';
-import DebouncedSearchForSearchPanel from "./DebouncedSearchForSearchPanel";
-import { ResetButton } from "./ResetButton";
-import CloseButton from "./CloseButton";
+import DebouncedSearchForSearchPanel from "../../../app/project-management/(inbox)/DebouncedSearchForSearchPanel";
+import { ResetButton } from "../../../app/project-management/(inbox)/ResetButton";
+import CloseButton from "../../../app/project-management/(inbox)/CloseButton";
 
 // import "../css/szh-accordion.css";
 
