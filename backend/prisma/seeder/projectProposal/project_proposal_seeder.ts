@@ -15,6 +15,7 @@ const project_proposal_seeder = async () => {
       ward_id: 31,
       user_id: 172,
       pin_code: 234565,
+      execution_body: 4,
       address: faker.address.city()
     };
     await prisma.project_proposals.create({ data: record });

@@ -14,9 +14,11 @@ import SuccesfullConfirmPopup from "@/components/global/molecules/general/Succes
 import goBack from "@/utils/helper";
 import Loader from "@/components/global/atoms/Loader";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
+import { useUser } from "@/components/global/molecules/general/useUser";
 
 const AddProjectProposal = () => {
   const queryClient = new QueryClient();
+  const user = useUser()
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
     useWorkingAnimation();
   const initialValues: ProjectProposalSchema = {
@@ -28,7 +30,8 @@ const AddProjectProposal = () => {
     pin_code: "",
     ulb_id: 0,
     ward_id: 0,
-    user_id: 1,
+    user_id: user?.getUserId(),
+    execution_body: 4,
     files: [
       {
         document_type_id: 1,
@@ -50,6 +53,10 @@ const AddProjectProposal = () => {
 
   ///////////////// Handling Submit /////////////
   const handleSubmit = async (values: FormikValues) => {
+    if (values.execution_body !== 4) {
+      delete values.ulb_id, delete values.ward_id;
+    }
+
     activateWorkingAnimation();
     const res = await axios({
       url: `${PFMS_URL.PROJ_RPOPOSAL_URL.create}`,

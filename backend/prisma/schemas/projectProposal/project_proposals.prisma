@@ -2,19 +2,20 @@
 model project_proposals {
   id Int @id @default(autoincrement())
 
-  ulb_id Int
+  ulb_id Int?
 
-  project_proposal_no String
-  date                DateTime @db.Date
-  summary             String
-  description         String
-  state_id            Int
-  district_id         Int
-  ward_id             Int
-  address             String
-  pin_code            Int
-  user_id             Int
-
+  project_proposal_no        String
+  date                       DateTime                     @db.Date
+  summary                    String
+  description                String
+  state_id                   Int
+  district_id                Int
+  ward_id                    Int?
+  address                    String
+  pin_code                   Int
+  user_id                    Int
+  execution_body             Int
+  
   project_proposal_checkings project_proposal_checkings[]
   project_proposal_documents project_proposal_documents[]
 

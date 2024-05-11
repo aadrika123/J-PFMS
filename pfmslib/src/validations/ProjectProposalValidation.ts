@@ -1,9 +1,15 @@
 import * as Yup from "yup";
+import { executionBody } from "../lists/jsonList";
+
+ //////// Check Execution Body is ULB or Not
+ const isUlb = (id: number) => {
+  return executionBody.find((i) => i.id === id)?.name === "ULB";
+};
 
 const fileTypeSchema = Yup.object({
   document_type_id: Yup.number().required("doc type id is required"),
   file_token: Yup.string().required("please upload the document"),
-  file_name: Yup.string().optional()
+  file_name: Yup.string().optional(),
 });
 
 // Validating request data
@@ -12,22 +18,36 @@ export const projectProposalValidationSchema = Yup.object({
     .required("district is required")
     .integer()
     .min(1, "plsease select district"),
-  description: Yup.string().matches(/^[A-Za-z0-9_(),\s']*$/, "special character not allowed"),
-  summary: Yup.string().required("summary is required.").matches(/^[A-Za-z0-9_(),\s']*$/, "special character not allowed"),
+  description: Yup.string().matches(
+    /^[A-Za-z0-9_(),\s']*$/,
+    "special character not allowed"
+  ),
+  summary: Yup.string()
+    .required("summary is required.")
+    .matches(/^[A-Za-z0-9_(),\s']*$/, "special character not allowed"),
   state_id: Yup.number()
     .required("state is required")
     .integer()
     .min(1, "plsease select state"),
+    execution_body: Yup.number().required("execution body required"),
   ulb_id: Yup.number()
-    .required("ULB is required")
     .integer()
-    .min(1, "plsease select ulb"),
+    .when('execution_body', {
+      is: 4,
+      then: (schema) => schema.min(1, "plsease select ulb").required("ulb is required"),
+      otherwise: (schema) => schema.optional()
+    }),
   ward_id: Yup.number()
-    .required("ward is required")
-    .integer()
-    .min(1, "plsease select ward"),
+  .integer()
+  .when('execution_body', {
+    is: 4,
+    then: (schema) => schema.min(1, "plsease select ward").required("ward is required"),
+    otherwise: (schema) => schema.optional()
+  }),
   user_id: Yup.number().required("user is required"),
-  address: Yup.string().required("Address is required").matches(/^[A-Za-z0-9_(),:-\s']*$/, "special character not allowed"),
+  address: Yup.string()
+    .required("address is required")
+    .matches(/^[A-Za-z0-9_(),:-\s']*$/, "special character not allowed"),
   pin_code: Yup.string()
     .required("Pin Code is required")
     .test("pin_code", (value, validationContext) => {
