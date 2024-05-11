@@ -3,9 +3,14 @@ import React, { ReactNode, useState } from "react";
 const defaultPage = 1;
 const defaultLimit = 10;
 
-export function usePagination(): [number, number, ReactNode] {
+export function usePagination(): [number, number, ReactNode, () => void] {
   const [page, setPage] = useState<number>(defaultPage);
   const [limit, setLimit] = useState<number>(defaultLimit);
+
+  const resetPaginator = () => {
+    setPage(defaultPage);
+    setLimit(defaultLimit);
+  }
 
   const [pageFieldValue, setPageFieldValue] = useState<number>(defaultPage);
 
@@ -81,5 +86,5 @@ export function usePagination(): [number, number, ReactNode] {
     </div>
   );
 
-  return [limit, page, paginator];
+  return [limit, page, paginator, resetPaginator];
 }

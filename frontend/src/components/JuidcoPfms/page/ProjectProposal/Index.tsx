@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { HeaderWidget } from "@/components/Helpers/Widgets/HeaderWidget";
-import ProjectManagementPage from "@/app/project-management/(inbox)/ProjectManagementPage";
+import ProjectManagementInboxPage from "@/app/project-management/(inbox)/ProjectManagementInboxPage";
 // import { PFMS_URL } from "@/utils/api/urls";
 // import ViewButton from "@/components/global/atoms/ViewButton";
 // import TableWithFeatures from "@/components/global/atoms/TableWithFeatures";
@@ -35,7 +35,7 @@ const HeroProjectProposal = () => {
     <>
       <HeaderWidget variant="add" title="Project Proposal" />
       <div className="shadow-lg p-4 border">
-        <ProjectManagementPage />
+        <ProjectManagementInboxPage />
 
         {/* <TableWithFeatures
           center

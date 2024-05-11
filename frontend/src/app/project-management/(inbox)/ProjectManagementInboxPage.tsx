@@ -7,8 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 
 import SimpleTable from "@/components/global/atoms/SimpleTable";
 
-import { useProjectProposalList, useUlbList } from "@/hooks/data/ProjectProposalsHooks";
-import StandaloneDropdownList from "@/components/global/atoms/StandAloneDropDownList";
+import { useProjectProposalsInboxList } from "@/hooks/data/ProjectProposalsHooks";
 import { FilterButton } from "@/components/global/atoms/FilterButton";
 
 
@@ -16,7 +15,7 @@ import Button from "@/components/global/atoms/Button";
 import goBack from "@/utils/helper";
 import { Icons } from "@/assets/svg/icons";
 import { LinkWithLoader } from "@/components/global/atoms/LinkWithLoader";
-import SearchPanel from "./SearchPanel";
+import SearchPanel from "../../../components/global/molecules/SearchPanel";
 import qs from "qs";
 import { usePagination } from "@/hooks/Pagination";
 import LoaderSkeleton from "@/components/global/atoms/LoaderSkeleton";
@@ -24,23 +23,24 @@ import { useWorkingAnimation } from "@/components/global/molecules/general/useWo
 
 
 
-const ProjectManagementPage = () => {
-    const router = useRouter();
-    const [workingAnimation, activateWorkingAnimation] = useWorkingAnimation();
-  
-  const pathName = usePathname();
+const ProjectManagementInboxPage = () => {
+  const router = useRouter();
+  const [workingAnimation, activateWorkingAnimation] = useWorkingAnimation();
 
-  const { data: ulbList } = useUlbList();
+  const pathName = usePathname();
 
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const [limit, page, paginator] = usePagination();
+  const [limit, page, paginator, resetPaginator] = usePagination();
 
-  const { isFetching, isLoading, data: projectProposalData } = useProjectProposalList(searchQuery, limit, page);
+  const { isFetching, isLoading, data: projectProposalData } = useProjectProposalsInboxList(searchQuery, limit, page);
 
   const [projectProposals, setProjectProposals] = useState<[]>();
 
-  const searchPanelItems = [{ name: "project_proposal_no", caption: "Project Proposal Number" },];
+  const searchPanelItems = [
+    { name: "project_proposal_no", caption: "Project Proposal Number" },
+    { name: "ulb_name", caption: 'Ulb Name' }
+  ];
   const [searchPanelItemValues, setSearchPanelItemValues] = useState<any>({});
 
   const [totalResults, setTotalResults] = useState<number>();
@@ -49,8 +49,10 @@ const ProjectManagementPage = () => {
 
   const columns = [
     { name: "id", caption: "Sr. No.", width: "w-[5%]" },
-    { name: "project_proposal_no", caption: "Project Proposal No.", width: "w-[20%]" },
     { name: "date", caption: "Date", width: "w-[20%]", type: "date" },
+    { name: "project_proposal_no", caption: "Project Proposal No.", width: "w-[20%]" },
+    { name: "ulb_name", caption: "Ulb Name", width: "w-[20%]" },
+    { name: "summary", caption: "Summary", width: "w-[20%]", align: "left"}
   ];
 
   const onViewButtonClick = (id: number) => {
@@ -68,17 +70,19 @@ const ProjectManagementPage = () => {
     setProjectProposals(projectProposalData?.records);
 
     // populate the items to be displayed in the search panel
-    const project_proposal_nos = projectProposalData?.project_proposal_no?.map((item: any) => item.project_proposal_no);
-    if (project_proposal_nos) setSearchPanelItemValues({ ...searchPanelItemValues, project_proposal_no: project_proposal_nos });
 
+    let newSearchPanelItemValues = { ...searchPanelItemValues };
+
+    const project_proposal_nos = projectProposalData?.project_proposal_no?.map((item: any) => item.project_proposal_no);
+    if (project_proposal_nos) newSearchPanelItemValues = { ...newSearchPanelItemValues, project_proposal_no: project_proposal_nos }
+
+
+    const ulb_names = projectProposalData?.ulb_name?.map((item: any) => item.ulb_name);
+    if (ulb_names) newSearchPanelItemValues = { ...newSearchPanelItemValues, ulb_name: ulb_names }
+
+    setSearchPanelItemValues(newSearchPanelItemValues);
 
   }, [projectProposalData]);
-
-
-
-  const onUlbChange = () => {
-  }
-
 
   const [isFilterPanelOpen, setFilterPanelOpen] = useState(false);
   const toggleFilterPanel = () => {
@@ -90,17 +94,19 @@ const ProjectManagementPage = () => {
     // console.log("Filters updated: ", filters);
     const q = qs.stringify(filters);
     setSearchQuery(q);
+    resetPaginator();
   }
 
   const onRemoveFilter = () => {
     console.log("Filters removed!");
     setSearchQuery("");
+    resetPaginator();
   }
 
   return (
     <>
-    {workingAnimation}
-    <div className="flex items-center justify-between border-b-2 pb-4 mb-4">
+      {workingAnimation}
+      <div className="flex items-center justify-between border-b-2 pb-4 mb-4">
         <Button
           variant="cancel"
           className="border-none text-primary_bg_indigo hover:text-primary_bg_indigo hover:bg-inherit"
@@ -110,11 +116,11 @@ const ProjectManagementPage = () => {
           <b>Back</b>
         </Button>
         <h2 className="text-black">
-          <b>Bills Verify</b>
+          <b>Project Proposal List</b>
         </h2>
       </div>
-      <div className="flex items-center mb-4">
-        <LinkWithLoader href={`/bills-verify`}>
+      <div className="flex items-center mb-2">
+        <LinkWithLoader href={`/project-management`}>
           <Button
             variant="primary"
             className={`mr-4 ${pathName.includes("outbox") && "bg-gray-200 text-gray-500"}`}
@@ -123,7 +129,7 @@ const ProjectManagementPage = () => {
             Inbox
           </Button>
         </LinkWithLoader>
-        <LinkWithLoader href={`${pathName.includes('bills-verify/view') ? '/bills-verify/outbox' : pathName + '/outbox'}`}>
+        <LinkWithLoader href={`${pathName.includes('project-management/view') ? '/project-management/outbox' : pathName + '/outbox'}`}>
           <Button
             variant="primary"
             className={`${!pathName.includes("outbox") && "bg-gray-200 text-gray-500"}`}
@@ -134,33 +140,30 @@ const ProjectManagementPage = () => {
         </LinkWithLoader>
       </div>
 
-      <div className="inline-block w-full mt-10 flex gap-2 justify-center">
+      <div className="inline-block w-full mt-4 flex gap-2 justify-center">
 
         <div hidden={!isFilterPanelOpen} className="w-[25%] h-[75vh] overflow-y-auto overflow-x-hidden hide-scrollbar">
           <SearchPanel onClose={toggleFilterPanel} items={searchPanelItems} values={searchPanelItemValues} onFilterChange={onFilterChange} onNoFilter={onRemoveFilter} />
         </div>
 
         <div className={isFilterPanelOpen ? 'w-[75%]' : 'w-[98%]'}>
-          <section className="border bg-white shadow-xl p-6 px-10">
-            <div className="flex items-center mb-4">
-              <div
-                className={`flex items-center  mr-3 pb-1 w-20 justify-center border-b-2 border-b-black`}
-              >
-                <Image src={list} height={20} width={20} alt="pro-1" />
-                <span className="ml-2 text-gray-500">List</span>
+        <section className="border bg-white shadow-xl p-6 px-10">
+            <div className="flex items-center mb-4 justify-between">
+              <div className="flex">
+                <div
+                  className={`flex items-center  mr-3 pb-1 w-20 justify-center border-b-2 border-b-black`}
+                >
+                  <Image src={list} height={20} width={20} alt="pro-1" />
+                  <span className="ml-2 text-gray-500">List</span>
+                </div>
+                <div className={`flex items-center  pb-1 w-28 justify-center`}>
+                  <Image src={details} height={20} width={20} alt="pro-1" />
+                  <span className="ml-2 text-gray-500">Details</span>
+                </div>
               </div>
-              <div className={`flex items-center  pb-1 w-28 justify-center`}>
-                <Image src={details} height={20} width={20} alt="pro-1" />
-                <span className="ml-2 text-gray-500">Details</span>
-              </div>
-            </div>
 
-            <div className="flex justify-between px-10 mb-10">
-              <div className="flex gap-2">
-                <StandaloneDropdownList label="ULB" name="ulb" value={2} onChange={onUlbChange} items={ulbList} />
-              </div>
               <div className="flex flex-col justify-center">
-                <FilterButton onClick={toggleFilterPanel} active={isFilterPanelOpen}/>
+                <FilterButton onClick={toggleFilterPanel} active={isFilterPanelOpen} />
               </div>
             </div>
 
@@ -168,13 +171,10 @@ const ProjectManagementPage = () => {
 
 
             {
-            (isFetching || isLoading) ?
-            <LoaderSkeleton rowCount={limit}/>:
-            <SimpleTable columns={columns} data={projectProposals} onViewButtonClick={onViewButtonClick} />
+              (isFetching || isLoading) ?
+                <LoaderSkeleton rowCount={limit} /> :
+                <SimpleTable columns={columns} data={projectProposals} onViewButtonClick={onViewButtonClick} rowIndexStart={(page - 1) * limit + 1} />
             }
-
-
-
 
             {paginator}
 
@@ -192,4 +192,4 @@ const ProjectManagementPage = () => {
   )
 }
 
-export default ProjectManagementPage
+export default ProjectManagementInboxPage;

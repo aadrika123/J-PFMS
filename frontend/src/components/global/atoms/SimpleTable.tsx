@@ -8,16 +8,18 @@ export interface ColumnProps {
   nested?: boolean;
   member?: string;
   type?: string;
+  align: "left" | "right"
 }
 
 interface SimpleTableProps<T> {
   columns: Array<ColumnProps>;
   data?: T[];
+  rowIndexStart?: number;
   onViewButtonClick: (id: number) => void;
 }
 
 
-const SimpleTable = <T,>({ columns, data, onViewButtonClick }: SimpleTableProps<T>) => {
+const SimpleTable = <T,>({ columns, data, onViewButtonClick, rowIndexStart }: SimpleTableProps<T>) => {
 
   const headers = columns.map((column, index) => {
     return (
@@ -42,7 +44,10 @@ const SimpleTable = <T,>({ columns, data, onViewButtonClick }: SimpleTableProps<
           {columns.map((column, index2) => {
 
             let value;
-            if (column.nested) {
+            if(column.name == "id"){
+              value = (rowIndexStart || 0) + index;
+            }
+            else if (column.nested) {
               const ob = row[column.name as keyof typeof row] as object;
               if (column.member) {
                 value = ob[column.member as keyof typeof ob];
@@ -68,7 +73,7 @@ const SimpleTable = <T,>({ columns, data, onViewButtonClick }: SimpleTableProps<
               const value1 = value as string;
               return (
                 <td key={`cell-${index2}`}>
-                  <div className="flex justify-center">
+                  <div className={`flex justify-${column?.align || "center"}`}>
                     {value1}
                   </div>
                 </td>

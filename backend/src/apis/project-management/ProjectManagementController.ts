@@ -2,6 +2,7 @@ import { APIv1Response } from "../APIv1";
 import { Request } from "express";
 import ProjectManagementDao from "./ProjectManagementDao";
 import * as Yup from "yup";
+import { ProjectProposalStages } from "pfmslib";
 
 
 
@@ -12,7 +13,6 @@ class ProjectManagementController {
   }
 
   get = async (req: Request): Promise<APIv1Response> => {
-
 
     return new Promise((resolve, reject) => {
 
@@ -28,7 +28,7 @@ class ProjectManagementController {
         const page: number = Number(req.query.page);
         const limit: number = Number(req.query.limit);
         const order: number = Number(req.query.order);
-        
+
         console.log(req.query);
 
         // call dao
@@ -51,6 +51,93 @@ class ProjectManagementController {
 
     });
   };
-}
+
+
+
+  commonCallFunction = async (
+    req: Request,
+    level: number,
+    callDao: (
+      filters: any,
+      ulbId: number,
+      page: number,
+      limit: number,
+      order: number,
+      level: number
+    ) => Promise<any>
+  ): Promise<APIv1Response> => {
+
+    const user = req.body.user;
+
+    return new Promise((resolve, reject) => {
+
+      const query = req.query;
+
+      // validate
+      Yup.object({
+        page: Yup.number().required("page is required."),
+        limit: Yup.number().required("limit is required."),
+        order: Yup.number().required("order is required.").oneOf([1, -1])
+      }).validate(req.query).then(() => {
+
+        //collect data
+        const page: number = Number(req.query.page);
+        const limit: number = Number(req.query.limit);
+        const order: number = Number(req.query.order);
+        const ulbId = user.getUlbId();
+
+
+        callDao(query, ulbId, page, limit, order, level).then((data: any) => {
+          if (!data) {
+            const result = { status: true, code: 200, message: "Not Found", data: data };
+            resolve(result);
+          } else {
+            const result = { status: true, code: 200, message: "Found", data: data };
+            resolve(result);
+          }
+        }).catch((error) => {
+          reject(error);
+        })
+
+
+      }).catch((error) => {
+        reject(error);
+      });
+
+    });
+  };
+
+
+    getInbox = async (req: Request): Promise<APIv1Response> => {
+
+
+      console.log("Inbox");
+      return new Promise((resolve, reject) => {
+
+        const user = req.body.user;
+
+        if (user.isExecutiveOfficer()) {
+          console.log("Executive officer");
+
+          this.commonCallFunction(
+            req,
+            ProjectProposalStages.ApprovedByBackOffice,
+            this.dao.getLevel0ExecutiveOfficerInbox
+          ).then((data: any) => {
+            resolve(data);
+          }).catch((error) => {
+            reject(error);
+          })
+
+        } else if (user.isCityManager()) {
+          console.log("City Manager");
+          reject("City Manager inbox Not supported Yet!");
+        }else{
+          console.log(user.getRole());
+          reject(`${user.getRole()} inbox is not supported yet`);
+        }
+      });
+    }
+  }
 
 export default ProjectManagementController;

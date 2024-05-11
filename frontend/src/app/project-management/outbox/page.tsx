@@ -1,11 +1,11 @@
-import HeroBillsVerify from "@/components/JuidcoPfms/page/billsVerify/Index";
 import PageLayout from "@/components/Layouts/PageLayout";
 import React from "react";
+import ProjectManagementOutboxPage from "./ProjectManagementOutboxPage";
 
 const page = () => {
   return (
     <PageLayout>
-      <HeroBillsVerify />
+      <ProjectManagementOutboxPage />
     </PageLayout>
   );
 };

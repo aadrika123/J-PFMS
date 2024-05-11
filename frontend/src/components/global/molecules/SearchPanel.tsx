@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from "react";
 
 import { Accordion, AccordionItem as Item } from '@szhsin/react-accordion';
-import DebouncedSearchForSearchPanel from "./DebouncedSearchForSearchPanel";
-import { ResetButton } from "./ResetButton";
-import CloseButton from "./CloseButton";
+import DebouncedSearchForSearchPanel from "../../../app/project-management/(inbox)/DebouncedSearchForSearchPanel";
+import { ResetButton } from "../../../app/project-management/(inbox)/ResetButton";
+import CloseButton from "../../../app/project-management/(inbox)/CloseButton";
 
 // import "../css/szh-accordion.css";
 
@@ -181,7 +181,7 @@ const SearchPanel = ({ onClose, items, values, onFilterChange, onNoFilter}: Sear
   }, [filters]);
 
   return (
-    <div style={{ height: "calc(100vh - 3.5rem)" }} className="border-2 p-2">
+    <div style={{ height: "calc(100vh - 3.5rem)" }} className="border-2 p-2 bg-white">
       <div className="flex justify-between">
         <div>Filters</div>
         <button onClick={onClose}><CloseButton /></button>

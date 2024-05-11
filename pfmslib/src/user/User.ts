@@ -5,15 +5,9 @@ function formatString(inputString: string) {
 }
 
 export const ROLES = Object.freeze({
-  JUNIOR_ENGINEER: "Junior Engineer",
-  ASSISTANT_ENGINEER: "Assistant Engineer",
-  EXE_ENGINEER: "Executive Engineer",
-  EXE_OFFICER_AMC: "Executive Officer - AMC",
-  INTERNAL_AUDITOR: "Internal Auditor",
-  ACC_DEP_PDF : "Accounts Department - PDF",
-  ACC_DEP_MANAGER: "Accounts Department - Manager", ///// Accounts Department – Manager   and Accounts Department - Manager     is not same So Please Copy it from database
-  ACC_DEP_ACCOUNTANT: "Accounts Department - Accountant",
-  PROJECT_DIR_FINANCE: "Project Director Finance",
+  BACK_OFFICE: "BACK OFFICE",
+  EXE_OFFICER: "EXECUTIVE OFFICER",
+  CITY_MANAGER: "City Manager",
 });
 
 class User {
@@ -22,58 +16,28 @@ class User {
     this.user = userData;
   }
 
-  isAccDepAccountant = () => {
-    return this.user?.role?.includes(ROLES.ACC_DEP_ACCOUNTANT);
-  };
-
-  isAccDepManager = () => {
-    return this.user?.role?.includes(ROLES.ACC_DEP_MANAGER);
-  };
-
-  isProjectDirectorFinance = () => {
-    return this.user?.role?.includes(ROLES.PROJECT_DIR_FINANCE);
-  };
-
-  isJuniorEngineer = () => {
-    return this.user?.role?.includes(ROLES.JUNIOR_ENGINEER);
-  };
-
-  isAssistantEngineer = () => {
-    return this.user?.role?.includes(ROLES.ASSISTANT_ENGINEER);
+  isBackOffice = () => {
+    return this.user?.role?.includes(ROLES.BACK_OFFICE);
   }
 
-  isExecutiveEngineer = () => {
-    return this.user?.role?.includes(ROLES.EXE_ENGINEER);
+  isExecutiveOfficer = () => {
+    return this.user?.role?.includes(ROLES.EXE_OFFICER);
   }
 
-  isExecutiveOfficer1 = () => {
-    return this.user?.role?.includes(ROLES.EXE_OFFICER_AMC);
+  isCityManager = () => {
+    return this.user?.role?.includes(ROLES.CITY_MANAGER);
   }
 
-  isExecutiveOfficer2 = () => {
-    return this.user?.role?.includes(ROLES.EXE_OFFICER_AMC);
-  }
-
-  isExecutiveOfficer3 = () => {
-    return this.user?.role?.includes(ROLES.EXE_OFFICER_AMC);
-  }
-
-  isInternalAuditor = () => {
-    return this.user?.role?.includes(ROLES.INTERNAL_AUDITOR);
-  }
-
-  isAccDepPdf= () => {
-    return this.user?.role?.includes(ROLES.ACC_DEP_PDF);
-  }
-  
   getUserLevel = () => {
-    if (this.user?.role?.includes(ROLES.JUNIOR_ENGINEER)) return 1;
-    if (this.user?.role?.includes(ROLES.ASSISTANT_ENGINEER)) return 2;
+    if (this.user?.role?.includes(ROLES.BACK_OFFICE)) return 1;
+    if (this.user?.role?.includes(ROLES.EXE_OFFICER)) return 2;
+    if (this.user?.role?.includes(ROLES.CITY_MANAGER)) return 3;
   };
 
   getUserId = () => {
     return this.user.id;
   }
+
 
   getRole = () => {
     return this.user?.role; 
