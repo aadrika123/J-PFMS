@@ -12,11 +12,7 @@ import SuccesfullConfirmPopup from "@/components/global/molecules/general/Succes
 import toast, { Toaster } from "react-hot-toast";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 
-const EditViewProjectProposal = ({
-  ProProposalId,
-}: {
-  ProProposalId: number;
-}) => {
+const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
     useWorkingAnimation();
   const parma: any = useSearchParams().get("mode");
@@ -80,9 +76,12 @@ const EditViewProjectProposal = ({
   });
 
   //// Handle files
-  const handleFileData = (files: []): any[] =>{
-    return files.map((file: any) => ({...file, file_token: String(file.file_token)}));
-  }
+  const handleFileData = (files: []): any[] => {
+    return files.map((file: any) => ({
+      ...file,
+      file_token: String(file.file_token),
+    }));
+  };
 
   return (
     <>
@@ -122,4 +121,4 @@ const EditViewProjectProposal = ({
   );
 };
 
-export default EditViewProjectProposal;
+export default EditProjectProposal;

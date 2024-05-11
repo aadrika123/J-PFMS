@@ -17,6 +17,7 @@ interface HeaderWidgetProps {
   handleEditMode?: () => void;
   handlePrint?: () => void;
   handleAdd?: () => void;
+  isDisabled?: boolean;
 }
 
 export function HeaderWidget(props: HeaderWidgetProps) {
@@ -37,9 +38,13 @@ export function HeaderWidget(props: HeaderWidgetProps) {
         <SubHeading className="text-2xl">{props.title}</SubHeading>
       </div>
       <div className="flex">
-          <Button onClick={props.handleAdd} variant="primary" className="rounded-3xl">
-            + Add {props.title}
-          </Button>
+        <Button
+          onClick={props.handleAdd}
+          variant="primary"
+          className="rounded-3xl"
+        >
+          + Add {props.title}
+        </Button>
       </div>
     </div>
   );
@@ -51,19 +56,20 @@ export function HeaderWidget(props: HeaderWidgetProps) {
       </div>
       <div className="flex">
         {editVisible && (
-          <Link href={`${pathName.replace("mode=view", "mode=view")}`}>
+          <Link href={`${pathName.replace("view", "edit")}`}>
             <Button
               onClick={props.handleEditMode}
               variant="primary"
-              className="rounded"
+              disabled={props?.isDisabled}
+              className={`rounded ${props?.isDisabled && "cursor-not-allowed hover:bg-opacity-55"}`}
             >
-              Edit
+              {props?.isDisabled ? "You Can't Edit" : "Edit"}
             </Button>
           </Link>
         )}
-        <Button onClick={props.handlePrint} variant="primary" className="rounded ml-2">
+        {/* <Button onClick={props.handlePrint} variant="primary" className="rounded ml-2">
           Print
-        </Button>
+        </Button> */}
       </div>
     </div>
   );
