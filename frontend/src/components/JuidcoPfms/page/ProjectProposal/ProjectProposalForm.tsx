@@ -430,7 +430,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                       <div>
                         <div className="flex items-end">
                           <SelectForNoApi
-                            className="h-[31px] bg-indigo-700 text-white border-[#4338ca]"
+                            className="h-[32px] bg-[#4338ca] text-white border-[#4338ca]"
                             data={docType}
                             onChange={handleChange}
                             value={values.files[0]?.document_type_id}

@@ -1,6 +1,6 @@
 "use client";
 
-import Button from "@/components/global/atoms/Button";
+import Button from "@/components/global/atoms/buttons/Button";
 import Input from "@/components/global/atoms/Input";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -53,7 +53,7 @@ const Login = () => {
 
       if(res.data.status){
         dispatch(login(res.data.data));
-          window.location.replace("/pfms/home");
+          window.location.replace("/pfms/project-proposal");
       }else{
         hideWorkingAnimation();
         setErrorMsg("You have entered wrong credentials !!");

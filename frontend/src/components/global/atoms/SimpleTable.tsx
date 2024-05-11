@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import React, { ReactElement } from "react";
-import Button from "./Button";
+import Button from "./buttons/Button";
 
 export interface ColumnProps {
   name: string;
@@ -8,7 +8,7 @@ export interface ColumnProps {
   nested?: boolean;
   member?: string;
   type?: string;
-  align: "left" | "right"
+  align?: string;
 }
 
 interface SimpleTableProps<T> {

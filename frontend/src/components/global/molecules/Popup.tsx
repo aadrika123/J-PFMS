@@ -1,6 +1,6 @@
 import React from "react";
 import { Heading } from "../atoms/Heading";
-import Button from "../atoms/Button";
+import Button from "../atoms/buttons/Button";
 
 interface PopupProps {
   children: React.ReactNode;

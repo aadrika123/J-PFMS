@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "@/lib/axiosConfig";
 import { useQuery } from "react-query";
-import DebouncedSearch from "../atoms/DebouncedSearch";
+import DebouncedSearch from "../atoms/searchboxes/DebouncedSearch";
 import Table, { ColumnProps } from "../molecules/Table";
 import NextPrevPagination from "../molecules/NextPrevPagination";
 import LoaderSkeleton from "../atoms/LoaderSkeleton";

@@ -117,7 +117,7 @@ class ProjectManagementController {
         const user = req.body.user;
 
         if (user.isExecutiveOfficer()) {
-          console.log("Executive officer");
+          console.log("Executive officer Inbox");
 
           this.commonCallFunction(
             req,
@@ -138,6 +138,54 @@ class ProjectManagementController {
         }
       });
     }
+
+    getOutbox = async (req: Request): Promise<APIv1Response> => {
+      return new Promise((resolve, reject) => {
+        const user = req.body.user;
+        if(user.isExecutiveOfficer()) {
+          console.log("Executive Officer Output");
+          
+          this.commonCallFunction(req, ProjectProposalStages.ApprovedByBackOffice, this.dao.getHigherLevelOutbox)
+          .then((data: any) => {
+            resolve(data);
+          }).catch((error) => {
+            reject(error);
+          })
+
+        } else if (user.isCityManager()) {
+          console.log("City Manager");
+          reject("City Manager Outbox Not supported Yet!");
+        }else{
+          console.log(user.getRole());
+          reject(`${user.getRole()} outbox is not supported yet`);
+        }
+      });
+    }
+
+
+    getArchive = async (req: Request): Promise<APIv1Response> => {
+      return new Promise((resolve, reject) => {
+        const user = req.body.user;
+        if(user.isExecutiveOfficer()) {
+          console.log("Executive Officer Archive");
+          
+          this.commonCallFunction(req, ProjectProposalStages.ApprovedByBackOffice, this.dao.getHigherLevelOutbox)
+          .then((data: any) => {
+            resolve(data);
+          }).catch((error) => {
+            reject(error);
+          })
+
+        } else if (user.isCityManager()) {
+          console.log("City Manager");
+          reject("City Manager Outbox Not supported Yet!");
+        }else{
+          console.log(user.getRole());
+          reject(`${user.getRole()} outbox is not supported yet`);
+        }
+      });
+    }
+
   }
 
 export default ProjectManagementController;

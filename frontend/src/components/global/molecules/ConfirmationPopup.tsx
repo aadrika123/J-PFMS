@@ -1,5 +1,5 @@
 import React from "react";
-import Button from "../atoms/Button";
+import Button from "../atoms/buttons/Button";
 import Popup from "./general/Popup";
 
 interface ConfirmationPopupProps {

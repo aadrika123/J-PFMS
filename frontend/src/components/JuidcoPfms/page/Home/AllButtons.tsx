@@ -1,4 +1,5 @@
-import Button from "@/components/global/atoms/Button";
+
+import Button from "@/components/global/atoms/buttons/Button";
 import { homeButtons } from "@/json/homeButtons.json";
 import React from "react";
 

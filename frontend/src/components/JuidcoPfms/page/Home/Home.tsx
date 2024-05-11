@@ -1,5 +1,5 @@
 "use client";
-import Button from "@/components/global/atoms/Button";
+import Button from "@/components/global/atoms/buttons/Button";
 import Table from "@/components/global/molecules/Table";
 // const Table = lazy(()=> import("@/components/global/molecules/Table"));
 import { useRouter } from "next/navigation";

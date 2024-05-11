@@ -4,7 +4,7 @@ import React, { memo, useCallback } from "react";
 import { Formik } from "formik";
 import FormikController from "../molecules/FormikController";
 import { FieldTypeProps, FormikErrors, FormikTouched, FormikWrapperProps } from "@/utils/types/formikTypes";
-import Button from "../atoms/Button";
+import Button from "../atoms/buttons/Button";
 import goBack from "@/utils/helper";
 
 /**

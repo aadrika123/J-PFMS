@@ -33,7 +33,7 @@ const HeroProjectProposal = () => {
   // ];
   return (
     <>
-      <HeaderWidget variant="add" title="Project Proposal" />
+      <HeaderWidget variant="add" title="Project Proposal"/>
       <div className="shadow-lg p-4 border">
         <ProjectManagementInboxPage />
 

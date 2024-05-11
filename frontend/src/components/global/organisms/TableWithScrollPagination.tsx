@@ -3,7 +3,7 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 // import Button from "../atoms/Button";
 import Table, { ColumnProps } from "../molecules/Table";
-import DebouncedSearch from "../atoms/DebouncedSearch";
+import DebouncedSearch from "../atoms/searchboxes/DebouncedSearch";
 import { useQuery } from "react-query";
 import axios from "@/lib/axiosConfig";
 import LoaderSkeleton from "../atoms/LoaderSkeleton";

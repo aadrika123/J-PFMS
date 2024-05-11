@@ -7,17 +7,16 @@ import React from "react";
 import { SubHeading } from "@/components/Helpers/Heading";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import Button from "@/components/global/atoms/Button";
+import Button from "@/components/global/atoms/buttons/Button";
+import { LinkWithLoader } from "@/components/global/atoms/LinkWithLoader";
 
 type HeaderFactory = "edit" | "add" | "view" | "";
 interface HeaderWidgetProps {
   title: string;
-  variant: HeaderFactory;
+  variant?: HeaderFactory;
   editVisible?: boolean | false;
   handleEditMode?: () => void;
   handlePrint?: () => void;
-  handleAdd?: () => void;
-  isDisabled?: boolean;
 }
 
 export function HeaderWidget(props: HeaderWidgetProps) {
@@ -38,13 +37,11 @@ export function HeaderWidget(props: HeaderWidgetProps) {
         <SubHeading className="text-2xl">{props.title}</SubHeading>
       </div>
       <div className="flex">
-        <Button
-          onClick={props.handleAdd}
-          variant="primary"
-          className="rounded-3xl"
-        >
-          + Add {props.title}
-        </Button>
+        <LinkWithLoader href={`${pathName}/add`}>
+          <Button variant="primary" className="rounded-3xl">
+            + Add {props.title}
+          </Button>
+        </LinkWithLoader>
       </div>
     </div>
   );
@@ -56,20 +53,19 @@ export function HeaderWidget(props: HeaderWidgetProps) {
       </div>
       <div className="flex">
         {editVisible && (
-          <Link href={`${pathName.replace("view", "edit")}`}>
+          <Link href={`${pathName.replace("mode=view", "mode=view")}`}>
             <Button
               onClick={props.handleEditMode}
               variant="primary"
-              disabled={props?.isDisabled}
-              className={`rounded ${props?.isDisabled && "cursor-not-allowed hover:bg-opacity-55"}`}
+              className="rounded"
             >
-              {props?.isDisabled ? "You Can't Edit" : "Edit"}
+              Edit
             </Button>
           </Link>
         )}
-        {/* <Button onClick={props.handlePrint} variant="primary" className="rounded ml-2">
+        <Button onClick={props.handlePrint} variant="primary" className="rounded ml-2">
           Print
-        </Button> */}
+        </Button>
       </div>
     </div>
   );

@@ -1,13 +1,13 @@
 import React from "react";
 
-interface DebouncedSearchForSearchPanelProps {
+interface DebouncedSearchForFilterPanelProps {
   onSearching?: (e: boolean) => void;
   onChange: (e: string) => void;
   debounceDuration?: number | 1000; // default 1 second
   onRef?: (element: any) => void;
 }
 
-const DebouncedSearchForSearchPanel: React.FC<DebouncedSearchForSearchPanelProps> = (props) => {
+const DebouncedSearchForFilterPanel: React.FC<DebouncedSearchForFilterPanelProps> = (props) => {
   const debounceTime = props.debounceDuration;
   const [searchText, setSearchText] = React.useState("");
 
@@ -69,4 +69,4 @@ const DebouncedSearchForSearchPanel: React.FC<DebouncedSearchForSearchPanelProps
   );
 };
 
-export default DebouncedSearchForSearchPanel;
+export default DebouncedSearchForFilterPanel;

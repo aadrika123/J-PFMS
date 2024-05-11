@@ -5,7 +5,7 @@ import React from "react";
 // import { formatString } from "@/utils/helper";
 import { useDispatch } from "react-redux";
 import { logout } from "@/redux/reducers/authReducer";
-import Button from "../atoms/Button";
+import Button from "../atoms/buttons/Button";
 import { useWorkingAnimation } from "../molecules/general/useWorkingAnimation";
 
 interface SideBarProps extends React.HTMLAttributes<HTMLDivElement> {

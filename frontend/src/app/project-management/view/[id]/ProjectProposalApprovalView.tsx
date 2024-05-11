@@ -7,13 +7,12 @@ import { useQuery } from "react-query";
 import { useUser } from "@/components/global/molecules/general/useUser";
 import axios from "@/lib/axiosConfig";
 import { PFMS_URL } from "@/utils/api/urls";
-import Button from "@/components/global/atoms/Button";
 import Popup from "@/components/global/molecules/Popup";
-import { HeaderWidget } from "@/components/Helpers/Widgets/HeaderWidget";
 import Stepper from "./molecules/Stepper";
 import BoxContainer from "./molecules/BoxContainer";
 import Steps from "./molecules/Steps";
 import ViewDetails from "./molecules/ViewDetails";
+import Button from "@/components/global/atoms/buttons/Button";
 
 const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number }) => {
   const user = useUser();
@@ -130,14 +129,14 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
           </div>
         </Popup>
       )}
-      <HeaderWidget
+      {/* <HeaderWidget
         title="Project Details"
         variant={"view"}
         editVisible={true}
         isDisabled={user?.getUserLevel() && user?.getUserLevel() > 2}
         // user?.getUserLevel() && user?.getUserLevel() < 2
         //  handleEditMode?: () => void;
-      />
+      /> */}
       <div className="shadow-lg p-4 border">
         <Stepper items={items} activeStepper={1 || user?.getUserLevel()} />
         <BoxContainer projectDetails={data} />

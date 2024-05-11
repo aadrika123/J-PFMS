@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import SimpleTable, { ColumnProps } from "../atoms/SimpleTable";
-import DebouncedSearchBox from "../atoms/DebouncedSearchBox";
-import NextButton from "../atoms/NextButton";
-import PrevButton from "../atoms/PrevButton";
+import DebouncedSearchBox from "../atoms/searchboxes/DebouncedSearchBox";
+import NextButton from "../atoms/buttons/NextButton";
+import PrevButton from "../atoms/buttons/PrevButton";
 import axios from "axios";
 import { useQuery } from "react-query";
 import Loader from "../atoms/Loader";

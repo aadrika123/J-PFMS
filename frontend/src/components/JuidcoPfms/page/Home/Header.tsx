@@ -1,5 +1,6 @@
-import Button from "@/components/global/atoms/Button";
 import React from "react";
+import Button from "@/components/global/atoms/buttons/Button";
+
 
 const HomeHeader = () => {
   return (

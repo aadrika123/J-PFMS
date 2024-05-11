@@ -13,6 +13,8 @@ class ProjectManagementRoute extends APIv1_New{
   configure(): void {
     this.addGetRoute(`get`, this.controller.get);
     this.addGetRoute(`inbox`, this.controller.getInbox);
+    this.addGetRoute(`outbox`, this.controller.getOutbox);
+    this.addGetRoute(`archive`, this.controller.getArchive);
   }
 }
 

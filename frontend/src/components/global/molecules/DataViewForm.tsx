@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import Routes from "@/json/routes.json";
 import { useQuery } from "react-query";
-import BackButton from "../atoms/BackButton";
-import PrintButton from "../atoms/PrintButton";
+import BackButton from "../atoms/buttons/BackButton";
+import PrintButton from "../atoms/buttons/PrintButton";
 import Loader from "../atoms/Loader";
 import Input from "../atoms/Input";
 
