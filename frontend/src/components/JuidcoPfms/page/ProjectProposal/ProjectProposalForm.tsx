@@ -25,7 +25,7 @@ import Check from "@/assets/svg/Check.svg";
 import LosingDataConfirmPopup from "@/components/global/molecules/general/LosingDataConfirmPopup";
 import toast, { Toaster } from "react-hot-toast";
 import Loader from "@/components/global/atoms/Loader";
-import { docType } from "./docType";
+import { docType, executionBody } from "pfmslib";
 import TextArea from "@/components/global/atoms/Textarea";
 // import ConfirmationPopup from "@/components/global/molecules/ConfirmationPopup";
 
@@ -41,6 +41,7 @@ export type ProjectProposalSchema = {
   summary: string;
   state_id: number;
   date?: string;
+  execution_body: number;
   ulb_id: number;
   ward_id: number;
   user_id: number;
@@ -67,6 +68,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
   const [state, setState] = useState<any>({
     ulbId: initialValues.ulb_id,
     districtId: initialValues.district_id,
+    exeBodyId: initialValues.execution_body,
     inProgress1: false,
     inProgress2: false,
     showWarning: false,
@@ -76,12 +78,19 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
   const {
     ulbId,
     districtId,
+    exeBodyId,
     inProgress1,
     inProgress2,
     showWarning,
     triggerFun,
-    validationError
+    validationError,
   } = state;
+
+  //////// Check Execution Body is ULB or Not
+  const isUlb = (id: number) => {
+    return executionBody.find((i) => i.id === id)?.name === "ULB";
+  };
+
   ////// Fetching data
   const fetch = async (endpoint: string, dependence?: any) => {
     if (!dependence || dependence === null) return [];
@@ -236,8 +245,22 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     }, 100);
   };
 
+  //// Handle Execution Body
+  const exeBodyHandler = (
+    id: number | string,
+    setFieldValue: (key: string, value: number) => void
+  ) => {
+    setState((prev: any) => ({
+      ...prev,
+      exeBodyId: id,
+    }));
+    if (!isUlb(Number(id))) {
+      setFieldValue("ulb_id", 0);
+      setFieldValue("ward_id", 0);
+    }
+  };
 
-  //////// Handle Submit 
+  //////// Handle Submit
   // const handleSubmit = (values: FormikValues) =>{
   //   if(showConfirmation){
   //     onSubmit(values)
@@ -245,8 +268,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
   //   setState({...state, showConfirmation: !showConfirmation})
   // }
 
-
-  // //// Handle Cancel 
+  // //// Handle Cancel
   // const handleCancel = () => {
   //   setState({...state, showConfirmation: !showConfirmation})
   // }
@@ -298,7 +320,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                       label="Project Summary"
                       name="summary"
                       placeholder="Enter Project Summary"
-                      maxlength={500}
+                      maxlength={300}
                       required
                       readonly={readonly}
                     />
@@ -344,34 +366,52 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                       }
                     />
                     <SelectForNoApi
-                      data={ulbs}
+                      data={executionBody}
                       onChange={handleChange}
-                      onBlur={handleBlur}
-                      placeholder="Please select the ULB"
-                      value={values.ulb_id}
-                      error={errors.ulb_id}
-                      touched={touched.ulb_id}
-                      label="ULB Name"
-                      name="ulb_id"
-                      required
+                      value={values.execution_body}
+                      error={errors.execution_body}
+                      touched={touched.execution_body}
                       readonly={readonly}
+                      label="Execution Body"
+                      name="execution_body"
+                      required
                       handler={(id: number | string) =>
-                        ulbHandler(id, setFieldValue)
+                        exeBodyHandler(id, setFieldValue)
                       }
                     />
-                    <SelectForNoApi
-                      data={wards}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      placeholder="Please select ward no"
-                      value={values.ward_id}
-                      error={errors.ward_id}
-                      touched={touched.ward_id}
-                      label="Ward No"
-                      name="ward_id"
-                      required
-                      readonly={readonly}
-                    />
+                    {isUlb(exeBodyId) && (
+                      <SelectForNoApi
+                        data={ulbs}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        placeholder="Please select the ULB"
+                        value={values.ulb_id}
+                        error={errors.ulb_id}
+                        touched={touched.ulb_id}
+                        label="ULB Name"
+                        name="ulb_id"
+                        required
+                        readonly={readonly}
+                        handler={(id: number | string) =>
+                          ulbHandler(id, setFieldValue)
+                        }
+                      />
+                    )}
+                    {isUlb(exeBodyId) && (
+                      <SelectForNoApi
+                        data={wards}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        placeholder="Please select ward no"
+                        value={values.ward_id}
+                        error={errors.ward_id}
+                        touched={touched.ward_id}
+                        label="Ward No"
+                        name="ward_id"
+                        required
+                        readonly={readonly}
+                      />
+                    )}
                     <Input
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -386,24 +426,11 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                       type="number"
                       readonly={readonly}
                     />
-                    <TextArea
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.address}
-                      error={errors.address}
-                      touched={touched.address}
-                      label="Address"
-                      name="address"
-                      placeholder="Enter Address"
-                      maxlength={500}
-                      required
-                      readonly={readonly}
-                    />
-                    <div className="flex">
+                     <div className="flex">
                       <div>
                         <div className="flex items-end">
                           <SelectForNoApi
-                            className="h-[32px] bg-[#4338ca] text-white border-[#4338ca]"
+                            className="h-[31px] bg-indigo-700 text-white border-[#4338ca]"
                             data={docType}
                             onChange={handleChange}
                             value={values.files[0]?.document_type_id}
@@ -526,6 +553,19 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                         )}
                       </div>
                     </div>
+                    <TextArea
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.address}
+                      error={errors.address}
+                      touched={touched.address}
+                      label="Address"
+                      name="address"
+                      placeholder="Enter Address"
+                      maxlength={500}
+                      required
+                      readonly={readonly}
+                    />
                   </div>
 
                   <div className="mt-4 flex items-center gap-5 justify-end">

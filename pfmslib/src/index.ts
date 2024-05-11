@@ -2,6 +2,7 @@
 
 import BankMasterValidation from "./validations/BankMasterValidation";
 import { AccountingCodeType } from "./standard/accounting_code_types";
+import { docType, executionBody } from "./lists/jsonList";
 import { multiProjectProposalValidationSchema, projectProposalValidationSchema } from "./validations/ProjectProposalValidation";
 import User from "./user/User";
 import {ROLES} from "./user";
@@ -34,5 +35,6 @@ export {
   multiProjectProposalValidationSchema,
   projectProposalValidationSchema,
   ROLES,
-  ProjectProposalStages
+  ProjectProposalStages,
+  docType, executionBody
 };
