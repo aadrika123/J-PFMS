@@ -7,8 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 
 import SimpleTable from "@/components/global/atoms/SimpleTable";
 
-import { useProjectProposalsInboxList, useUlbList } from "@/hooks/data/ProjectProposalsHooks";
-import StandaloneDropdownList from "@/components/global/atoms/StandAloneDropDownList";
+import { useProjectProposalsInboxList } from "@/hooks/data/ProjectProposalsHooks";
 import { FilterButton } from "@/components/global/atoms/FilterButton";
 
 
@@ -25,12 +24,10 @@ import { useWorkingAnimation } from "@/components/global/molecules/general/useWo
 
 
 const ProjectManagementInboxPage = () => {
-    const router = useRouter();
-    const [workingAnimation, activateWorkingAnimation] = useWorkingAnimation();
-  
-  const pathName = usePathname();
+  const router = useRouter();
+  const [workingAnimation, activateWorkingAnimation] = useWorkingAnimation();
 
-  const { data: ulbList } = useUlbList();
+  const pathName = usePathname();
 
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -42,7 +39,7 @@ const ProjectManagementInboxPage = () => {
 
   const searchPanelItems = [
     { name: "project_proposal_no", caption: "Project Proposal Number" },
-    { name: "ulb_name", caption: 'Ulb Name'}
+    { name: "ulb_name", caption: 'Ulb Name' }
   ];
   const [searchPanelItemValues, setSearchPanelItemValues] = useState<any>({});
 
@@ -54,7 +51,8 @@ const ProjectManagementInboxPage = () => {
     { name: "id", caption: "Sr. No.", width: "w-[5%]" },
     { name: "date", caption: "Date", width: "w-[20%]", type: "date" },
     { name: "project_proposal_no", caption: "Project Proposal No.", width: "w-[20%]" },
-    { name: "ulb_name", caption:"Ulb Name", width: "w-[20%]"}
+    { name: "ulb_name", caption: "Ulb Name", width: "w-[20%]" },
+    { name: "summary", caption: "Summary", width: "w-[20%]", align: "left"}
   ];
 
   const onViewButtonClick = (id: number) => {
@@ -73,10 +71,10 @@ const ProjectManagementInboxPage = () => {
 
     // populate the items to be displayed in the search panel
 
-    let newSearchPanelItemValues = {...searchPanelItemValues};
+    let newSearchPanelItemValues = { ...searchPanelItemValues };
 
     const project_proposal_nos = projectProposalData?.project_proposal_no?.map((item: any) => item.project_proposal_no);
-    if (project_proposal_nos) newSearchPanelItemValues = {...newSearchPanelItemValues, project_proposal_no: project_proposal_nos }
+    if (project_proposal_nos) newSearchPanelItemValues = { ...newSearchPanelItemValues, project_proposal_no: project_proposal_nos }
 
 
     const ulb_names = projectProposalData?.ulb_name?.map((item: any) => item.ulb_name);
@@ -85,13 +83,6 @@ const ProjectManagementInboxPage = () => {
     setSearchPanelItemValues(newSearchPanelItemValues);
 
   }, [projectProposalData]);
-
-
-
-
-  const onUlbChange = () => {
-  }
-
 
   const [isFilterPanelOpen, setFilterPanelOpen] = useState(false);
   const toggleFilterPanel = () => {
@@ -114,8 +105,8 @@ const ProjectManagementInboxPage = () => {
 
   return (
     <>
-    {workingAnimation}
-    <div className="flex items-center justify-between border-b-2 pb-4 mb-4">
+      {workingAnimation}
+      <div className="flex items-center justify-between border-b-2 pb-4 mb-4">
         <Button
           variant="cancel"
           className="border-none text-primary_bg_indigo hover:text-primary_bg_indigo hover:bg-inherit"
@@ -128,8 +119,8 @@ const ProjectManagementInboxPage = () => {
           <b>Project Proposal List</b>
         </h2>
       </div>
-      <div className="flex items-center mb-4">
-        <LinkWithLoader href={`/bills-verify`}>
+      <div className="flex items-center mb-2">
+        <LinkWithLoader href={`/project-management`}>
           <Button
             variant="primary"
             className={`mr-4 ${pathName.includes("outbox") && "bg-gray-200 text-gray-500"}`}
@@ -138,7 +129,7 @@ const ProjectManagementInboxPage = () => {
             Inbox
           </Button>
         </LinkWithLoader>
-        <LinkWithLoader href={`${pathName.includes('bills-verify/view') ? '/bills-verify/outbox' : pathName + '/outbox'}`}>
+        <LinkWithLoader href={`${pathName.includes('project-management/view') ? '/project-management/outbox' : pathName + '/outbox'}`}>
           <Button
             variant="primary"
             className={`${!pathName.includes("outbox") && "bg-gray-200 text-gray-500"}`}
@@ -149,33 +140,30 @@ const ProjectManagementInboxPage = () => {
         </LinkWithLoader>
       </div>
 
-      <div className="inline-block w-full mt-10 flex gap-2 justify-center">
+      <div className="inline-block w-full mt-4 flex gap-2 justify-center">
 
         <div hidden={!isFilterPanelOpen} className="w-[25%] h-[75vh] overflow-y-auto overflow-x-hidden hide-scrollbar">
           <SearchPanel onClose={toggleFilterPanel} items={searchPanelItems} values={searchPanelItemValues} onFilterChange={onFilterChange} onNoFilter={onRemoveFilter} />
         </div>
 
         <div className={isFilterPanelOpen ? 'w-[75%]' : 'w-[98%]'}>
-          <section className="border bg-white shadow-xl p-6 px-10">
-            <div className="flex items-center mb-4">
-              <div
-                className={`flex items-center  mr-3 pb-1 w-20 justify-center border-b-2 border-b-black`}
-              >
-                <Image src={list} height={20} width={20} alt="pro-1" />
-                <span className="ml-2 text-gray-500">List</span>
+        <section className="border bg-white shadow-xl p-6 px-10">
+            <div className="flex items-center mb-4 justify-between">
+              <div className="flex">
+                <div
+                  className={`flex items-center  mr-3 pb-1 w-20 justify-center border-b-2 border-b-black`}
+                >
+                  <Image src={list} height={20} width={20} alt="pro-1" />
+                  <span className="ml-2 text-gray-500">List</span>
+                </div>
+                <div className={`flex items-center  pb-1 w-28 justify-center`}>
+                  <Image src={details} height={20} width={20} alt="pro-1" />
+                  <span className="ml-2 text-gray-500">Details</span>
+                </div>
               </div>
-              <div className={`flex items-center  pb-1 w-28 justify-center`}>
-                <Image src={details} height={20} width={20} alt="pro-1" />
-                <span className="ml-2 text-gray-500">Details</span>
-              </div>
-            </div>
 
-            <div className="flex justify-between px-10 mb-10">
-              <div className="flex gap-2">
-                <StandaloneDropdownList label="ULB" name="ulb" value={2} onChange={onUlbChange} items={ulbList} />
-              </div>
               <div className="flex flex-col justify-center">
-                <FilterButton onClick={toggleFilterPanel} active={isFilterPanelOpen}/>
+                <FilterButton onClick={toggleFilterPanel} active={isFilterPanelOpen} />
               </div>
             </div>
 
@@ -183,13 +171,10 @@ const ProjectManagementInboxPage = () => {
 
 
             {
-            (isFetching || isLoading) ?
-            <LoaderSkeleton rowCount={limit}/>:
-            <SimpleTable columns={columns} data={projectProposals} onViewButtonClick={onViewButtonClick} rowIndexStart={(page-1)*limit+1}/>
+              (isFetching || isLoading) ?
+                <LoaderSkeleton rowCount={limit} /> :
+                <SimpleTable columns={columns} data={projectProposals} onViewButtonClick={onViewButtonClick} rowIndexStart={(page - 1) * limit + 1} />
             }
-
-
-
 
             {paginator}
 

@@ -1,12 +1,12 @@
-import ViewDetailsHero from "@/components/JuidcoPfms/page/billsVerify/viewDetails/Index";
 import PageLayout from "@/components/Layouts/PageLayout";
 import React from "react";
+import ProjectProposalApprovalView from "./ProjectProposalApprovalView";
 
 const page = ({ params }: { params: { id: string } }) => {
   const { id } = params;
   return (
     <PageLayout>
-      <ViewDetailsHero BillsId={id} />
+      <ProjectProposalApprovalView ProProposalId={Number(id)} />
     </PageLayout>
   );
 };

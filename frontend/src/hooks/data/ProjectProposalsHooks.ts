@@ -1,6 +1,9 @@
 import { baseURL } from "@/lib/axiosConfig";
 import { useQuery } from "react-query";
 import axios from "@/lib/axiosConfig";
+import { usePathname } from "next/navigation";
+
+
 
 
 const projectProposalsApi = `${baseURL}/project-management/get`;
@@ -9,7 +12,8 @@ const projectProposalsOutboxApi = `${baseURL}/project-management/outbox`;
 
 
 export const useProjectProposalList = (searchQuery: string, limit: number, page: number) => {
-    return useQuery(["project-proposals", searchQuery, limit, page], (): Promise<any> => {
+  const pathName = usePathname();
+    return useQuery(["project-proposals", searchQuery, limit, page, pathName], (): Promise<any> => {
       return new Promise((resolve, reject) => {
         axios.get(`${projectProposalsApi}?limit=${limit}&page=${page}&order=-1&${searchQuery && searchQuery.length>0?`&${searchQuery}`:''}`).then(resp => {
           console.log(resp.data.message);
@@ -27,7 +31,9 @@ export const useProjectProposalList = (searchQuery: string, limit: number, page:
 
 
   export const useProjectProposalsInboxList = (searchQuery: string, limit: number, page: number) => {
-    return useQuery(["project-proposals", searchQuery, limit, page], (): Promise<any> => {
+    const pathName = usePathname();
+
+    return useQuery(["project-proposals", searchQuery, limit, page, pathName], (): Promise<any> => {
       return new Promise((resolve, reject) => {
         axios.get(`${projectProposalsInboxApi}?limit=${limit}&page=${page}&order=-1&${searchQuery && searchQuery.length>0?`&${searchQuery}`:''}`).then(resp => {
           console.log(resp.data.message);
@@ -45,7 +51,9 @@ export const useProjectProposalList = (searchQuery: string, limit: number, page:
 
 
   export const useProjectProposalsOutboxList = (searchQuery: string, limit: number, page: number) => {
-    return useQuery(["project-proposals", searchQuery, limit, page], (): Promise<any> => {
+    const pathName = usePathname();
+
+    return useQuery(["project-proposals", searchQuery, limit, page, pathName], (): Promise<any> => {
       return new Promise((resolve, reject) => {
         axios.get(`${projectProposalsOutboxApi}?limit=${limit}&page=${page}&order=-1&${searchQuery && searchQuery.length>0?`&${searchQuery}`:''}`).then(resp => {
           console.log(resp.data.message);

@@ -13,7 +13,6 @@ import SearchPanel from "@/components/global/molecules/SearchPanel";
 import Image from "next/image";
 import list from "@/assets/svg/list.svg";
 import details from "@/assets/svg/details.svg";
-import StandaloneDropdownList from "@/components/global/atoms/StandAloneDropDownList";
 import { FilterButton } from "@/components/global/atoms/FilterButton";
 import LoaderSkeleton from "@/components/global/atoms/LoaderSkeleton";
 import SimpleTable from "@/components/global/atoms/SimpleTable";
@@ -86,10 +85,6 @@ const ProjectManagementOutboxPage = () => {
 
 
 
-  const onUlbChange = () => {
-  }
-
-
   const [isFilterPanelOpen, setFilterPanelOpen] = useState(false);
   const toggleFilterPanel = () => {
     setFilterPanelOpen((prevState) => !prevState);
@@ -126,7 +121,7 @@ const ProjectManagementOutboxPage = () => {
         </h2>
       </div>
       <div className="flex items-center mb-4">
-        <LinkWithLoader href={`/bills-verify`}>
+        <LinkWithLoader href={`/project-management`}>
           <Button
             variant="primary"
             className={`mr-4 ${pathName.includes("outbox") && "bg-gray-200 text-gray-500"}`}
@@ -135,7 +130,7 @@ const ProjectManagementOutboxPage = () => {
             Inbox
           </Button>
         </LinkWithLoader>
-        <LinkWithLoader href={`${pathName.includes('bills-verify/view') ? '/bills-verify/outbox' : pathName + '/outbox'}`}>
+        <LinkWithLoader href={`${pathName.includes('project-management/view') ? '/project-management/outbox' : pathName + '/outbox'}`}>
           <Button
             variant="primary"
             className={`${!pathName.includes("outbox") && "bg-gray-200 text-gray-500"}`}
@@ -144,8 +139,6 @@ const ProjectManagementOutboxPage = () => {
             Outbox
           </Button>
         </LinkWithLoader>
-
-
       </div>
 
       <div className="inline-block w-full mt-10 flex gap-2 justify-center">
@@ -175,9 +168,7 @@ const ProjectManagementOutboxPage = () => {
               </div>
             </div>
 
-
             Total Results: {totalResults}
-
 
             {
               (isFetching || isLoading) ?

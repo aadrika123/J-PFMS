@@ -8,6 +8,7 @@ export interface ColumnProps {
   nested?: boolean;
   member?: string;
   type?: string;
+  align: "left" | "right"
 }
 
 interface SimpleTableProps<T> {
@@ -72,7 +73,7 @@ const SimpleTable = <T,>({ columns, data, onViewButtonClick, rowIndexStart }: Si
               const value1 = value as string;
               return (
                 <td key={`cell-${index2}`}>
-                  <div className="flex justify-center">
+                  <div className={`flex justify-${column?.align || "center"}`}>
                     {value1}
                   </div>
                 </td>

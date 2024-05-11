@@ -39,7 +39,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
               </Drawer>
               <section
                 style={{ height: "calc(100vh - 3.5rem)" }}
-                className="hide-scrollbar w-full overflow-y-auto bg-white p-5"
+                className="hide-scrollbar w-full overflow-y-auto bg-gray-100 p-5"
               >
                 {children}
               </section>

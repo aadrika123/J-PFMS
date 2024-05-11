@@ -181,7 +181,7 @@ const SearchPanel = ({ onClose, items, values, onFilterChange, onNoFilter}: Sear
   }, [filters]);
 
   return (
-    <div style={{ height: "calc(100vh - 3.5rem)" }} className="border-2 p-2">
+    <div style={{ height: "calc(100vh - 3.5rem)" }} className="border-2 p-2 bg-white">
       <div className="flex justify-between">
         <div>Filters</div>
         <button onClick={onClose}><CloseButton /></button>
