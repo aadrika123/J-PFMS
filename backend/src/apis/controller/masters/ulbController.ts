@@ -100,6 +100,14 @@ class UlbController {
     return { status: true, code: 200, message: "Found", data: data };
   };
   
+  getAllDepartments = async (): Promise<APIv1Response> => {
+    // call dao
+    const data = await this.dao.getAllDepartments();
+    // return the result
+    if (!data)
+      return { status: true, code: 200, message: "Not Found", data: data };
+    return { status: true, code: 200, message: "Found", data: data };
+  };
 }
 
 export default UlbController;

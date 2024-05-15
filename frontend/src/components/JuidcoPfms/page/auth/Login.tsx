@@ -51,7 +51,7 @@ const Login = () => {
       // });
 
       if (res.data.status) {
-        const data:any = await initialApiCall()
+        const data:any = await initialApiCall(res?.data?.data?.userDetails?.ulb_id)
         const updatedData = {
           ...res.data.data,
           userDetails: {...res.data.data.userDetails, ...data},

@@ -65,6 +65,10 @@ class User {
   getUlb = () => {
     return this.user.ulb
   }
+
+  getDepartmentId = () =>{
+    return this.user.department
+  }
 }
 
 export default User;

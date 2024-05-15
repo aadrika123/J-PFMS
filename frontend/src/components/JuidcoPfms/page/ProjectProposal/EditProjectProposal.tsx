@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { ProjectProposalForm } from "./ProjectProposalForm";
-import { QueryClient, useMutation, useQuery } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import axios from "@/lib/axiosConfig";
 import { PFMS_URL } from "@/utils/api/urls";
 import goBack, { DateFormatter } from "@/utils/helper";
@@ -18,7 +18,7 @@ const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
     useWorkingAnimation();
   const parma: any = useSearchParams().get("mode");
-  const query = new QueryClient();
+  const queryClient = useQueryClient()
   const [state, setState] = useState({
     showNotification: false,
   });
@@ -72,8 +72,8 @@ const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
       toast.error("Something Went Wrong!!!");
     },
     onSettled: () => {
+      queryClient.invalidateQueries(["pro-proposal", ProProposalId]);
       hideWorkingAnimation();
-      query.invalidateQueries(['pro-proposal', `${PFMS_URL.PROJ_RPOPOSAL_URL.get}`]);
     },
   });
 
@@ -90,7 +90,7 @@ const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
       <Toaster />
       {workingAnimation}
       {showNotification && (
-        <SuccesfullConfirmPopup message="Recorded Successfully" />
+        <SuccesfullConfirmPopup message="Updated successfully" />
       )}
       <HeaderWidget
         title="Project Details"
@@ -113,7 +113,7 @@ const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
             pin_code: data?.pin_code,
             ulb_id: data?.ulb_id,
             ward_id: data?.ward_id,
-            // execution_body: data?.execution_body,
+            execution_body: data?.execution_body,
             user_id: user?.getUserId(),
             files: handleFileData(data?.files),
           }}

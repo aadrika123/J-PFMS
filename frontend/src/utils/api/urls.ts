@@ -35,6 +35,7 @@ type Urls = {
     upload?: string;
     getByAuth?: string;
     getByUlb?: string;
+    getDepartments?: string;
   };
 };
 
@@ -51,6 +52,7 @@ export const PFMS_URL: Urls = {
   ULB_URL: {
     get: "/ulb/get-by-district",
     getById: "/ulb/get",
+    getDepartments: "ulb/department/get"
   },
   WARD_URL: {
     get: "/ulb/ward/get",

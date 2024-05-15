@@ -75,7 +75,7 @@ const Home = () => {
       setState({ ...state, moduleId: id });
     }
   };
-  console.log("first", user);
+  
   const tButton = (id: string) => {
     return (
       <>

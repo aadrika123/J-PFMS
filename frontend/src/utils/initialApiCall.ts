@@ -1,11 +1,11 @@
 import axios from "@/lib/axiosConfig";
 import { PFMS_URL } from "./api/urls";
 
-export const initialApiCall = async () => {
+export const initialApiCall = async (id: number) => {
   let result = {};
   const res = await Promise.all([
     axios({
-      url: `${PFMS_URL.ULB_URL.getById}/2`,
+      url: `${PFMS_URL.ULB_URL.getById}/${id}`,
       method: "GET",
     }),
   ]);

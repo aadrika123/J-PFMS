@@ -31,7 +31,7 @@ const AddProjectProposal = () => {
     ward_id: 0,
     state_id:user?.getState()?.id,
     user_id: user?.getUserId(),
-    // execution_body: 0,
+    execution_body: user?.getDepartmentId()?.id,
     files: [
       {
         document_type_id: 0,

@@ -29,6 +29,7 @@ export const projectProposalValidationSchema = Yup.object({
     .required("state is required")
     .integer()
     .min(1, "plsease select state"),
+  execution_body: Yup.string().required('please slelect execution body'),
   // execution_body: Yup.number()
   //   .integer()
   //   .required("execution body required")
@@ -51,13 +52,12 @@ export const projectProposalValidationSchema = Yup.object({
   //   }),
   ulb_id: Yup.number()
     .integer()
-    .min(1, "plsease select ulb").required("ulb is required"),
+    .optional(),
   ward_id: Yup.number()
     .integer()
-    .min(1, "plsease select ward").required("ward is required"),
+    .optional(),
   user_id: Yup.number().required("user is required"),
-  address: Yup.string()
-    .required("address is required"),
+  address: Yup.string().required("address is required"),
   pin_code: Yup.string()
     .required("Pin Code is required")
     .test("pin_code", (value, validationContext) => {

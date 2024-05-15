@@ -14,6 +14,7 @@ model project_proposals {
   address                    String
   pin_code                   Int
   user_id                    Int
+  execution_body_id          Int
   
   project_proposal_checkings project_proposal_checkings[]
   project_proposal_documents project_proposal_documents[]

@@ -98,7 +98,9 @@ class project_proposalsDao {
     pp.district_id,
     ms.name as state_name,
     um.ulb_name,
-    uwm.ward_name
+    uwm.ward_name,
+    dm.department_name as execution_body_name,
+    dm.id as execution_body
     from project_proposals as pp
     left join
     m_states as ms on ms.id = pp.state_id
@@ -106,6 +108,8 @@ class project_proposalsDao {
     ulb_masters as um on um.id = pp.ulb_id
     left join
     ulb_ward_masters as uwm on uwm.id = pp.ward_id
+    left join
+    department_masters as dm on dm.id = pp.execution_body
     where pp.id=${id}`;
     const data: any = await prisma.$queryRawUnsafe<[]>(query);
     const doc = await prisma.$queryRaw`
@@ -129,7 +133,6 @@ class project_proposalsDao {
     // });
     const newData = data[0];
     newData.files = doc;
-    console.log("first", newData)
     return newData;
   };
 

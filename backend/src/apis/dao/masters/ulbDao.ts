@@ -87,12 +87,16 @@ class UlbDao {
     dm.district_name, 
     dm.id::int as district_id, 
     sm.id::int as state_id, 
-    sm.name as state_name
+    sm.name as state_name,
+    dpm.department_name,
+    dpm.id::int as department_id
     from ulb_masters as um
     left join 
     district_masters as dm on dm.id = um.district_id
     left join
     m_states as sm on sm.id = um.state_id
+    left join
+    department_masters dpm on dpm.id = um.department_id
     where um.id = ${ulbId}
     `;
 
@@ -109,11 +113,27 @@ class UlbDao {
         id: data[0].id,
         name: data[0].ulb_name,
       },
+      department: {
+        id: data[0].department_id,
+        name: data[0].department_name,
+      },
     };
 
     delete data[0];
 
     return generateRes(updatedData);
+  }
+
+  ///// Get districts on the basis of district, ulb
+  async getAllDepartments() {
+    const data: any[] = await prisma.$queryRaw`
+    select 
+    id::int,
+    department_name as name
+    from department_masters
+    `;
+
+    return generateRes(data);
   }
 }
 

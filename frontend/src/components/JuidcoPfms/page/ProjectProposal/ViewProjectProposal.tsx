@@ -14,6 +14,8 @@ import { PFMS_URL } from "@/utils/api/urls";
 import { HeaderWidget } from "./HeaderWidget";
 import Button from "@/components/global/atoms/Button";
 import Popup from "@/components/global/molecules/Popup";
+import Loader from "@/components/global/atoms/Loader";
+// import Image from "next/image";
 
 const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
   const user = useUser();
@@ -57,8 +59,8 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
 
   /////// View Button
   const ViewButton = (id: number | string) => {
+    const doc = data?.files.find((item: any) => item.id === id);
     const handleClick = () => {
-      const doc = data?.files.find((item: any) => item.id === id);
       setState((prev: any) => ({
         ...prev,
         showPopup: !showPopup,
@@ -70,7 +72,7 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
       <img
         onClick={handleClick}
         className="h-8 w-12 object-contain"
-        src={`http://localhost:2001/public/pdfs/${docData?.path}`}
+        src={`http://localhost:2001/public/pdfs/${doc?.path}`}
         alt=""
       />
     );
@@ -130,6 +132,7 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
         //  handleEditMode?: () => void;
       />
       <div className="shadow-lg bg-white p-4 border">
+      {!data ? <Loader/> : <>
         <Stepper items={items} activeStepper={1 || user?.getUserLevel()} />
         <BoxContainer projectDetails={data} />
         <Steps
@@ -146,6 +149,8 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
             </div>
           )
         )}
+        </>}
+
       </div>
     </>
   );
