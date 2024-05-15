@@ -12,6 +12,7 @@ import { PFMS_URL } from "@/utils/api/urls";
 import axios from "@/lib/axiosConfig";
 import LoaderSkeleton from "@/components/global/atoms/LoaderSkeleton";
 import { useSelector } from "react-redux";
+import { initialApiCall } from "@/utils/initialApiCall";
 
 type stateProps = {
   moduleId: number | null;
@@ -74,7 +75,7 @@ const Home = () => {
       setState({ ...state, moduleId: id });
     }
   };
-
+  console.log("first", user);
   const tButton = (id: string) => {
     return (
       <>
@@ -118,9 +119,11 @@ const Home = () => {
       value: tButton,
     },
   ];
+
   return (
-    <div>
-      <h1 className="flex items-center justify-end text-secondary_black font-bold mb-2">
+    <div className="flex justify-center">
+      Home Page Under Construction
+      {/* <h1 className="flex items-center justify-end text-secondary_black font-bold mb-2">
         Home
       </h1>
       <HomeHeader />
@@ -141,7 +144,7 @@ const Home = () => {
         ) : (
           <Table center columns={columns} data={data?.data} />
         )}
-      </div>
+      </div> */}
     </div>
   );
 };

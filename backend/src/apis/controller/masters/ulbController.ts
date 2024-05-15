@@ -81,6 +81,24 @@ class UlbController {
 
     return { status: true, code: 200, message: "OK", data: result };
   };
+
+  getDetailsByUlb = async (req: Request): Promise<APIv1Response> => {
+    //validate the input
+    await Yup.object({
+      ulbId: Yup.number().required("ulbId is required"),
+    }).validate(req.params);
+
+    //collect data
+
+    const id: number = Number(req.params.ulbId);
+
+    // call dao
+    const data = await this.dao.getDetailsByUlb(id);
+    // return the result
+    if (!data)
+      return { status: true, code: 200, message: "Not Found", data: data };
+    return { status: true, code: 200, message: "Found", data: data };
+  };
   
 }
 

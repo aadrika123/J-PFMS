@@ -34,6 +34,7 @@ type Urls = {
     getTopPaymentMode?: string;
     upload?: string;
     getByAuth?: string;
+    getByUlb?: string;
   };
 };
 
@@ -49,6 +50,7 @@ export const PFMS_URL: Urls = {
   },
   ULB_URL: {
     get: "/ulb/get-by-district",
+    getById: "/ulb/get",
   },
   WARD_URL: {
     get: "/ulb/ward/get",
@@ -63,7 +65,7 @@ export const PFMS_URL: Urls = {
     get: "/project-perposal/get-all",
     create: "/project-perposal/create",
     update: "/project-perposal/update",
-    getById: "/project-perposal/get"
+    getById: "/project-perposal/get",
   },
   BILLS_VERIFICATION: {
     getById: "bill-verification/get",

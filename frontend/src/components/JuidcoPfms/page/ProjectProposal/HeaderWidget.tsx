@@ -81,7 +81,7 @@ export function HeaderWidget(props: HeaderWidgetProps) {
   );
 
   return (
-    <div className="border shadow-xl p-4 mb-10">
+    <div className="border bg-white shadow-xl p-4 mb-10">
       {props.variant === "edit"
         ? EditHeader
         : props.variant === "add"

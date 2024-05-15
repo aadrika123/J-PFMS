@@ -39,7 +39,7 @@ const Stepper: React.FC<StepperProps> = (props) => {
             />
           </div>
           <div
-            className={`mr-6 mt-3 -ml-10 w-28 text-xs text-center ${activeStepper >= index + 1 && "font-bold"}`}
+            className={`mr-6 mt-3 -ml-10 ${items.length <=5 ? '-ml-12 w-36' : 'w-28'} text-xs text-center ${activeStepper >= index + 1 && "font-bold"}`}
           >
             {item.info}
           </div>

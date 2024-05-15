@@ -75,6 +75,46 @@ class UlbDao {
     const updatedData = this.removeDuplicates(data);
     return generateRes(updatedData);
   }
+
+  ///// Get all details by ulb by ulbId
+
+  ////// Get districts on the basis of district, ulb
+  async getDetailsByUlb(ulbId: number) {
+    const data: any[] = await prisma.$queryRaw`
+    select 
+    um.id::int,
+    um.ulb_name, 
+    dm.district_name, 
+    dm.id::int as district_id, 
+    sm.id::int as state_id, 
+    sm.name as state_name
+    from ulb_masters as um
+    left join 
+    district_masters as dm on dm.id = um.district_id
+    left join
+    m_states as sm on sm.id = um.state_id
+    where um.id = ${ulbId}
+    `;
+
+    const updatedData = {
+      district: {
+        id: data[0].district_id,
+        name: data[0].district_name,
+      },
+      state: {
+        id: data[0].state_id,
+        name: data[0].state_name,
+      },
+      ulb: {
+        id: data[0].id,
+        name: data[0].ulb_name,
+      },
+    };
+
+    delete data[0];
+
+    return generateRes(updatedData);
+  }
 }
 
 export default UlbDao;

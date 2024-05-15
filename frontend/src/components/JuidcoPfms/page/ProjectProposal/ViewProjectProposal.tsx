@@ -28,39 +28,15 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
   const { activeStep, showPopup, docData } = state;
   const items = [
     {
-      info: "JUNIOR ENGINEER",
+      info: "BACK OFFICE",
       img: admi,
     },
     {
-      info: "ASSISTANT ENGINEER",
+      info: "EXECUTIVE OFFICER",
       img: admi,
     },
     {
-      info: "EXECUTIVE ENGINEER",
-      img: admi,
-    },
-    {
-      info: "EXECUTIVE OFFICER (AMC)",
-      img: admi,
-    },
-    {
-      info: "ACCOUNT DEPARTMENT (MANAGER)",
-      img: admi,
-    },
-    {
-      info: "INTERNAL AUDITOR",
-      img: admi,
-    },
-    {
-      info: "EXECUTIVE OFFICER (AMC)",
-      img: admi,
-    },
-    {
-      info: "ACCOUNTS DEPARTMENT (PDF)",
-      img: admi,
-    },
-    {
-      info: "EXECUTIVE OFFICER (AMC)",
+      info: "CITY MANAGER",
       img: admi,
     },
   ];
@@ -133,7 +109,7 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
             className=""
             src={`http://localhost:2001/public/pdfs/${docData?.path}`}
             width="1000"
-            height="720"
+            height="620"
           ></iframe>
           <div className="flex items-center absolute bottom-3 self-center">
             <Button
@@ -153,7 +129,7 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
         // user?.getUserLevel() && user?.getUserLevel() < 2
         //  handleEditMode?: () => void;
       />
-      <div className="shadow-lg p-4 border">
+      <div className="shadow-lg bg-white p-4 border">
         <Stepper items={items} activeStepper={1 || user?.getUserLevel()} />
         <BoxContainer projectDetails={data} />
         <Steps

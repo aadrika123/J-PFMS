@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import { login } from "@/redux/reducers/authReducer";
 import axios from "axios";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
+import { initialApiCall } from "@/utils/initialApiCall";
 // some comment
 
 interface LoginInitialData {
@@ -22,7 +23,8 @@ const Login = () => {
   const dispatch = useDispatch();
   const [errorMsg, setErrorMsg] = useState<string>();
   const [hide, setHide] = useState(true);
-  const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] = useWorkingAnimation();
+  const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
+    useWorkingAnimation();
 
   const LoginSchema = Yup.object().shape({
     user_id: Yup.string().required("User Id is required"),
@@ -35,26 +37,28 @@ const Login = () => {
     activateWorkingAnimation();
     try {
       // "https://jharkhandegovernance.com/auth/api/login",
-      const res = await axios.post(
-        `${process.env.backend}/api/login`,
-        {
-          email: values.user_id,
-          password: values.password,
-        },
-        );
-        // const res = await axios({
-        //   url: PFMS_URL.AUTH_URL.login,
-        //   method: "POST",
-        //   data: {
-        //     email: values.user_id,
-        //     password: values.password,
-        //   },
-        // });
+      const res = await axios.post(`${process.env.backend}/api/login`, {
+        email: values.user_id,
+        password: values.password,
+      });
+      // const res = await axios({
+      //   url: PFMS_URL.AUTH_URL.login,
+      //   method: "POST",
+      //   data: {
+      //     email: values.user_id,
+      //     password: values.password,
+      //   },
+      // });
 
-      if(res.data.status){
-        dispatch(login(res.data.data));
-          window.location.replace("/pfms/home");
-      }else{
+      if (res.data.status) {
+        const data:any = await initialApiCall()
+        const updatedData = {
+          ...res.data.data,
+          userDetails: {...res.data.data.userDetails, ...data},
+        }
+        dispatch(login(updatedData));
+        window.location.replace("/pfms/home");
+      } else {
         hideWorkingAnimation();
         setErrorMsg("You have entered wrong credentials !!");
       }

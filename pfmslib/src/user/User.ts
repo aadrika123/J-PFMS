@@ -38,7 +38,6 @@ class User {
     return this.user.id;
   }
 
-
   getRole = () => {
     return this.user?.role; 
   }
@@ -53,6 +52,18 @@ class User {
 
   isUserAdmin = () => {
     return this.user?.user_type === "Admin"
+  }
+
+  getDistrict = () => {
+    return this.user.district
+  }
+
+  getState = () => {
+    return this.user.state
+  }
+
+  getUlb = () => {
+    return this.user.ulb
   }
 }
 

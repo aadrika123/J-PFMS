@@ -75,7 +75,7 @@ const SelectForUpdateValueWithNoAPI: React.FC<SelectProps> = (props) => {
           onChange={(event) => handleChange(event)}
           onBlur={props.onBlur}
           value={props.value}
-          className={`text-primary h-[40px] pl-3 rounded-lg border bg-transparent border-zinc-400 ${props.className}`}
+          className={`text-primary h-[40px] pl-3 rounded-lg shadow-lg border bg-transparent border-zinc-400 ${props.className}`}
           name={props.name}
           id={fieldId}
         >

@@ -11,8 +11,10 @@ import { HeaderWidget } from "@/components/Helpers/Widgets/HeaderWidget";
 import SuccesfullConfirmPopup from "@/components/global/molecules/general/SuccesfullConfirmPopup";
 import toast, { Toaster } from "react-hot-toast";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
+import { useUser } from "@/components/global/molecules/general/useUser";
 
 const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
+  const user = useUser()
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
     useWorkingAnimation();
   const parma: any = useSearchParams().get("mode");
@@ -71,7 +73,7 @@ const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
     },
     onSettled: () => {
       hideWorkingAnimation();
-      query.invalidateQueries([`${PFMS_URL.PROJ_RPOPOSAL_URL.get}`]);
+      query.invalidateQueries(['pro-proposal', `${PFMS_URL.PROJ_RPOPOSAL_URL.get}`]);
     },
   });
 
@@ -111,8 +113,8 @@ const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
             pin_code: data?.pin_code,
             ulb_id: data?.ulb_id,
             ward_id: data?.ward_id,
-            execution_body: 1,
-            user_id: 1,
+            // execution_body: data?.execution_body,
+            user_id: user?.getUserId(),
             files: handleFileData(data?.files),
           }}
           readonly={parma === "view"}
