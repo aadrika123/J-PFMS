@@ -10,6 +10,7 @@ import technical from "@/assets/svg/technical.svg";
 import measure from "@/assets/svg/measure.svg";
 import running from "@/assets/svg/running.svg";
 import userAdmin from "@/assets/svg/userAdmin.svg";
+import houseIcons from "@/assets/svg/house_icons.svg";
 
 import { ROLES } from "pfmslib";
 
@@ -20,16 +21,16 @@ export const sidebarLinks: SidebarLinksProps = {
       path: "/",
       icon: <Image src={rupeeIcons} alt="finance" width={100} height={100} />,
       subModules: [
-        // {
-        //   moduleName: "Home",
-        //   icon: <Image src={houseIcons} alt="home" width={100} height={100} />,
-        //   path: "/home",
-        // },
+        {
+          moduleName: "Home",
+          icon: <Image src={houseIcons} alt="home" width={100} height={100} />,
+          path: "/home",
+        },
         {
           moduleName: "Project Proposal",
           icon: <Image src={project} alt="home" width={100} height={100} />,
           path: "/project-proposal",
-          roles: [ROLES.BACK_OFFICE, ROLES.EXE_OFFICER, ROLES.CITY_MANAGER],
+          roles: [ROLES.BACK_OFFICE],
         },
         {
           moduleName: "Project Management",

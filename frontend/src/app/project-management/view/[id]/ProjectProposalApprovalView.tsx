@@ -95,6 +95,8 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
 
   const [measurementFormVisible, setMeasurementFormVisible] = useState<boolean>(false);
 
+  console.log(projectProposalDetails);
+
   useEffect(() => {
     console.log(projectProposalDetails);
   }, [projectProposalDetails]);
@@ -160,6 +162,17 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
               <Title title="Project Summary" />
               <Paragraph desc={projectProposalDetails?.summary} />
             </section>
+
+            <section>
+              <Title title="Project Description" />
+              <Paragraph desc={projectProposalDetails?.description} />
+            </section>
+          </div>
+          <div>
+            <div> 
+              <div>State</div>
+
+            </div>
           </div>
         </div>
 
