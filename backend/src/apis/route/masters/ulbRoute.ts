@@ -15,6 +15,8 @@ class UlbRoute extends APIv1{
     this.addGetRoute('get-filtered', this.controller.getFilteredUlbs);
     this.addGetRoute('get-by-district/:districtId', this.controller.getUlbsByDistrict);
     this.addGetRoute('ward/get/:ulbId', this.controller.getWardsByUlb);
+    this.addGetRoute('get/:ulbId', this.controller.getDetailsByUlb);
+    this.addGetRoute('department/get', this.controller.getAllDepartments);
   }
 }
 

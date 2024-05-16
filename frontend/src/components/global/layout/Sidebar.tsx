@@ -35,7 +35,7 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
   const handleRedirect = (url: string) => {
     router.push(url);
   };
-
+console.log("first", user)
   return (
     <div style={{ height: "calc(100vh - 3.5rem)" }} {...props}>
       <section>

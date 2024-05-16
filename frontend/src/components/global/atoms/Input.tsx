@@ -62,7 +62,7 @@ const Input: React.FC<InputProps> = (props) => {
           {props.required ? <span className="text-red-600 pl-2">*</span> : ""}
         </label>
         <div
-          className={`flex items-center justify-between rounded border bg-transparent border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none ${props.icon && props.iconAlign === "left" && "flex-row-reverse"} ${props.readonly ? `bg-gray-300` : ""}`}
+          className={`flex items-center justify-between rounded border shadow-lg bg-transparent border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none ${props.icon && props.iconAlign === "left" && "flex-row-reverse"} ${props.readonly ? `bg-gray-300` : ""}`}
         >
           <input
             disabled={props.readonly}

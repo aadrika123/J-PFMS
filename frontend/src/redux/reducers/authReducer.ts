@@ -13,7 +13,7 @@ const authSlice = createSlice({
   reducers: {
     login: (state, action: PayloadAction<any>) => {
       state.user = action.payload;
-      Cookies.set("loginData", JSON.stringify(action.payload), { expires: 1 });
+      Cookies.set("loginData", JSON.stringify(action.payload));
     },
     logout: (state) => {
       state.user = null;

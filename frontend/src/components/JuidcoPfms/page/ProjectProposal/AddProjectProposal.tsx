@@ -22,22 +22,17 @@ const AddProjectProposal = () => {
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
     useWorkingAnimation();
   const initialValues: ProjectProposalSchema = {
-    district_id: 0,
+    district_id: user?.getDistrict()?.id,
     description: "",
     summary: "",
-    state_id: 1,
     address: "",
     pin_code: "",
-    ulb_id: 0,
+    ulb_id: user?.getUlb()?.id,
     ward_id: 0,
+    state_id:user?.getState()?.id,
     user_id: user?.getUserId(),
-    execution_body: 4,
+    execution_body: user?.getDepartmentId()?.id,
     files: [
-      {
-        document_type_id: 1,
-        file_token: "",
-        file_name: "",
-      },
       {
         document_type_id: 0,
         file_token: "",
@@ -53,10 +48,6 @@ const AddProjectProposal = () => {
 
   ///////////////// Handling Submit /////////////
   const handleSubmit = async (values: FormikValues) => {
-    if (values.execution_body !== 4) {
-      delete values.ulb_id, delete values.ward_id;
-    }
-
     activateWorkingAnimation();
     const res = await axios({
       url: `${PFMS_URL.PROJ_RPOPOSAL_URL.create}`,
@@ -85,26 +76,13 @@ const AddProjectProposal = () => {
     },
   });
 
-  ////// Handle Cancel
-  // const handleCancel = () => {
-  //   setState({ ...state, showConfirmation: !showConfirmation });
-  // };
-
-  // //// Handle onSubmit
-  // const handleOnSubmit = (values: FormikValues) => {
-  //   mutate(values)
-  // }
-
   return (
     <>
       {workingAnimation}
-      {/* {showConfirmation && (
-        <ConfirmationPopup cancel={handleCancel} continue={mutate} />
-      )} */}
       {showNotification && (
         <SuccesfullConfirmPopup message="Recorded Successfully" />
       )}
-      <div className="shadow-lg px-4 py-2 border mb-6">
+      <div className="shadow-lg px-4 py-2 border mb-6 bg-white">
         <span className="text-secondary font-bold">Fill Project Details</span>
       </div>
       <Suspense fallback={<Loader />}>

@@ -50,6 +50,10 @@ const ViewDetails: React.FC<ViewDetailsProps<any>> = (props) => {
       content: projectDetails?.state_name,
     },
     {
+      label: "Execution Body",
+      content: projectDetails?.execution_body_name,
+    },
+    {
       label: "ULB Name",
       content: projectDetails?.ulb_name,
     },

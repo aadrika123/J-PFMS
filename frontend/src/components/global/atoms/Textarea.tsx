@@ -61,7 +61,7 @@ const TextArea: React.FC<TextareaProps> = (props) => {
             onChange={handleChange}
             onBlur={props.onBlur}
             value={props?.value}
-            className={`text-primary min-h-16 px-3 pt-1 pb-3 bg-transparent outline-none hide-scrollbar w-full`}
+            className={`text-primary min-h-32 px-3 pt-1 pb-3 bg-transparent outline-none hide-scrollbar w-full shadow-lg`}
             name={props.name}
             id={fieldId}
           />

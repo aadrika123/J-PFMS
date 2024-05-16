@@ -13,7 +13,7 @@
     "start": "node build/src/server.js",
     "dev": "nodemon src/server.ts",
     "migrate": "rm -rf prisma/migrations &&  npx prisma migrate dev --name init",
-    "migrate_create_only": "npx prisma migrate dev --create-only",
+    "migrate_dev": "npx prisma migrate dev",
     "migrate_win": "rmdir /s .\\prisma\\migrations &&  npx prisma migrate dev --name init",
     "magic": "node magic/index.js",
     "doc": "python3 magic/gen_doc.py",

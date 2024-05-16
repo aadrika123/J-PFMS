@@ -24,10 +24,7 @@ import Check from "@/assets/svg/Check.svg";
 import LosingDataConfirmPopup from "@/components/global/molecules/general/LosingDataConfirmPopup";
 import toast, { Toaster } from "react-hot-toast";
 import Loader from "@/components/global/atoms/Loader";
-import { docType, executionBody } from "pfmslib";
 import TextArea from "@/components/global/atoms/Textarea";
-import Button from "@/components/global/atoms/buttons/Button";
-// import ConfirmationPopup from "@/components/global/molecules/ConfirmationPopup";
 
 type FileTypes = {
   document_type_id: number;
@@ -39,7 +36,7 @@ export type ProjectProposalSchema = {
   district_id: number;
   description: string;
   summary: string;
-  state_id: number;
+  state_id?: number;
   date?: string;
   execution_body: number;
   ulb_id: number;
@@ -69,8 +66,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     ulbId: initialValues.ulb_id,
     districtId: initialValues.district_id,
     exeBodyId: initialValues.execution_body,
-    inProgress1: false,
-    inProgress2: false,
+    inProgress: false,
     showWarning: false,
     triggerFun: null,
     validationError: null,
@@ -78,18 +74,12 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
   const {
     ulbId,
     districtId,
-    exeBodyId,
-    inProgress1,
-    inProgress2,
+    inProgress,
     showWarning,
+    exeBodyId,
     triggerFun,
     validationError,
   } = state;
-
-  //////// Check Execution Body is ULB or Not
-  const isUlb = (id: number) => {
-    return executionBody.find((i) => i.id === id)?.name === "ULB";
-  };
 
   ////// Fetching data
   const fetch = async (endpoint: string, dependence?: any) => {
@@ -117,15 +107,29 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     if (!res.data.status) throw "Something Went Wrong!!";
 
     const resDistrict = await axios({
-      url: `${PFMS_URL.DISTRICT_URL.get}/${res.data.data.id}`,
+      url: `${PFMS_URL.DISTRICT_URL.get}/${res?.data?.data.id}`,
       method: "GET",
     });
 
-    return { state: res.data.data, district: resDistrict?.data?.data };
+    const resDepart = await axios({
+      url: `${PFMS_URL.ULB_URL.getDepartments}`,
+      method: "GET",
+    });
+
+    return {
+      state: res?.data?.data,
+      district: resDistrict?.data?.data,
+      departments: resDepart?.data?.data,
+    };
   };
 
   ///////// Getting District and State
   const { data: data } = useQuery(["districtState"], fetchStateDistrict);
+
+  //////// Check Execution Body is ULB or Not
+  const isUlb = (id: number) => {
+    return data?.departments.find((i:any) => i.id === id)?.name === "ULB";
+  };
 
   ///////// Getting Ulbs
   const { data: ulbs } = useQuery(["ulbs", districtId], () =>
@@ -171,7 +175,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     setState((prev: any) => {
       if (index === 0) return { ...prev, inProgress1: true };
 
-      return { ...prev, inProgress2: true };
+      return { ...prev, inProgress: true };
     });
     try {
       if (e.target.files) {
@@ -209,7 +213,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
       setState((prev: any) => {
         if (index === 0) return { ...prev, inProgress1: false };
 
-        return { ...prev, inProgress2: false };
+        return { ...prev, inProgress: false };
       });
     }
   };
@@ -218,19 +222,9 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
   const handleBackAndReset = (trigger?: () => void) => {
     setState({ ...state, showWarning: !showWarning, triggerFun: trigger });
     if (trigger) {
-      const d: any = document?.getElementById("identity");
-      d.value = "";
       const c: any = document?.getElementById("letter");
       c.value = "";
     }
-  };
-
-  ///// Handle Select Document Type
-  const handleDocType = (
-    setFieldValue: (key: string, value: string) => void
-  ) => {
-    setFieldValue("files[0].file_token", "");
-    setFieldValue("files[0].file_name", "");
   };
 
   ///// handle Complete Reset
@@ -245,47 +239,31 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     }, 100);
   };
 
-  //// Handle Execution Body
-  const exeBodyHandler = (
-    id: number | string,
-    setFieldValue: (key: string, value: number) => void
-  ) => {
-    setState((prev: any) => ({
-      ...prev,
-      exeBodyId: id,
-    }));
-    if (!isUlb(Number(id))) {
-      setFieldValue("ulb_id", 0);
-      setFieldValue("ward_id", 0);
-    }
-  };
-
-  //////// Handle Submit
-  // const handleSubmit = (values: FormikValues) =>{
-  //   if(showConfirmation){
-  //     onSubmit(values)
+  // Handle Execution Body
+  // const exeBodyHandler = (
+  //   id: number | string,
+  //   setFieldValue: (key: string, value: number) => void
+  // ) => {
+  //   setState((prev: any) => ({
+  //     ...prev,
+  //     exeBodyId: id,
+  //   }));
+  //   if (!isUlb(Number(id))) {
+  //     setFieldValue("ulb_id", 0);
+  //     setFieldValue("ward_id", 0);
   //   }
-  //   setState({...state, showConfirmation: !showConfirmation})
-  // }
-
-  // //// Handle Cancel
-  // const handleCancel = () => {
-  //   setState({...state, showConfirmation: !showConfirmation})
-  // }
+  // };
 
   return (
     <>
       <Toaster />
-      {/* {showConfirmation && (
-        <ConfirmationPopup cancel={handleCancel} continue={handleSubmit} />
-      )} */}
       {showWarning && (
         <LosingDataConfirmPopup
           continue={handleCompleteReset}
           cancel={handleBackAndReset}
         />
       )}
-      <div className="shadow-lg p-4 border">
+      <div className="shadow-lg p-4 border bg-white">
         {data ? (
           <>
             <Formik
@@ -320,7 +298,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                       label="Project Summary"
                       name="summary"
                       placeholder="Enter Project Summary"
-                      maxlength={300}
+                      maxlength={250}
                       required
                       readonly={readonly}
                     />
@@ -348,6 +326,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                       label="State"
                       name="state_id"
                       required
+                      setFieldValue={setFieldValue}
                     />
                     <SelectForNoApi
                       data={data?.district}
@@ -359,26 +338,27 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                       touched={touched.district_id}
                       label="District"
                       name="district_id"
-                      readonly={readonly}
+                      readonly={true}
                       required
                       handler={(id: number | string) =>
                         handler(id, setFieldValue)
                       }
                     />
-                    <SelectForNoApi
-                      data={executionBody}
+                    {/* <SelectForNoApi
+                      data={data?.departments}
                       onChange={handleChange}
                       value={values.execution_body}
                       error={errors.execution_body}
                       touched={touched.execution_body}
-                      readonly={readonly}
+                      readonly={true}
                       label="Execution Body"
                       name="execution_body"
+                      placeholder="Please select"
                       required
                       handler={(id: number | string) =>
                         exeBodyHandler(id, setFieldValue)
                       }
-                    />
+                    /> */}
                     {isUlb(exeBodyId) && (
                       <SelectForNoApi
                         data={ulbs}
@@ -391,7 +371,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                         label="ULB Name"
                         name="ulb_id"
                         required
-                        readonly={readonly}
+                        readonly={true}
                         handler={(id: number | string) =>
                           ulbHandler(id, setFieldValue)
                         }
@@ -412,76 +392,63 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                         readonly={readonly}
                       />
                     )}
-                    <Input
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.pin_code}
-                      error={errors.pin_code}
-                      touched={touched.pin_code}
-                      label="Pin Code"
-                      name="pin_code"
-                      placeholder="Enter Pin Code"
-                      maxlength={6}
-                      required
-                      type="number"
-                      readonly={readonly}
-                    />
-                     <div className="flex">
-                      <div>
-                        <div className="flex items-end">
-                          <SelectForNoApi
-                            className="h-[32px] bg-[#4338ca] text-white border-[#4338ca]"
-                            data={docType}
-                            onChange={handleChange}
-                            value={values.files[0]?.document_type_id}
-                            error={
-                              errors.files && errors.files[0]?.document_type_id
-                            }
-                            touched={
-                              touched.files &&
-                              touched.files[0]?.document_type_id
-                            }
-                            readonly={readonly}
-                            label="Upload Document (jpeg, jpg, pdf)"
-                            name="files[0].document_type_id"
-                            required
-                            handler={() => handleDocType(setFieldValue)}
-                          />
-                          <input
-                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                              handleUpload(e, setFieldValue, 0)
-                            }
-                            id="identity"
-                            type="file"
-                            className="hidden"
-                            disabled={readonly}
-                            accept={".jpg, .jpeg, .pdf"}
-                          />
-                          <label
-                            className={`bg-primary_bg_indigo relative p-[6px] h-8 w-8 rounded mt-6 ml-1 ${readonly ? "bg-opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
-                            htmlFor="identity"
-                          >
-                            {values.files[0]?.file_token && !inProgress1 ? (
-                              <Image
-                                src={Check}
-                                width={20}
-                                height={20}
-                                alt="upload"
-                              />
-                            ) : inProgress1 ? (
-                              <div className="absolute -left-2 -top-4">
-                                <RunningAnimation />
-                              </div>
-                            ) : (
-                              <Image
-                                src={upload}
-                                width={20}
-                                height={20}
-                                alt="upload"
-                              />
-                            )}
-                          </label>
-                        </div>
+                    <div className="flex flex-col justify-between">
+                      <Input
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        value={values.pin_code}
+                        error={errors.pin_code}
+                        touched={touched.pin_code}
+                        label="Pin Code"
+                        name="pin_code"
+                        placeholder="Enter Pin Code"
+                        maxlength={6}
+                        required
+                        type="number"
+                        readonly={readonly}
+                      />
+                      <div className="flex flex-col min-w-28">
+                        <span className="text-secondary text-sm mb-1">
+                          Upload Letter (jpeg, jpg, pdf)
+                          <span className="ml-2 text-red-500">*</span>
+                        </span>
+                        <input
+                          id="letter"
+                          type="file"
+                          className="hidden"
+                          disabled={readonly}
+                          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                            handleUpload(e, setFieldValue, 0)
+                          }
+                          accept={".jpg, .jpeg, .pdf"}
+                        />
+                        <label
+                          className={`bg-primary_bg_indigo relative p-1 shadow-lg rounded flex text-white justify-between px-2 ${readonly ? "bg-opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
+                          htmlFor="letter"
+                        >
+                          {values.files[0]?.file_token && !inProgress
+                            ? "Uploaded"
+                            : "Upload"}
+                          {values.files[0]?.file_token && !inProgress ? (
+                            <Image
+                              src={Check}
+                              width={20}
+                              height={20}
+                              alt="letter"
+                            />
+                          ) : inProgress ? (
+                            <div className="absolute -right-2 -top-4">
+                              <RunningAnimation />
+                            </div>
+                          ) : (
+                            <Image
+                              src={upload}
+                              width={20}
+                              height={20}
+                              alt="letter"
+                            />
+                          )}
+                        </label>
                         {!values?.files[0]?.file_token &&
                         !validationError &&
                         touched?.files &&
@@ -498,61 +465,8 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                           <span>{values.files[0]?.file_name}</span>
                         )}
                       </div>
-                      <div className="flex flex-col min-w-28 ml-2">
-                        <span className="text-secondary text-sm mb-1 ml-2">
-                          Upload Letter (jpeg, jpg, pdf)
-                          <span className="ml-2 text-red-500">*</span>
-                        </span>
-                        <input
-                          id="letter"
-                          type="file"
-                          className="hidden"
-                          disabled={readonly}
-                          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                            handleUpload(e, setFieldValue, 1)
-                          }
-                          accept={".jpg, .jpeg, .pdf"}
-                        />
-                        <label
-                          className={`bg-primary_bg_indigo relative p-1 rounded ml-2 flex text-white justify-between px-2 ${readonly ? "bg-opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
-                          htmlFor="letter"
-                        >
-                          {values.files[1]?.file_token && !inProgress2
-                            ? "Uploaded"
-                            : "Upload"}
-                          {values.files[1]?.file_token && !inProgress2 ? (
-                            <Image
-                              src={Check}
-                              width={20}
-                              height={20}
-                              alt="letter"
-                            />
-                          ) : inProgress2 ? (
-                            <div className="absolute -right-2 -top-4">
-                              <RunningAnimation />
-                            </div>
-                          ) : (
-                            <Image
-                              src={upload}
-                              width={20}
-                              height={20}
-                              alt="letter"
-                            />
-                          )}
-                        </label>
-                        {!values.files[1].file_token &&
-                        touched.files &&
-                        errors.files[1]?.file_token ? (
-                          <span className="text-red-500 ml-2">
-                            {errors.files[1]?.file_token}
-                          </span>
-                        ) : (
-                          <span className="ml-2">
-                            {values.files[1]?.file_name}
-                          </span>
-                        )}
-                      </div>
                     </div>
+
                     <TextArea
                       onChange={handleChange}
                       onBlur={handleBlur}

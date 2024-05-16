@@ -85,19 +85,32 @@ class project_proposalsDao {
 
   getById = async (id: number): Promise<[]> => {
     const query = `select 
-    id,
-    summary, 
-    description, 
-    address, 
-    date, 
-    pin_code, 
-    project_proposal_no,
-    state_id,
-    ulb_id,
-    ward_id,
-    district_id
-    from project_proposals
-    where id=${id}`;
+    pp.id,
+    pp.summary, 
+    pp.description, 
+    pp.address, 
+    pp.date, 
+    pp.pin_code, 
+    pp.project_proposal_no,
+    pp.state_id,
+    pp.ulb_id,
+    pp.ward_id,
+    pp.district_id,
+    ms.name as state_name,
+    um.ulb_name,
+    uwm.ward_name,
+    dm.department_name as execution_body_name,
+    dm.id as execution_body
+    from project_proposals as pp
+    left join
+    m_states as ms on ms.id = pp.state_id
+    left join
+    ulb_masters as um on um.id = pp.ulb_id
+    left join
+    ulb_ward_masters as uwm on uwm.id = pp.ward_id
+    left join
+    department_masters as dm on dm.id = pp.execution_body
+    where pp.id=${id}`;
     const data: any = await prisma.$queryRawUnsafe<[]>(query);
     const doc = await prisma.$queryRaw`
     select
@@ -120,7 +133,6 @@ class project_proposalsDao {
     // });
     const newData = data[0];
     newData.files = doc;
-    console.log("first", newData)
     return newData;
   };
 

@@ -1,9 +1,8 @@
 "use client";
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import Header from "../global/layout/Header";
 import Sidebar from "../global/layout/Sidebar";
 import Loading from "./Loading";
-
 
 interface PageLayoutProps {
   children: React.ReactNode;
@@ -12,15 +11,20 @@ interface PageLayoutProps {
 
 const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
   const [isExpanded, setIsExpanded] = useState(true);
-
+  useEffect(() => {
+    setIsExpanded(
+      sessionStorage.getItem("isExpanded") == "false" ? false : true
+    );
+  }, [isExpanded]);
   const handleToggle = () => {
+    sessionStorage.setItem("isExpanded", String(!isExpanded));
     setIsExpanded(!isExpanded);
   };
   // max-sm:hidden max-md:hidden
   return (
     <>
       <main>
-          <Suspense fallback={<Loading />}>
+        <Suspense fallback={<Loading />}>
           <div className="h-screen">
             <Header onClick={handleToggle} />
             <div className="flex">
@@ -29,13 +33,13 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
               />
               <section
                 style={{ height: "calc(100vh - 3.5rem)" }}
-                className="hide-scrollbar w-full overflow-y-auto bg-white p-5"
+                className="hide-scrollbar w-full overflow-y-auto bg-gray-50 p-5"
               >
                 {children}
               </section>
             </div>
           </div>
-          </Suspense>
+        </Suspense>
       </main>
     </>
   );

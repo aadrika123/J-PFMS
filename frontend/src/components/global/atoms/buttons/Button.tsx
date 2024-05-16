@@ -19,7 +19,7 @@ interface ButtonProps {
 }
 
 const buttonVariants = cva(
-  `p-2.5 px-5 text-[0.875rem] flex items-center gap-3 btn-neutral hover:border-neutral-400 rounded-md font-medium text-white hover:bg-indigo-600  hover:text-white`,
+  `p-2.5 px-5 text-[0.875rem] shadow-xl flex items-center gap-3 btn-neutral hover:border-neutral-400 rounded-md font-medium text-white hover:bg-indigo-600  hover:text-white`,
   {
     variants: {
       variant: {

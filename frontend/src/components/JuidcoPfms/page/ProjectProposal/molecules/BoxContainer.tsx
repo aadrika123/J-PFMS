@@ -29,6 +29,7 @@ export const BoldSpan: React.FC<SpanProps> = (props) => {
 
 const BoxContainer: React.FC<BoxContainerPropsType<any>> = (props) => {
   const { projectDetails } = props;
+
   return (
     <div className="flex items-center gap-2 mt-4">
       <div className="bg-gray-100 border flex flex-col p-4 h-52 w-1/3 items-center justify-center rounded">
@@ -40,10 +41,9 @@ const BoxContainer: React.FC<BoxContainerPropsType<any>> = (props) => {
         <BoldSpan content="Proposal Date" />
         <div className="flex items-center mb-2">
           <Image src={home} alt="calender" />
-          <BoldSpan
-            className="mt-2 ml-1 text-red-500"
-            content={`${moment([projectDetails?.date.split("T")[0].replace("-", ",")]).toNow(true)} passed`}
-          />
+          <span className="ml-1 text-red-500">
+            {`${projectDetails?.date.split("T")[0] == new Date().toISOString().split("T")[0] ? "Today" : moment(projectDetails?.date).fromNow()}`}
+          </span>
         </div>
       </div>
       <div className="bg-gray-100 border flex flex-col py-4 px-8 h-52 w-full rounded">

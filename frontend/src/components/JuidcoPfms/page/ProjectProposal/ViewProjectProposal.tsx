@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import Stepper from "./molecules/Stepper";
 import BoxContainer from "./molecules/BoxContainer";
 import Steps from "./molecules/Steps";
 import ViewDetails from "./molecules/ViewDetails";
@@ -28,40 +27,54 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
   const { activeStep, showPopup, docData } = state;
   const items = [
     {
-      info: "JUNIOR ENGINEER",
+      info: "BACK OFFICE",
       img: admi,
+      level: 0,
+      approvalAmount: 100,
     },
     {
-      info: "ASSISTANT ENGINEER",
+      info: "TECHNICAL DEPARTMENT",
       img: admi,
+      level: 1,
+      others: [
+        {
+          info: "EXECUTIVE OFFICER",
+          img: admi,
+          approvalAmount: 200,
+        },
+        {
+          info: "NEW BACK OFFICE",
+          img: admi,
+          approvalAmount: 300,
+        },
+        {
+          info: "NEW CITY MANAGER",
+          img: admi,
+          approvalAmount: 400,
+        },
+      ],
     },
     {
-      info: "EXECUTIVE ENGINEER",
+      info: "ADD DEPARTMENT",
       img: admi,
-    },
-    {
-      info: "EXECUTIVE OFFICER (AMC)",
-      img: admi,
-    },
-    {
-      info: "ACCOUNT DEPARTMENT (MANAGER)",
-      img: admi,
-    },
-    {
-      info: "INTERNAL AUDITOR",
-      img: admi,
-    },
-    {
-      info: "EXECUTIVE OFFICER (AMC)",
-      img: admi,
-    },
-    {
-      info: "ACCOUNTS DEPARTMENT (PDF)",
-      img: admi,
-    },
-    {
-      info: "EXECUTIVE OFFICER (AMC)",
-      img: admi,
+      level: 2,
+      others: [
+        {
+          info: "ADD OFFICER",
+          img: admi,
+          approvalAmount: 200,
+        },
+        {
+          info: "ADD BACK OFFICE",
+          img: admi,
+          approvalAmount: 300,
+        },
+        {
+          info: "ADD CITY MANAGER",
+          img: admi,
+          approvalAmount: 400,
+        },
+      ],
     },
   ];
 
@@ -81,8 +94,8 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
 
   /////// View Button
   const ViewButton = (id: number | string) => {
+    const doc = data?.files.find((item: any) => item.id === id);
     const handleClick = () => {
-      const doc = data?.files.find((item: any) => item.id === id);
       setState((prev: any) => ({
         ...prev,
         showPopup: !showPopup,
@@ -94,7 +107,7 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
       <img
         onClick={handleClick}
         className="h-8 w-12 object-contain"
-        src={`http://localhost:2001/public/pdfs/${docData?.path}`}
+        src={`http://localhost:2001/public/pdfs/${doc?.path}`}
         alt=""
       />
     );
@@ -133,7 +146,7 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
             className=""
             src={`http://localhost:2001/public/pdfs/${docData?.path}`}
             width="1000"
-            height="720"
+            height="620"
           ></iframe>
           <div className="flex items-center absolute bottom-3 self-center">
             <Button
@@ -153,22 +166,33 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
         // user?.getUserLevel() && user?.getUserLevel() < 2
         //  handleEditMode?: () => void;
       />
-      <div className="shadow-lg p-4 border">
-        <Stepper items={items} activeStepper={1 || user?.getUserLevel()} />
-        <BoxContainer projectDetails={data} />
-        <Steps
-          handleClick={handleStepClick}
-          activeStep={activeStep}
-          className="mt-4"
-        />
-        {activeStep === 0 ? (
-          <ViewDetails projectDetails={data} />
+      <div className="shadow-lg bg-white p-4 border">
+        {!data ? (
+          <Loader />
         ) : (
-          activeStep === 1 && (
-            <div className="mt-4">
-              <Table columns={columns} data={data?.files} center />
-            </div>
-          )
+          <>
+            <ProjectProposalApprovalStepper
+              level={2}
+              subLevel={0}
+              budget={300}
+              items={items}
+            />
+            <BoxContainer projectDetails={data} />
+            <Steps
+              handleClick={handleStepClick}
+              activeStep={activeStep}
+              className="mt-4"
+            />
+            {activeStep === 0 ? (
+              <ViewDetails projectDetails={data} />
+            ) : (
+              activeStep === 1 && (
+                <div className="mt-4">
+                  <Table columns={columns} data={data?.files} center />
+                </div>
+              )
+            )}
+          </>
         )}
       </div>
     </>

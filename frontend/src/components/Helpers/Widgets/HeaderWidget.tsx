@@ -38,10 +38,14 @@ export function HeaderWidget(props: HeaderWidgetProps) {
       </div>
       <div className="flex">
         <LinkWithLoader href={`${pathName}/add`}>
-          <Button variant="primary" className="rounded-3xl">
-            + Add {props.title}
-          </Button>
-        </LinkWithLoader>
+        <Button
+          onClick={props.handleAdd}
+          variant="primary"
+          className="rounded-3xl"
+          >
+          + Add {props.title}
+        </Button>
+          </LinkWithLoader>
       </div>
     </div>
   );
@@ -77,7 +81,7 @@ export function HeaderWidget(props: HeaderWidgetProps) {
   );
 
   return (
-    <div className="border shadow-xl p-4 mb-10">
+    <div className="border bg-white shadow-xl p-4 mb-10">
       {props.variant === "edit"
         ? EditHeader
         : props.variant === "add"
