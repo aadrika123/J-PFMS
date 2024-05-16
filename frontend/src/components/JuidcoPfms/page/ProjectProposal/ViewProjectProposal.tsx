@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import Stepper from "./molecules/Stepper";
 import BoxContainer from "./molecules/BoxContainer";
 import Steps from "./molecules/Steps";
 import ViewDetails from "./molecules/ViewDetails";
@@ -15,6 +14,7 @@ import { HeaderWidget } from "./HeaderWidget";
 import Button from "@/components/global/atoms/Button";
 import Popup from "@/components/global/molecules/Popup";
 import Loader from "@/components/global/atoms/Loader";
+import ProjectProposalApprovalStepper from "./molecules/ProjectProposalApprovalStepper";
 // import Image from "next/image";
 
 const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
@@ -32,14 +32,52 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
     {
       info: "BACK OFFICE",
       img: admi,
+      level: 0,
+      approvalAmount: 100,
     },
     {
-      info: "EXECUTIVE OFFICER",
+      info: "TECHNICAL DEPARTMENT",
       img: admi,
+      level: 1,
+      others: [
+        {
+          info: "EXECUTIVE OFFICER",
+          img: admi,
+          approvalAmount: 200,
+        },
+        {
+          info: "NEW BACK OFFICE",
+          img: admi,
+          approvalAmount: 300,
+        },
+        {
+          info: "NEW CITY MANAGER",
+          img: admi,
+          approvalAmount: 400,
+        },
+      ],
     },
     {
-      info: "CITY MANAGER",
+      info: "ADD DEPARTMENT",
       img: admi,
+      level: 2,
+      others: [
+        {
+          info: "ADD OFFICER",
+          img: admi,
+          approvalAmount: 200,
+        },
+        {
+          info: "ADD BACK OFFICE",
+          img: admi,
+          approvalAmount: 300,
+        },
+        {
+          info: "ADD CITY MANAGER",
+          img: admi,
+          approvalAmount: 400,
+        },
+      ],
     },
   ];
 
@@ -132,25 +170,33 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
         //  handleEditMode?: () => void;
       />
       <div className="shadow-lg bg-white p-4 border">
-      {!data ? <Loader/> : <>
-        <Stepper items={items} activeStepper={1 || user?.getUserLevel()} />
-        <BoxContainer projectDetails={data} />
-        <Steps
-          handleClick={handleStepClick}
-          activeStep={activeStep}
-          className="mt-4"
-        />
-        {activeStep === 0 ? (
-          <ViewDetails projectDetails={data} />
+        {!data ? (
+          <Loader />
         ) : (
-          activeStep === 1 && (
-            <div className="mt-4">
-              <Table columns={columns} data={data?.files} center />
-            </div>
-          )
+          <>
+            <ProjectProposalApprovalStepper
+              level={2}
+              subLevel={0}
+              budget={300}
+              items={items}
+            />
+            <BoxContainer projectDetails={data} />
+            <Steps
+              handleClick={handleStepClick}
+              activeStep={activeStep}
+              className="mt-4"
+            />
+            {activeStep === 0 ? (
+              <ViewDetails projectDetails={data} />
+            ) : (
+              activeStep === 1 && (
+                <div className="mt-4">
+                  <Table columns={columns} data={data?.files} center />
+                </div>
+              )
+            )}
+          </>
         )}
-        </>}
-
       </div>
     </>
   );

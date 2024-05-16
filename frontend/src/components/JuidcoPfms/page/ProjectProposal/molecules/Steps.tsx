@@ -33,10 +33,14 @@ const Steps: React.FC<StepPorps> = (props) => {
     <>
       <div className={`flex ${className}`}>
         {items.map((item, index) => (
-          <div onClick={() => handleClick(index)} key={index} className={`mr-4 flex-col items-center cursor-pointer ${!item?.isVisible && 'hidden'}`}>
+          <div
+            onClick={() => handleClick(index)}
+            key={index}
+            className={`mr-4 flex-col items-center cursor-pointer ${!item?.isVisible && "hidden"}`}
+          >
             <span className="text-black">{item.info}</span>
             <div
-              className={`h-2 w-4 rounded-t-full bg-indigo-500 ml-[50%] ${index !== activeStep && "hidden"}`}
+              className={`h-2 w-4 ml-[40%] border-l-[10px] border-l-transparent border-b-[10px] border-b-indigo-500 border-r-[10px] border-r-transparent ${index !== activeStep && "hidden"}`}
             ></div>
           </div>
         ))}
