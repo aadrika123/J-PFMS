@@ -20,7 +20,7 @@ const WorkingPopup: React.FC = () => {
   
 
   return (
-    <Popup title="" zindex={50} width={80}>
+    <Popup title="" zindex={50} width={40}>
       <div className="flex flex-col justify-center items-center w-40">
         <DNA
           visible={true}

@@ -1,0 +1,19 @@
+
+Run this query for juidco_masters at once in PgAdmin after selecting Jidco_masters SQL Tool
+
+CREATE TABLE department_masters (
+	id SERIAL PRIMARY KEY,
+    department_name varchar(255),
+    status boolean,
+    interpotential_date date,
+    created_at timestamp,
+    updated_at timestamp
+);
+
+insert into department_masters 
+  (department_name, status, interpotential_date, created_at, updated_at)
+  values
+  ('ULB', true, '2024-05-15T00:00:00z', '2024-05-15T00:00:00z', '2024-05-15T00:00:00z'),
+  ('JUIDCO', true, '2024-05-15T00:00:00z', '2024-05-15T00:00:00z', '2024-05-15T00:00:00z'),
+  ('SUDA', true, '2024-05-15T00:00:00z', '2024-05-15T00:00:00z', '2024-05-15T00:00:00z'),
+  ('DMA', true, '2024-05-15T00:00:00z', '2024-05-15T00:00:00z', '2024-05-15T00:00:00z')

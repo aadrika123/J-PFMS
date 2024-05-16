@@ -11,10 +11,14 @@ class ProjectManagementRoute extends APIv1_New{
   }
 
   configure(): void {
-    this.addGetRoute(`get`, this.controller.get);
+    this.addGetRoute(`get/:proposalId`, this.controller.get);
+    this.addGetRoute(`get-all`, this.controller.getAll);
     this.addGetRoute(`inbox`, this.controller.getInbox);
     this.addGetRoute(`outbox`, this.controller.getOutbox);
     this.addGetRoute(`archive`, this.controller.getArchive);
+
+    // mutable routes: use post
+    this.addPostRoute(`acknowledge/:proposalId`, this.controller.acknowledge);
   }
 }
 

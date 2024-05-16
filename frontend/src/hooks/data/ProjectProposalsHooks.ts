@@ -6,10 +6,12 @@ import { usePathname } from "next/navigation";
 
 
 
-const projectProposalsApi = `${baseURL}/project-management/get`;
+const projectProposalApi = `${baseURL}/project-management/get`;
+const projectProposalsApi = `${baseURL}/project-management/get-all`;
 const projectProposalsInboxApi = `${baseURL}/project-management/inbox`;
 const projectProposalsOutboxApi = `${baseURL}/project-management/outbox`;
 const projectProposalsArchiveApi = `${baseURL}/project-management/archive`;
+const projectProposalAcknowledgementApi = `${baseURL}/project-management/acknowledge`;
 
 
 export const useProjectProposalList = (searchQuery: string, limit: number, page: number) => {
@@ -89,6 +91,42 @@ export const useProjectProposalList = (searchQuery: string, limit: number, page:
       });
     });
   }
+
+
+  export const useProjectProposalDetails = (proposalId: number) => {
+    const pathName = usePathname();
+      return useQuery(["project-proposal", proposalId, pathName], (): Promise<any> => {
+        return new Promise((resolve, reject) => {
+          axios.get(`${projectProposalApi}/${proposalId}`).then(resp => {
+            console.log(resp.data.message);
+            if (!resp.data.status) {
+              reject(resp.data.message);
+            } else {
+              resolve(resp.data.data);
+            }
+          }).catch((reason) => {
+            reject(reason);
+          });
+        });
+      });
+    }
+
+  
+  export const acknowledgeProposal = (proposalId: number) => {
+    return new Promise((resolve, reject) => {
+      axios.post(`${projectProposalAcknowledgementApi}/${proposalId}`).then(resp => {
+        console.log(resp.data.message);
+        if(!resp.data.status){
+          reject(resp.data.message);
+        }else{
+          resolve(resp.data.data);
+        }
+      }).catch((reason) => {
+        reject(reason);
+      });
+    });
+  }
+  
 
 
   export const useUlbList = () => {

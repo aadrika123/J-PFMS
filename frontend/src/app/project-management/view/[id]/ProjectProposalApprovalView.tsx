@@ -1,156 +1,214 @@
 "use client";
-import React, { useState } from "react";
-import Table from "@/components/global/molecules/Table";
-import admi from "@/assets/svg/admi.svg";
-import { useQuery } from "react-query";
+import React, { useEffect, useState } from "react";
 // import { usePathname } from "next/navigation";
-import { useUser } from "@/components/global/molecules/general/useUser";
-import axios from "@/lib/axiosConfig";
-import { PFMS_URL } from "@/utils/api/urls";
-import Popup from "@/components/global/molecules/Popup";
-import Stepper from "./molecules/Stepper";
-import BoxContainer from "./molecules/BoxContainer";
-import Steps from "./molecules/Steps";
-import ViewDetails from "./molecules/ViewDetails";
 import Button from "@/components/global/atoms/buttons/Button";
+import ConfirmationPopup from "@/components/global/molecules/ConfirmationPopup";
+import { acknowledgeProposal, useProjectProposalDetails } from "@/hooks/data/ProjectProposalsHooks";
+import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
+import { useProjectApprovalStepper } from "./useProjectApprovalStepper";
+import Image from "next/image";
+import home from "@/assets/svg/list.svg";
+import Popup from "@/components/global/molecules/general/Popup";
+import { AddMeasurementComponent } from "./AddMeasurementComponent";
+import { usePathname } from "next/navigation";
 
-const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number }) => {
-  const user = useUser();
-  //   const pathname = usePathname();
-  const [state, setState] = useState<any>({
-    activeStep: 0,
-    showPopup: false,
-    remarks: "",
-    docData: null,
-  });
 
-  const { activeStep, showPopup, docData } = state;
+
+
+type StepPorps = {
+  className?: string;
+  activeStep: number;
+  handleClick: (step: number) => void;
+};
+
+const Steps: React.FC<StepPorps> = (props) => {
+  const pathname = usePathname();
+  const { className, activeStep, handleClick } = props;
   const items = [
     {
-      info: "BACK OFFICE",
-      img: admi,
+      info: "VIEW DETAILS",
+      isVisible: true,
     },
     {
-      info: "EXECUTIVE OFFICER",
-      img: admi,
+      info: "VIEW DOCUMENTS",
+      isVisible: true,
     },
+    // {
+    //   info: "VERIFY DOCUMENTS",
+    //   isVisible: !pathname.includes('outbox'),
+    // },
     {
-      info: "CITY MANAGER",
-      img: admi,
+      info: "ACTION",
+      isVisible: !pathname.includes('outbox'),
     },
-    {
-      info: "ENGENEERING DEPARTMENT ",
-      img: admi,
-    },
-    {
-      info: "ADMINSITRATIVE DEPARTMENT ",
-      img: admi,
-    },
-    
   ];
 
-  ///////// Fetching Data
-  const fetch = async () => {
-    const res = await axios({
-      url: `${PFMS_URL.PROJ_RPOPOSAL_URL.getById}/${ProProposalId}`,
-      method: "GET",
-    });
-
-    if (!res.data.status) throw "Someting Went Wrong!!";
-
-    return res.data.data;
-  };
-
-  const { data: data }: any = useQuery(["pro-proposal", ProProposalId], fetch);
-
-  /////// View Button
-  const ViewButton = (id: number | string) => {
-    const handleClick = () => {
-      const doc = data?.files.find((item: any) => item.id === id);
-      setState((prev: any) => ({
-        ...prev,
-        showPopup: !showPopup,
-        docData: doc,
-      }));
-    };
-
-    return (
-      <img
-        onClick={handleClick}
-        className="h-8 w-12 object-contain"
-        src={`http://localhost:2001/public/pdfs/${docData?.path}`}
-        alt=""
-      />
-    );
-  };
-
-  ///////////// Handling step click ///////////
-  const handleStepClick = (step: number) => {
-    setState({ ...state, activeStep: step });
-  };
-
-  const columns = [
-    { name: "id", caption: "Sr. No.", width: "w-[5%]" },
-    {
-      name: "file_name",
-      caption: "Document Name",
-    },
-    {
-      name: "path",
-      caption: "View",
-      value: ViewButton,
-    },
-    {
-      name: "approved",
-      caption: "Status",
-    },
-    {
-      name: "remarks",
-      caption: "Remarks",
-    },
-  ];
   return (
     <>
-      {showPopup && (
-        <Popup padding="0">
-          <iframe
-            className=""
-            src={`http://localhost:2001/public/pdfs/${docData?.path}`}
-            width="1000"
-            height="720"
-          ></iframe>
-          <div className="flex items-center absolute bottom-3 self-center">
-            <Button
-              onClick={() => setState({ ...state, showPopup: !showPopup })}
-              variant="cancel"
-            >
-              Close
-            </Button>
+      <div className={`flex ${className}`}>
+        {items.map((item, index) => (
+          <div onClick={() => handleClick(index)} key={index} className={`mr-4 flex-col items-center cursor-pointer ${!item?.isVisible && 'hidden'}`}>
+            <span className="text-black">{item.info}</span>
+            <div
+              className={`h-2 w-4 rounded-t-full bg-indigo-500 ml-[50%] ${index !== activeStep && "hidden"}`}
+            ></div>
           </div>
-        </Popup>
+        ))}
+      </div>
+      <hr className="border-2 border-indigo-500" />
+    </>
+  );
+};
+
+
+const Title = ({ title }: { title: string }) => {
+  return <b>{title}</b>;
+};
+
+type SpanProps = {
+  label?: string;
+  content?: string;
+  className?: string;
+};
+
+/////////// BoldSpan Component
+export const BoldSpan: React.FC<SpanProps> = (props) => {
+  const { label, content, className } = props;
+  return (
+    <span className={`mb-2 text-secondary ${className} `}>
+      {label && <b>{label}&nbsp;</b>}
+      {content}
+    </span>
+  );
+};
+
+export const Paragraph = ({ desc }: { desc: string }) => {
+  return <p className="text-gray-500">{desc}</p>;
+};
+
+
+const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number }) => {
+  const {data: projectProposalDetails, refetch: refetchProjectProposalDetails} = useProjectProposalDetails(ProProposalId);
+  const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] = useWorkingAnimation();
+
+  const [projectApprovalStepper] = useProjectApprovalStepper();
+
+  const [measurementFormVisible, setMeasurementFormVisible] = useState<boolean>(false);
+
+  useEffect(() => {
+    console.log(projectProposalDetails);
+  }, [projectProposalDetails]);
+
+  const [acknowledgementPopupVisible, setAcknowledgetmentPopupVisible] = useState<boolean>(false);
+
+
+  const acknowledge = () => {
+    console.log("Acknowledetment!");
+    setAcknowledgetmentPopupVisible(false);
+    activateWorkingAnimation();
+    acknowledgeProposal(ProProposalId).then((data) => {
+      console.log(data);
+      refetchProjectProposalDetails();
+      hideWorkingAnimation();
+    }).catch((error) => {
+      hideWorkingAnimation();
+      console.log(error);
+    });
+  }
+
+  const handleStepClick = (step: number) => {
+    setActiveStep(step);
+  };
+
+  const [activeStep, setActiveStep] = useState<number>(0);
+
+  return (
+    <>
+    {workingAnimation}
+      {acknowledgementPopupVisible && (<ConfirmationPopup message="Acknowledge the assignement?" cancel={() => setAcknowledgetmentPopupVisible(false)} continue={acknowledge} />)}
+      
+      
+      {measurementFormVisible && (
+              <Popup width={80} zindex={30}>
+             <AddMeasurementComponent onBack={() => setMeasurementFormVisible(false)}/>
+            </Popup>
+      
       )}
-      {/* <HeaderWidget
-        title="Project Details"
-        variant={"view"}
-        editVisible={true}
-        isDisabled={user?.getUserLevel() && user?.getUserLevel() > 2}
-        // user?.getUserLevel() && user?.getUserLevel() < 2
-        //  handleEditMode?: () => void;
-      /> */}
+
       <div className="shadow-lg p-4 border">
-        <Stepper items={items} activeStepper={1 || user?.getUserLevel()} />
-        <BoxContainer projectDetails={data} />
-        <Steps
-          handleClick={handleStepClick}
-          activeStep={activeStep}
-          className="mt-4"
+        
+        {projectApprovalStepper}
+
+        <div className="flex items-center gap-2 mt-4">
+      <div className="bg-gray-100 border flex flex-col p-4 h-52 w-1/3 items-center justify-center rounded">
+        <BoldSpan
+          className="text-secondary_black mb-4 text-center"
+          label={""}
         />
+        <BoldSpan label={""} />
+        <BoldSpan content="Proposal Date" />
+        <div className="flex items-center mb-2">
+          <Image src={home} alt="calender" />
+          <BoldSpan
+            className="mt-2 ml-1 text-red-500"
+            content={""}
+          />
+        </div>
+      </div>
+      <div className="bg-gray-100 border flex flex-col py-4 px-8 h-52 w-full rounded">
+        <section>
+          <Title title="Project Summary" />
+          <Paragraph desc={projectProposalDetails?.summary} />
+        </section>
+      </div>
+    </div>
+
+
+    <div className="border p-6 mt-4">
+        <section>
+          <Title title="Project Description" />
+          <Paragraph
+            desc={projectProposalDetails?.description}
+          />
+        </section>
+        <hr className="mt-3 border border-gray-400" />
+        <hr className="border border-gray-400" />
+        <div className=" grid grid-cols-4 gap-4 mt-3">
+        </div>
+      </div>
+
+      <Steps
+            handleClick={handleStepClick}
+            activeStep={activeStep}
+            className="mt-4"
+          />
+
         {activeStep === 0 ? (
-          <ViewDetails projectDetails={data} />
+          
+          projectProposalDetails?.acknowledged? (
+            <>
+            <div className="flex gap-2 justify-end">
+              <Button variant="primary">Add BOQ</Button>
+              <Button variant="primary" onClick={() => setMeasurementFormVisible(true)}>Add Measurement</Button>
+              <Button variant="primary">Upload</Button>
+            </div>
+            </>
+          ): (
+            <>
+            <div className="flex justify-end mt-4">
+              <Button variant="primary" onClick={() => setAcknowledgetmentPopupVisible(true)}>Acknowledge</Button>
+            </div>
+            <div className="flex justify-end">
+              <span className="text-red-500">*</span>
+              Please acknowledge the form to submit measurement * other details
+            </div>
+            </>
+          )
+          
         ) : (
           activeStep === 1 && (
             <div className="mt-4">
-              <Table columns={columns} data={data?.files} center />
+                Hello
             </div>
           )
         )}

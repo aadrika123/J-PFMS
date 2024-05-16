@@ -110,7 +110,7 @@ export class APIv1_New {
             action: req.method,
           },
         };
-        res.status(500).json(finalResponse);
+        res.status(200).json(finalResponse);
         resolve(res);
       });
     });

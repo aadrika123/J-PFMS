@@ -12,8 +12,8 @@ import { useUser } from "@/components/global/molecules/general/useUser";
 import axios from "@/lib/axiosConfig";
 import { PFMS_URL } from "@/utils/api/urls";
 import { HeaderWidget } from "./HeaderWidget";
-import Button from "@/components/global/atoms/Button";
 import Popup from "@/components/global/molecules/Popup";
+import Button from "@/components/global/atoms/buttons/Button";
 
 const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
   const user = useUser();

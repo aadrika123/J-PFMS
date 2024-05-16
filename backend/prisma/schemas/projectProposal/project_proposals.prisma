@@ -15,6 +15,7 @@ model project_proposals {
   pin_code                   Int
   user_id                    Int
   execution_body             Int
+  acknowledged                Boolean? @default(false)
   
   project_proposal_checkings project_proposal_checkings[]
   project_proposal_documents project_proposal_documents[]

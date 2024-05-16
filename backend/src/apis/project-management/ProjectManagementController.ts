@@ -12,7 +12,34 @@ class ProjectManagementController {
     this.dao = new ProjectManagementDao();
   }
 
-  get = async (req: Request): Promise<APIv1Response> => {
+  get =  async (req: Request): Promise<APIv1Response> => {
+    return new Promise((resolve, reject) => {
+      // validate
+      Yup.object({
+        proposalId: Yup.number().required(),
+      }).validate(req.params).then(() => {
+        // collect data
+        const proposalId = Number(req.params.proposalId);
+        // call dao
+        this.dao.get(proposalId).then((data)=>{
+          if (!data) {
+            const result = { status: true, code: 200, message: "Not Found", data: data };
+            resolve(result);
+          } else {
+            const result = { status: true, code: 200, message: "Found", data: data };
+            resolve(result);
+          }
+        }).catch((error) => {
+          reject(error);
+        });
+      }).catch((error) => {
+        reject(error);
+      });
+
+    });
+  }
+
+  getAll = async (req: Request): Promise<APIv1Response> => {
 
     return new Promise((resolve, reject) => {
 
@@ -32,7 +59,7 @@ class ProjectManagementController {
         console.log(req.query);
 
         // call dao
-        this.dao.get(req.query, page, limit, order).then((data: any) => {
+        this.dao.getAll(req.query, page, limit, order).then((data: any) => {
           if (!data) {
             const result = { status: true, code: 200, message: "Not Found", data: data };
             resolve(result);
@@ -183,6 +210,33 @@ class ProjectManagementController {
           console.log(user.getRole());
           reject(`${user.getRole()} outbox is not supported yet`);
         }
+      });
+    }
+
+    acknowledge = (req: Request): Promise<APIv1Response> => {
+      return new Promise((resolve, reject) => {
+        
+        //validate
+        Yup.object({
+          proposalId: Yup.number().required("proposal id is required")
+        }).validate(req.params).then((xx) => {
+
+          console.log("xx", xx);
+          const p = req.params;
+          this.dao.acknowledge(Number(p.proposalId)).then((data) => {
+            if (!data) {
+              const result = { status: true, code: 200, message: "Failure", data: data };
+              resolve(result);
+            } else {
+              const result = { status: true, code: 200, message: "Success", data: data };
+              resolve(result);
+            }
+          }).catch((error) => {
+            reject(error);
+          });
+        }).catch((error) =>{
+          reject(error);
+        });
       });
     }
 

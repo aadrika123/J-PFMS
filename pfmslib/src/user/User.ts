@@ -11,7 +11,7 @@ export const ROLES = Object.freeze({
 });
 
 class User {
-  private user: any;
+  private user: any
   constructor(userData: any) {
     this.user = userData;
   }

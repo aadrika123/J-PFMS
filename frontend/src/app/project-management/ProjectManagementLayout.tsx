@@ -43,7 +43,7 @@ export const ProjectManagementLayout = ({children}: ProjectManagementLayoutProps
             className={`${!pathName.includes("outbox") && "bg-gray-200 text-gray-500"}`}
           >
             {Icons.outbox}
-            Outbox
+            Outbox 
           </Button>
         </LinkWithLoader>
 

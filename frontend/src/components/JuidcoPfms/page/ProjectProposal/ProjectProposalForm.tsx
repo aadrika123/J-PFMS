@@ -3,7 +3,6 @@ import React, { ChangeEvent, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Input from "@/components/global/atoms/Input";
 import { PFMS_URL } from "@/utils/api/urls";
-import Button from "@/components/global/atoms/Button";
 import { projectProposalValidationSchema } from "pfmslib";
 import goBack from "@/utils/helper";
 import Image from "next/image";
@@ -27,6 +26,7 @@ import toast, { Toaster } from "react-hot-toast";
 import Loader from "@/components/global/atoms/Loader";
 import { docType, executionBody } from "pfmslib";
 import TextArea from "@/components/global/atoms/Textarea";
+import Button from "@/components/global/atoms/buttons/Button";
 // import ConfirmationPopup from "@/components/global/molecules/ConfirmationPopup";
 
 type FileTypes = {

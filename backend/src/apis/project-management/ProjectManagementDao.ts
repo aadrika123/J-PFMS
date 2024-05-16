@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, project_proposals } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -15,7 +15,19 @@ const joinStringValues = (items: []) => {
 
 class ProjectManagementDao {
 
-  async get(filters: any, page: number, limit: number, order: number): Promise<any> {
+  get = async (proposalId: number): Promise<project_proposals | null> => {
+    return new Promise((resolve) => {
+      prisma.$queryRaw<any[]>`select * from project_proposals 
+      where id=${proposalId}`.then((result) => {
+        if(result.length == 0)
+          resolve(null);
+        else
+          resolve(result[0]);
+      });
+    });
+  }
+
+getAll = async (filters: any, page: number, limit: number, order: number): Promise<any>  => {
     return new Promise((resolve, reject) => {
       let query = "from project_proposals where true";
 
@@ -265,6 +277,21 @@ class ProjectManagementDao {
     });
   }
 
+
+  acknowledge = async (proposalId: number) => {
+    return new Promise((resolve, reject) => {
+      prisma.$queryRaw`update project_proposals 
+      set acknowledged=true
+      where id=${proposalId}`.then((result) => {
+        console.log(result);
+        resolve(result);
+      }).catch((error) => {
+        reject(error);
+      });
+    });
+  }
+
+  
 
 }
 
