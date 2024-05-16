@@ -2,7 +2,7 @@
 const nextConfig = {
   basePath: "/pfms",
   env: {
-    backend: "http://jharkhandegov.com:8000",
+    backend: "http://localhost.com:2000",
   },
   async redirects() {
     return [
