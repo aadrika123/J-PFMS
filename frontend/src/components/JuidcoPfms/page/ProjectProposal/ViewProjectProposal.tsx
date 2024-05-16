@@ -13,6 +13,8 @@ import { PFMS_URL } from "@/utils/api/urls";
 import { HeaderWidget } from "./HeaderWidget";
 import Popup from "@/components/global/molecules/Popup";
 import Button from "@/components/global/atoms/buttons/Button";
+import ProjectProposalApprovalStepper from "./molecules/ProjectProposalApprovalStepper";
+import Loader from "@/components/global/atoms/Loader";
 
 const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
   const user = useUser();

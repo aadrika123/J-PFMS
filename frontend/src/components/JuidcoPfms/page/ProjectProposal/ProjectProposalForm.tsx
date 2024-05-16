@@ -25,6 +25,7 @@ import LosingDataConfirmPopup from "@/components/global/molecules/general/Losing
 import toast, { Toaster } from "react-hot-toast";
 import Loader from "@/components/global/atoms/Loader";
 import TextArea from "@/components/global/atoms/Textarea";
+import Button from "@/components/global/atoms/buttons/Button";
 
 type FileTypes = {
   document_type_id: number;
