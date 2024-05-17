@@ -4,7 +4,7 @@ import { Icons } from "@/assets/svg/icons";
 import Button from "@/components/global/atoms/buttons/Button";
 import goBack from "@/utils/helper";
 import { Formik, FormikProps } from "formik";
-import React, { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import * as Yup from "yup";
 
 
@@ -225,14 +225,25 @@ SORRecordRow.displayName = "SORRecordRow";
 
 
 const SORTable = forwardRef<CanProvideData>((props, ref) => {
-  const rows = useState<any | null>({});
 
+  const [rows, setRows] = useState<any[]>([
+    <SORRecordRow ref={(element: any) => { addRowRef(0, element) }} />
+  ]);
 
+  const [rowRefs] = useState<any | null>({});
   const addRowRef = (index: number, element: any) => {
-    console.log("ref: ", element);
     if (element != null) {
-      rows[index] = element;
+      rowRefs[index] = element;
     }
+  }
+
+
+  const addRow = () => {
+    const index = rows.length;
+    const newRows = [...rows,
+    <SORRecordRow ref={(element: any) => { addRowRef(index, element) }} />
+    ];
+    setRows(newRows);
   }
 
 
@@ -240,20 +251,28 @@ const SORTable = forwardRef<CanProvideData>((props, ref) => {
   useImperativeHandle(ref, () => ({
     async getData() {
 
-      const keys = Object.keys(rows);
-      console.log(keys.length);
+      console.log("djdj", rowRefs);
+
+      const data: any[] = [];
+      const keys = Object.keys(rowRefs);
+      console.log(keys);
+
+      let atleastOneFormInvalid = false;
       for (let i = 0; i < keys.length; i++) {
         const key: number = Number(keys[i]);
-        const row = rows[key];
-        const data = await row.getData();
-        console.log("row: " + i, data);
+        const row = rowRefs[key];
+        console.log(row);
+        const rowData = await row?.getData();
+        if (rowData == null) {
+          atleastOneFormInvalid = true;
+        }
+        data.push(rowData);
+        console.log("row: " + i, rowData);
       }
 
-      return "hello";
+      return atleastOneFormInvalid ? null : data;
     }
   }));
-
-
 
 
 
@@ -277,13 +296,13 @@ const SORTable = forwardRef<CanProvideData>((props, ref) => {
             <div className="table-cell text-color-primary">Remarks</div>
           </div>
 
-          <SORRecordRow ref={(element: any) => { addRowRef(0, element) }} />
-          <SORRecordRow ref={(element: any) => { addRowRef(1, element) }} />
-          <SORRecordRow ref={(element: any) => { addRowRef(2, element) }} />
-
+          {rows.map((row) => {
+            return (row);
+          })}
 
         </div>
 
+        <Button variant="primary" onClick={addRow}>Add Row</Button>
       </div>
 
 
@@ -296,24 +315,47 @@ SORTable.displayName = "SORTable";
 
 
 const ScheduleOfRatesRegistrationPage = () => {
-  const tables = useState<any | null>({});
+  const [tables, setTables] = useState<any[]>([
+    <SORTable ref={(element: any) => { addTableRef(0, element) }} />
+  ]);
 
 
+  const [tableRefs] = useState<any | null>({});
   const addTableRef = ((index: number, element: any) => {
-    console.log("table ref: ", element);
     if (element != null) {
-      tables[index] = element;
+      tableRefs[index] = element;
     }
   })
 
+
+  const addTable = () => {
+    const index = tables.length;
+    const newTables = [...tables,
+    <SORTable ref={(element: any) => { addTableRef(index, element) }} />
+    ];
+    setTables(newTables);
+  }
+
   const collectData = async () => {
-    const keys = Object.keys(tables);
-    for(let i=0;i<keys.length;i++){
+
+    const allData: any[] = [];
+    let atleastOneFormInvalid = false;
+    const keys = Object.keys(tableRefs);
+    for (let i = 0; i < keys.length; i++) {
       const key: number = Number(keys[i]);
-      const table = tables[key];
+      const table = tableRefs[key];
       const data = await table.getData();
+      if (data == null) {
+        atleastOneFormInvalid = true;
+      }
+      allData.push(data);
       console.log("table: " + i, data);
     }
+
+    if (atleastOneFormInvalid)
+      console.log("Invalid Data");
+    else
+      console.log(allData);
   }
 
 
@@ -334,9 +376,13 @@ const ScheduleOfRatesRegistrationPage = () => {
           Enter SOR Details
         </div>
       </div>
-      <SORTable ref={(element: any) => { addTableRef(0, element) }} />
 
-      <SORTable ref={(element: any) => { addTableRef(1, element) }} />
+      {tables.map((table) => {
+        return (table);
+      })}
+
+      <Button variant="primary" onClick={addTable}>Add Table</Button>
+
 
       <div className="flex justify-center pt-10">
         <Button variant="primary" onClick={collectData}>Click</Button>
