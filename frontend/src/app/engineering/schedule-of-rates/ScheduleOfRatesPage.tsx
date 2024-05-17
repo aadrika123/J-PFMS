@@ -127,8 +127,6 @@ const ScheduleOfRates = () => {
                 </Button>
 
                 <Button variant="primary" onClick={addSOR}>Add SOR</Button>
-
-
             </div>
 
             <div className="flex items-center mb-4 justify-between">

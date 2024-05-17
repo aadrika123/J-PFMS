@@ -1,11 +1,13 @@
 import PageLayout from "@/components/Layouts/PageLayout";
 import React from "react";
+import ScheduleOfRatesRegistrationPage from "./ScheduleOfRatesRegistrationPage";
 
-export default function Home() {
- 
+const Page = () => {
   return (
     <PageLayout>
-      Add SOR
+      <ScheduleOfRatesRegistrationPage />
     </PageLayout>
   );
-}
+};
+
+export default Page;
