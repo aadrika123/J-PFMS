@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import Stepper from "./molecules/Stepper";
-import admi from "../../../../assets/svg/admi.svg";
+import admi from "@/assets/svg/admi.svg";
 const items = [
     {
       info: "JUNIOR ENGINEER",

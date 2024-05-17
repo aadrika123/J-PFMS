@@ -33,10 +33,38 @@ export const sidebarLinks: SidebarLinksProps = {
           roles: [ROLES.BACK_OFFICE],
         },
         {
-          moduleName: "Project Management",
+          moduleName: "Engineering Section",
           icon: <Image src={project} alt="home" width={100} height={100} />,
-          path: "/project-management",
-          roles: [ROLES.EXE_OFFICER, ROLES.CITY_MANAGER]
+          path: "/engineering",
+          roles: [ROLES.EXE_OFFICER, ROLES.CITY_MANAGER],
+
+          subModules: [
+            {
+              moduleName: "Projects",
+              icon: <Image src={houseIcons} alt="projects" width={100} height={100} />,
+              path: "/engineering/projects",
+            },
+            {
+              moduleName: "e-Measurement Book",
+              icon: <Image src={houseIcons} alt="e-measurement" width={100} height={100} />,
+              path: "/engineering/e-measurement-book",
+            },
+            {
+              moduleName: "Running Bills",
+              icon: <Image src={houseIcons} alt="running-bills" width={100} height={100} />,
+              path: "/engineering/running-bills",
+            },            
+          ]
+        },
+        {
+          moduleName: "Schedule Of Rates",
+          icon: <Image src={houseIcons} alt="sor" width={100} height={100} />,
+          path: "/engineering/schedule-of-rates",
+          subModules: [
+            {moduleName: "SOR Table", path: "/engineering/schedule-of-rates"},
+            {moduleName: "Add SOR", path: "/engineering/schedule-of-rates/add"}
+
+          ]
         },
         {
           moduleName: "Fund Management",

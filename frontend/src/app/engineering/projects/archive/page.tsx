@@ -9,5 +9,4 @@ const page = () => {
     </PageLayout>
   );
 };
-
 export default page;
