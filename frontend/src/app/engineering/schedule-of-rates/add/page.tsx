@@ -1,12 +1,12 @@
-import PageLayout from "@/components/Layouts/PageLayout";
 import React from "react";
 import ScheduleOfRatesRegistrationPage from "./ScheduleOfRatesRegistrationPage";
+import PageLayout2 from "@/components/Layouts/PageLayout2";
 
 const Page = () => {
   return (
-    <PageLayout>
+    <PageLayout2>
       <ScheduleOfRatesRegistrationPage />
-    </PageLayout>
+    </PageLayout2>
   );
 };
 
