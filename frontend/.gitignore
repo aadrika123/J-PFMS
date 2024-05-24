@@ -1,5 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+
+/next.config.js
+
 # i18next
 i18n.js
 i18nConfig.js
@@ -48,4 +51,3 @@ next-env.d.ts
 
 /prisma/migrations
 
-next.config.js

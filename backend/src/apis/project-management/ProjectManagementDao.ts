@@ -77,9 +77,6 @@ getAll = async (filters: any, page: number, limit: number, order: number): Promi
       }).catch((error) => {
         reject(error);
       });
-
-
-
     });
   }
 

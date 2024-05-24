@@ -28,16 +28,16 @@ export const ProjectManagementLayout = ({children}: ProjectManagementLayoutProps
         </h2>
       </div>
       <div className="flex items-center mb-2 gap-2">
-        <LinkWithLoader href={`/project-management`}>
+        <LinkWithLoader href={`/engineering/projects`}>
           <Button
             variant="primary"
-            className={`${pathName.includes("outbox") && "bg-gray-200 text-gray-500"}`}
+            className={`${(pathName.includes("outbox") || pathName.includes("archive")) && "bg-gray-200 text-gray-500"}`}
           >
             {Icons.outbox}
             Inbox
           </Button>
         </LinkWithLoader>
-        <LinkWithLoader href={`${pathName.includes('project-management/view') ? '/project-management/outbox' : pathName + '/outbox'}`}>
+        <LinkWithLoader href={`/engineering/projects/outbox`}>
           <Button
             variant="primary"
             className={`${!pathName.includes("outbox") && "bg-gray-200 text-gray-500"}`}
@@ -47,7 +47,7 @@ export const ProjectManagementLayout = ({children}: ProjectManagementLayoutProps
           </Button>
         </LinkWithLoader>
 
-        <LinkWithLoader href={`${pathName.includes('project-management/view') ? '/project-management/archive' : pathName + '/archive'}`}>
+        <LinkWithLoader href={'/engineering/projects/archive'}>
           <Button
             variant="primary"
             className={`${!pathName.includes("archive") && "bg-gray-200 text-gray-500"}`}

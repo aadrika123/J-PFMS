@@ -11,7 +11,7 @@ import { useProjectProposalsInboxList } from "@/hooks/data/ProjectProposalsHooks
 import { FilterButton } from "@/components/global/atoms/FilterButton";
 
 
-import SearchPanel from "../../../components/global/molecules/SearchPanel";
+import SearchPanel from "../../../../components/global/molecules/SearchPanel";
 import qs from "qs";
 import { usePagination } from "@/hooks/Pagination";
 import LoaderSkeleton from "@/components/global/atoms/LoaderSkeleton";
