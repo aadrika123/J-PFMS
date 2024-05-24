@@ -14,11 +14,11 @@ interface PopupProps {
   padding?: string;
 }
 
-const Popup: React.FC<PopupProps> = ({ children, title, closeModal, width="70%", bgColor="white", opacity="", padding="5" }) => {
+const Popup: React.FC<PopupProps> = ({ children, title, closeModal, width="70%", bgColor="white", opacity="", padding="5", height="90%" }) => {
   return (
     <>
       <div className="fixed top-0 left-0 w-full h-full bg-black opacity-40 z-30"></div>
-      <section className={`fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[${width}] max-h-[90%] overflow-auto z-50 rounded-xl hide-scrollbar`}>
+      <section className={`fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[${width}] max-h-[${height}] overflow-auto z-50 rounded-xl hide-scrollbar`}>
         <div className="relative z-50 ">
           <div className={`w-full rounded-lg h-auto backdrop-blur-lg bg-${bgColor} border shadow-lg flex flex-col ${opacity} p-${padding}`}>
             {title && <Heading>{title}</Heading>}

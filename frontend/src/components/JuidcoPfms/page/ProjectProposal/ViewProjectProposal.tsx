@@ -15,6 +15,8 @@ import Popup from "@/components/global/molecules/Popup";
 import Button from "@/components/global/atoms/buttons/Button";
 import ProjectProposalApprovalStepper from "./molecules/ProjectProposalApprovalStepper";
 import Loader from "@/components/global/atoms/Loader";
+import pdfIcon from "@/assets/svg/pdf_icon.svg";
+import Image from "next/image";
 
 const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
   const user = useUser();
@@ -106,12 +108,17 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
     };
 
     return (
-      <img
-        onClick={handleClick}
-        className="h-8 w-12 object-contain"
-        src={`http://localhost:2001/public/pdfs/${doc?.path}`}
-        alt=""
-      />
+      <div onClick={handleClick}>
+        {doc?.path.split(".")[1] !== "pdf" ? (
+          <img
+            className="w-12 h-12"
+            src={`${process.env.img_base}${doc?.path}`}
+            alt=""
+          />
+        ) : (
+          <Image src={pdfIcon} width={30} height={30} alt="pdf-icon" />
+        )}
+      </div>
     );
   };
 
@@ -145,10 +152,10 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
       {showPopup && (
         <Popup padding="0">
           <iframe
-            className=""
-            src={`http://localhost:2001/public/pdfs/${docData?.path}`}
-            width="1000"
-            height="620"
+            width={1000}
+            height={570}
+            src={`${process.env.img_base}${docData?.path}`}
+            scrolling="no"
           ></iframe>
           <div className="flex items-center absolute bottom-3 self-center">
             <Button
@@ -174,7 +181,7 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
         ) : (
           <>
             <ProjectProposalApprovalStepper
-              level={2}
+              level={1}
               subLevel={0}
               budget={300}
               items={items}

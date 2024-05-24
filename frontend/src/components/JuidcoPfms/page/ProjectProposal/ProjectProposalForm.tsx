@@ -26,11 +26,15 @@ import toast, { Toaster } from "react-hot-toast";
 import Loader from "@/components/global/atoms/Loader";
 import TextArea from "@/components/global/atoms/Textarea";
 import Button from "@/components/global/atoms/buttons/Button";
+import CustomImage from "@/components/global/molecules/general/CustomImage";
+import pdfIcon from "@/assets/svg/pdf_icon.svg";
+import Popup from "@/components/global/molecules/Popup";
 
 type FileTypes = {
   document_type_id: number;
   file_token: string;
   file_name?: string;
+  path?: string;
 };
 
 export type ProjectProposalSchema = {
@@ -67,10 +71,15 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     ulbId: initialValues.ulb_id,
     districtId: initialValues.district_id,
     exeBodyId: initialValues.execution_body,
+    file: initialValues.files[0]?.path
+      ? `${initialValues.files[0]?.path}`
+      : null,
     inProgress: false,
     showWarning: false,
     triggerFun: null,
     validationError: null,
+    fileType: initialValues.files[0]?.path?.split(".")[1],
+    showPopup: false,
   });
   const {
     ulbId,
@@ -80,6 +89,9 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     exeBodyId,
     triggerFun,
     validationError,
+    file,
+    fileType,
+    showPopup,
   } = state;
 
   ////// Fetching data
@@ -129,7 +141,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
 
   //////// Check Execution Body is ULB or Not
   const isUlb = (id: number) => {
-    return data?.departments.find((i:any) => i.id === id)?.name === "ULB";
+    return data?.departments.find((i: any) => i.id === id)?.name === "ULB";
   };
 
   ///////// Getting Ulbs
@@ -162,9 +174,9 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
 
   ///////////// Checking File Type
   const validateFileType = (file: any) => {
-    const fileType = ["jpeg", "jpg", "pdf"];
+    const fileTypes = ["jpeg", "jpg", "pdf"];
 
-    return fileType.some((type) => file?.type?.includes(type));
+    return fileTypes.some((type) => file?.type?.includes(type));
   };
 
   ////// Handle Upload
@@ -174,13 +186,20 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     index: number
   ) => {
     setState((prev: any) => {
-      if (index === 0) return { ...prev, inProgress1: true };
+      if (index === 0) return { ...prev, inProgress: true };
 
       return { ...prev, inProgress: true };
     });
     try {
       if (e.target.files) {
         const file = e.target.files[0];
+        if (file.size > 2 * 1024 * 1024) {
+          setState({
+            ...state,
+            validationError: `max file size is 2 mb`,
+          });
+          return;
+        }
         if (!validateFileType(file)) {
           setState({
             ...state,
@@ -204,6 +223,8 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
         setState({
           ...state,
           validationError: null,
+          file: URL.createObjectURL(file),
+          fileType: file?.type?.includes("pdf") ? "pdf" : "",
         });
       }
     } catch (error: any) {
@@ -236,6 +257,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
         ...prev,
         districtId: initialValues.district_id,
         ulbId: initialValues.ulb_id,
+        file: null,
       }));
     }, 100);
   };
@@ -258,6 +280,23 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
   return (
     <>
       <Toaster />
+      {showPopup && (
+        <Popup padding="0">
+          <iframe
+            width={1000}
+            height={570}
+            src={`${file.split(".")[1] === "pdf" ? `${process.env.img_base}${file}` : file}`}
+          ></iframe>
+          <div className="flex items-center absolute bottom-3 self-center">
+            <Button
+              onClick={() => setState({ ...state, showPopup: !showPopup })}
+              variant="cancel"
+            >
+              Close
+            </Button>
+          </div>
+        </Popup>
+      )}
       {showWarning && (
         <LosingDataConfirmPopup
           continue={handleCompleteReset}
@@ -408,62 +447,81 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                         type="number"
                         readonly={readonly}
                       />
-                      <div className="flex flex-col min-w-28">
-                        <span className="text-secondary text-sm mb-1">
-                          Upload Letter (jpeg, jpg, pdf)
-                          <span className="ml-2 text-red-500">*</span>
-                        </span>
-                        <input
-                          id="letter"
-                          type="file"
-                          className="hidden"
-                          disabled={readonly}
-                          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                            handleUpload(e, setFieldValue, 0)
-                          }
-                          accept={".jpg, .jpeg, .pdf"}
-                        />
-                        <label
-                          className={`bg-primary_bg_indigo relative p-1 shadow-lg rounded flex text-white justify-between px-2 ${readonly ? "bg-opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
-                          htmlFor="letter"
-                        >
-                          {values.files[0]?.file_token && !inProgress
-                            ? "Uploaded"
-                            : "Upload"}
-                          {values.files[0]?.file_token && !inProgress ? (
-                            <Image
-                              src={Check}
-                              width={20}
-                              height={20}
-                              alt="letter"
-                            />
-                          ) : inProgress ? (
-                            <div className="absolute -right-2 -top-4">
-                              <RunningAnimation />
-                            </div>
+                      <div className="flex items-end w-full">
+                        <div className="flex flex-col min-w-28">
+                          <span className="text-secondary text-sm mb-1">
+                            Upload Letter (jpeg, jpg, pdf)
+                            <span className="ml-2 text-red-500">*</span>
+                          </span>
+                          <input
+                            id="letter"
+                            type="file"
+                            className="hidden"
+                            disabled={readonly}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                              handleUpload(e, setFieldValue, 0)
+                            }
+                            accept={".jpg, .jpeg, .pdf"}
+                          />
+                          <label
+                            className={`bg-primary_bg_indigo relative p-1 shadow-lg rounded flex text-white justify-between px-2 ${readonly ? "bg-opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
+                            htmlFor="letter"
+                          >
+                            {values.files[0]?.file_token && !inProgress
+                              ? "Uploaded"
+                              : "Upload"}
+                            {values.files[0]?.file_token && !inProgress ? (
+                              <Image
+                                src={Check}
+                                width={20}
+                                height={20}
+                                alt="letter"
+                              />
+                            ) : inProgress ? (
+                              <div className="absolute -right-2 -top-4 h-">
+                                <RunningAnimation />
+                              </div>
+                            ) : (
+                              <Image
+                                src={upload}
+                                width={20}
+                                height={20}
+                                alt="letter"
+                              />
+                            )}
+                          </label>
+                          {!values?.files[0]?.file_token &&
+                          !validationError &&
+                          touched?.files &&
+                          errors?.files &&
+                          errors?.files[0]?.file_token ? (
+                            <span className="text-red-500">
+                              {errors.files[0]?.file_token}
+                            </span>
+                          ) : validationError ? (
+                            <span className="text-red-500">
+                              {validationError}
+                            </span>
                           ) : (
-                            <Image
-                              src={upload}
-                              width={20}
-                              height={20}
-                              alt="letter"
-                            />
+                            <span>{values.files[0]?.file_name}</span>
                           )}
-                        </label>
-                        {!values?.files[0]?.file_token &&
-                        !validationError &&
-                        touched?.files &&
-                        errors?.files &&
-                        errors?.files[0]?.file_token ? (
-                          <span className="text-red-500">
-                            {errors.files[0]?.file_token}
-                          </span>
-                        ) : validationError ? (
-                          <span className="text-red-500">
-                            {validationError}
-                          </span>
-                        ) : (
-                          <span>{values.files[0]?.file_name}</span>
+                        </div>
+                        {file && (
+                          <div className="hide-scrollbar ml-4">
+                            {fileType !== "pdf" ? (
+                              <CustomImage src={file} width={100} height={80} />
+                            ) : (
+                              <Image
+                                onClick={() =>
+                                  setState({ ...state, showPopup: !showPopup })
+                                }
+                                src={pdfIcon}
+                                width={70}
+                                height={70}
+                                alt="pdf-icon"
+                              />
+                            )}
+                          </div>
                         )}
                       </div>
                     </div>

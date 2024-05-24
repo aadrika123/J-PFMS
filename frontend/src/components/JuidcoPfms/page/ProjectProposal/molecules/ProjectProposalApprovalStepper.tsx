@@ -71,7 +71,7 @@ const ProjectProposalApprovalStepper: React.FC<
 
   useEffect(() => {
     handleTimeline(level, false);
-  }, [level, budget]);
+  }, [level, budget, subLevel]);
 
   //// HandleClick
   const handleExpand = (item: any) => {

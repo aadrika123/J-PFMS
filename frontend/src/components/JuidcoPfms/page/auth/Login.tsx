@@ -51,11 +51,12 @@ const Login = () => {
       // });
 
       if (res.data.status) {
-        const data:any = await initialApiCall(res?.data?.data?.userDetails?.ulb_id)
+        const data:any = await initialApiCall(res?.data?.data?.userDetails?.ulb_id, res.data.data.token)
         const updatedData = {
           ...res.data.data,
           userDetails: {...res.data.data.userDetails, ...data},
         }
+
         dispatch(login(updatedData));
         window.location.replace("/pfms/home");
       } else {
