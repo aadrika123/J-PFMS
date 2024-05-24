@@ -18,7 +18,7 @@ import SearchPanel from "@/components/global/molecules/SearchPanel";
 
 const HeroProjectProposal = () => {
   const router = useRouter();
-  const [workingAnimation, activateWorkingAnimation] = useWorkingAnimation();
+  const [, activateWorkingAnimation] = useWorkingAnimation();
 
   const pathName = usePathname();
 

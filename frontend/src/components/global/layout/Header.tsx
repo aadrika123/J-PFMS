@@ -10,14 +10,13 @@ import { useWorkingAnimation } from "../molecules/general/useWorkingAnimation";
 
 interface SideBarProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
+  onClick?: () => void;
 }
 
 const Header: React.FC<SideBarProps> = (props) => {
   // const pathName = usePathname();
   const dispatch = useDispatch();
   const [workingAnimation, activateWorkingAnimation] = useWorkingAnimation();
-
-
 
   //__________ Logout Functionality _____________//
   const handleClick = () => {
