@@ -30,13 +30,13 @@ export const sidebarLinks: SidebarLinksProps = {
           moduleName: "Project Proposal",
           icon: <Image src={project} alt="home" width={100} height={100} />,
           path: "/project-proposal",
-          roles: [ROLES.BACK_OFFICE],
+          roles: [ROLES.BACK_OFFICE, ROLES.JUNIOR_ENGINEER],
         },
         {
           moduleName: "Engineering Section",
           icon: <Image src={project} alt="home" width={100} height={100} />,
           path: "/engineering",
-          roles: [ROLES.EXE_OFFICER, ROLES.CITY_MANAGER],
+          roles: [ROLES.JUNIOR_ENGINEER, ROLES.EXE_OFFICER, ROLES.CITY_MANAGER],
 
           subModules: [
             {
@@ -53,17 +53,12 @@ export const sidebarLinks: SidebarLinksProps = {
               moduleName: "Running Bills",
               icon: <Image src={houseIcons} alt="running-bills" width={100} height={100} />,
               path: "/engineering/running-bills",
-            },            
-          ]
-        },
-        {
-          moduleName: "Schedule Of Rates",
-          icon: <Image src={houseIcons} alt="sor" width={100} height={100} />,
-          path: "/engineering/schedule-of-rates",
-          subModules: [
-            {moduleName: "SOR Table", path: "/engineering/schedule-of-rates"},
-            {moduleName: "Add SOR", path: "/engineering/schedule-of-rates/add"}
-
+            },
+            {
+              moduleName: "Schedule Of Rates",
+              icon: <Image src={houseIcons} alt="running-bills" width={100} height={100} />,
+              path: "/engineering/schedule-of-rates",
+            },         
           ]
         },
         {

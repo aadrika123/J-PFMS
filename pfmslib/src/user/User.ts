@@ -6,6 +6,8 @@ function formatString(inputString: string) {
 
 export const ROLES = Object.freeze({
   BACK_OFFICE: "BACK OFFICE",
+  JUNIOR_ENGINEER: "JUNIOR ENGINEER",
+  ASSISTANT_ENGINEER: "ASSISTANT ENGINEER",
   EXE_OFFICER: "EXECUTIVE OFFICER",
   CITY_MANAGER: "City Manager",
 });
@@ -18,6 +20,10 @@ class User {
 
   isBackOffice = () => {
     return this.user?.role?.includes(ROLES.BACK_OFFICE);
+  }
+
+  isJuniorEngineer = () => {
+    return this.user?.role?.includes(ROLES.JUNIOR_ENGINEER);
   }
 
   isExecutiveOfficer = () => {

@@ -6,7 +6,6 @@ import React, { ChangeEvent, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import axios from "@/lib/axiosConfig";
 import toast, { Toaster } from "react-hot-toast";
-import { FINANCE_URL } from "@/utils/api/urls";
 import { useUser } from "@/components/global/molecules/general/useUser";
 
 type StateType = {

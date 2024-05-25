@@ -645,7 +645,6 @@ const ScheduleOfRatesRegistrationPage = () => {
 
       <div className="flex justify-end">
         <Button variant="primary" onClick={addTable}>Add Table +</Button>
-
       </div>
 
 

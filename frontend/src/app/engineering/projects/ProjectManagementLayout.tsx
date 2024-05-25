@@ -5,16 +5,16 @@ import goBack from "@/utils/helper";
 import { usePathname } from "next/navigation";
 import React, { ReactNode } from "react";
 
-interface ProjectManagementLayoutProps{
-    children: ReactNode
+interface ProjectManagementLayoutProps {
+  children: ReactNode
 }
 
-export const ProjectManagementLayout = ({children}: ProjectManagementLayoutProps) => {
-    const pathName = usePathname();
+export const ProjectManagementLayout = ({ children }: ProjectManagementLayoutProps) => {
+  const pathName = usePathname();
 
-    return (
-        <>
-              <div className="flex items-center justify-between border-b-2 pb-4 mb-4">
+  return (
+    <>
+      <div className="flex items-center justify-between border-b-2 pb-4 mb-4">
         <Button
           variant="cancel"
           className="border-none text-primary_bg_indigo hover:text-primary_bg_indigo hover:bg-inherit"
@@ -43,7 +43,7 @@ export const ProjectManagementLayout = ({children}: ProjectManagementLayoutProps
             className={`${!pathName.includes("outbox") && "bg-gray-200 text-gray-500"}`}
           >
             {Icons.outbox}
-            Outbox 
+            Outbox
           </Button>
         </LinkWithLoader>
 
@@ -60,11 +60,11 @@ export const ProjectManagementLayout = ({children}: ProjectManagementLayoutProps
 
       <div className="inline-block w-full mt-4 flex gap-2 justify-center">
 
-         {children}
+        {children}
 
       </div>
 
 
-        </>
-    );
+    </>
+  );
 }
