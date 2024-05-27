@@ -23,7 +23,8 @@ interface SelectProps {
   className?: string;
   visibility?: boolean;
   required?: boolean | false;
-  handler?: (id: number | string) => void;
+  shouldNameCome?: boolean | false;
+  handler?: (id: number | string, value?: string) => void;
   onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLSelectElement>) => void;
 }
@@ -66,18 +67,22 @@ const Select: React.FC<SelectProps> = (props) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (!props.readonly) {
+      const selectedOption = e.target.options[e.target.selectedIndex].dataset;
       if (props.handler) {
-        props.handler(parseInt(e.target.value));
+        props.handler(parseInt(e.target.value), selectedOption.name);
       }
       setValue(parseInt(e.target.value));
-      const selectedOption = e.target.options[e.target.selectedIndex].dataset;
-      setValue1(selectedOption.name);
+      if (props.shouldNameCome) {
+        setValue1(selectedOption.name);
+      }
     }
   };
 
   return (
     <>
-      <div className={`flex flex-col gap-1 ${props.readonly && 'dropdown-container'}`}>
+      <div
+        className={`flex flex-col gap-1 ${props.readonly && "dropdown-container"}`}
+      >
         <label className="text-secondary text-sm" htmlFor={fieldId}>
           {props.label}
           {props.required ? <span className="text-red-600 pl-2">*</span> : ""}
@@ -87,7 +92,7 @@ const Select: React.FC<SelectProps> = (props) => {
           onChange={(event) => handleChange(event)}
           onBlur={props.onBlur}
           value={props.value}
-          className={`text-primary h-[40px] pl-3 rounded-lg border bg-transparent border-zinc-400 ${props.className}`}
+          className={`text-primary shadow-lg h-[40px] pl-3 rounded-lg border bg-transparent border-zinc-400 ${props.className}`}
           name={props.name}
           id={fieldId}
         >

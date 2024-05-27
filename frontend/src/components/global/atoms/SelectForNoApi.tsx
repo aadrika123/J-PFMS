@@ -31,29 +31,31 @@ interface SelectProps {
   className?: string;
   visibility?: boolean;
   required?: boolean | false;
-  handler?: (id: number | string) => void;
+  shouldNameCome?: boolean | false;
+  handler?: (id: number | string, value?: string) => void;
   onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLSelectElement>) => void;
 }
 
 const SelectForNoApi: React.FC<SelectProps> = (props) => {
   const [, , helpers] = useField(props.name);
-  // const [, , helpers1] = useField(`${props.name}_name`);
+  const [, , helpers1] = useField(`${props.name}_name`);
 
   const { setValue } = helpers;
-  // const { setValue: setValue1 } = helpers1;
+  const { setValue: setValue1 } = helpers1;
 
   const fieldId = "id_" + props.name;
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (!props.readonly) {
+      const selectedOption = e.target.options[e.target.selectedIndex].dataset;
       if (props.handler) {
-        props.handler(parseInt(e.target.value));
+        props.handler(parseInt(e.target.value), selectedOption.name);
       }
-
       setValue(parseInt(e.target.value));
-      // const selectedOption = e.target.options[e.target.selectedIndex].dataset;
-      // setValue1(selectedOption.name);
+      if (props.shouldNameCome) {
+        setValue1(selectedOption.name);
+      }
     }
   };
 

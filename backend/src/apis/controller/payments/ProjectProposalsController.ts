@@ -46,12 +46,12 @@ class project_proposalsController {
   };
 
   generateUniqueRandomID = (existing: string[]) => {
-    const millis = new Date().getTime();
+    const date = new Date();
 
     let id;
     do {
-      const randomNumber = Math.floor(Math.random() * 1000000000);
-      id = `${millis}-${randomNumber}`;
+      const randomNumber = Math.floor(Math.random() * 1000);
+      id = `${date.getFullYear()}${String(date.getMonth()+1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}${randomNumber}`;
     } while (existing.includes(id));
 
     existing.push(id);
@@ -61,6 +61,7 @@ class project_proposalsController {
   create = async (req: Request): Promise<APIv1Response> => {
     //validate
     await projectProposalValidationSchema.validate(req.body.data);
+    req.body.data.wards=[1,2];
 
     // collect the input
     const record = req.body.data;
@@ -77,7 +78,7 @@ class project_proposalsController {
     const destDir = `${rootDir}/${relativeDir}`;
 
     // generate bill numbers
-    record.date = new Date();
+    record.proposed_date = new Date();
     record.project_proposal_no =
       "PPN-" + this.generateUniqueRandomID(existingIDs);
 
@@ -142,6 +143,7 @@ class project_proposalsController {
     // collect the input
     const record = req.body.data;
     const id = Number(req.params.id);
+    req.body.data.wards=[1, 3];
 
     const date = new Date();
     const year = date.getFullYear();
@@ -153,7 +155,7 @@ class project_proposalsController {
     const destDir = `${rootDir}/${relativeDir}`;
 
     // generate bill numbers
-    record.date = new Date();
+    record.proposed_date = new Date();
 
     const docRecords = [];
     if (record?.files && record.files.length > 0) {
@@ -179,7 +181,6 @@ class project_proposalsController {
 
     }
     delete record.files;
-    console.log("first11111111111", docRecords)
     await this.dao.update(id, record, docRecords);
 
     // call dao

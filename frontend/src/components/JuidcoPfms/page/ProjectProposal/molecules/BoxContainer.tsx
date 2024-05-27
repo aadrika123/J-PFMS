@@ -37,19 +37,19 @@ const BoxContainer: React.FC<BoxContainerPropsType<any>> = (props) => {
           className="text-secondary_black mb-4 text-center"
           label={projectDetails?.project_proposal_no}
         />
-        <BoldSpan label={DateFormatter(projectDetails?.date)} />
+        <BoldSpan label={DateFormatter(projectDetails?.proposed_date)} />
         <BoldSpan content="Proposal Date" />
         <div className="flex items-center mb-2">
           <Image src={home} alt="calender" />
-          <span className="ml-1 text-red-500">
-            {`${projectDetails?.date.split("T")[0] == new Date().toISOString().split("T")[0] ? "Today" : moment(projectDetails?.date).fromNow()}`}
-          </span>
+          {/* <span className="ml-1 text-red-500">
+            {`${projectDetails?.proposed_date.split("T")[0] == new Date().toISOString().split("T")[0] ? "Today" : moment(projectDetails?.date).fromNow()}`}
+          </span> */}
         </div>
       </div>
       <div className="bg-gray-100 border flex flex-col py-4 px-8 h-52 w-full rounded">
         <section>
-          <Title title="Project Summary" />
-          <Paragraph desc={projectDetails?.summary} />
+          <Title title="Project Description" />
+          <Paragraph desc={projectDetails?.description} />
         </section>
       </div>
     </div>

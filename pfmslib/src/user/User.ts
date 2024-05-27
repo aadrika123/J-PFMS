@@ -66,7 +66,7 @@ class User {
     return this.user.ulb
   }
 
-  getDepartmentId = () =>{
+  getDepartment = () =>{
     return this.user.department
   }
 }

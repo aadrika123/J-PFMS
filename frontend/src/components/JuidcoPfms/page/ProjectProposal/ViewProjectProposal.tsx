@@ -155,7 +155,6 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
             width={1000}
             height={570}
             src={`${process.env.img_base}${docData?.path}`}
-            scrolling="no"
           ></iframe>
           <div className="flex items-center absolute bottom-3 self-center">
             <Button

@@ -1,5 +1,5 @@
 import { Formik, FormikValues } from "formik";
-import React, { ChangeEvent, useRef, useState } from "react";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Input from "@/components/global/atoms/Input";
 import { PFMS_URL } from "@/utils/api/urls";
@@ -9,7 +9,6 @@ import Image from "next/image";
 import upload from "@/assets/svg/upload.svg";
 import axios from "@/lib/axiosConfig";
 import { useQuery } from "react-query";
-import SelectForUpdateValueWithNoAPI from "@/components/global/atoms/SelectForUpdateValueWithNoAPI";
 import SelectForNoApi from "@/components/global/atoms/SelectForNoApi";
 const RunningAnimation = dynamic(
   () =>
@@ -23,12 +22,13 @@ const RunningAnimation = dynamic(
 import Check from "@/assets/svg/Check.svg";
 import LosingDataConfirmPopup from "@/components/global/molecules/general/LosingDataConfirmPopup";
 import toast, { Toaster } from "react-hot-toast";
-import Loader from "@/components/global/atoms/Loader";
 import TextArea from "@/components/global/atoms/Textarea";
 import Button from "@/components/global/atoms/buttons/Button";
 import CustomImage from "@/components/global/molecules/general/CustomImage";
 import pdfIcon from "@/assets/svg/pdf_icon.svg";
 import Popup from "@/components/global/molecules/Popup";
+import { useUser } from "@/components/global/molecules/general/useUser";
+import Select from "@/components/global/atoms/Select";
 
 type FileTypes = {
   document_type_id: number;
@@ -40,9 +40,11 @@ type FileTypes = {
 export type ProjectProposalSchema = {
   district_id: number;
   description: string;
-  summary: string;
+  title: string;
   state_id?: number;
-  date?: string;
+  proposed_date?: string;
+  type_id: number;
+  proposed_by: string;
   execution_body: number;
   ulb_id: number;
   ward_id: number;
@@ -57,6 +59,7 @@ type AddNewProjectProposalProps = {
   initialValues: ProjectProposalSchema;
   enableReinitialize?: boolean;
   readonly?: boolean;
+  additionalData?: any;
 };
 
 export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
@@ -65,8 +68,10 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     initialValues,
     enableReinitialize,
     readonly = false,
+    additionalData,
   } = props;
   const formRef = useRef<HTMLFormElement>(null);
+  const user = useUser();
   const [state, setState] = useState<any>({
     ulbId: initialValues.ulb_id,
     districtId: initialValues.district_id,
@@ -80,19 +85,32 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     validationError: null,
     fileType: initialValues.files[0]?.path?.split(".")[1],
     showPopup: false,
+    isReset: false
   });
   const {
     ulbId,
-    districtId,
     inProgress,
     showWarning,
-    exeBodyId,
     triggerFun,
     validationError,
     file,
     fileType,
     showPopup,
+    isReset
   } = state;
+  const [projectDetails, setProjectDetails] = useState<any>();
+
+  useEffect(() =>{
+    setProjectDetails({
+      title: initialValues.title || null,
+      description: initialValues.description || null,
+      address: initialValues.address || null,
+      proposed_by: initialValues.proposed_by || null,
+      type: additionalData?.type || null,
+      ward_no: additionalData?.ward_no || null,
+      pin_code: initialValues.pin_code || null,
+    })
+  },[isReset])
 
   ////// Fetching data
   const fetch = async (endpoint: string, dependence?: any) => {
@@ -110,67 +128,15 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     return res.data.data;
   };
 
-  /// fetching state and district
-  const fetchStateDistrict = async () => {
-    const res = await axios({
-      url: `${PFMS_URL.STATE_URL.get}`,
-      method: "GET",
-    });
-
-    if (!res.data.status) throw "Something Went Wrong!!";
-
-    const resDistrict = await axios({
-      url: `${PFMS_URL.DISTRICT_URL.get}/${res?.data?.data.id}`,
-      method: "GET",
-    });
-
-    const resDepart = await axios({
-      url: `${PFMS_URL.ULB_URL.getDepartments}`,
-      method: "GET",
-    });
-
-    return {
-      state: res?.data?.data,
-      district: resDistrict?.data?.data,
-      departments: resDepart?.data?.data,
-    };
-  };
-
-  ///////// Getting District and State
-  const { data: data } = useQuery(["districtState"], fetchStateDistrict);
-
   //////// Check Execution Body is ULB or Not
-  const isUlb = (id: number) => {
-    return data?.departments.find((i: any) => i.id === id)?.name === "ULB";
+  const isUlb = () => {
+    return user?.getDepartment()?.name === "ULB";
   };
-
-  ///////// Getting Ulbs
-  const { data: ulbs } = useQuery(["ulbs", districtId], () =>
-    fetch(`${PFMS_URL.ULB_URL.get}/${districtId}`, districtId)
-  );
 
   ///////// Getting Ward
   const { data: wards } = useQuery(["wards", ulbId], () =>
     fetch(`${PFMS_URL.WARD_URL.get}/${ulbId}`, ulbId)
   );
-
-  /////// District Handler
-  const handler = (
-    id: number | string,
-    setFieldValue: (key: string, value: number) => void
-  ) => {
-    setState({ ...state, districtId: id });
-    setFieldValue("ulb_id", 0);
-  };
-
-  /////// Ulb Handler
-  const ulbHandler = (
-    id: number | string,
-    setFieldValue: (key: string, value: number) => void
-  ) => {
-    setState({ ...state, ulbId: id });
-    setFieldValue("ward_id", 0);
-  };
 
   ///////////// Checking File Type
   const validateFileType = (file: any) => {
@@ -193,10 +159,10 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     try {
       if (e.target.files) {
         const file = e.target.files[0];
-        if (file.size > 2 * 1024 * 1024) {
+        if (file.size > 2 * 1024 * 1024 || file.size !< 9 * 1024) {
           setState({
             ...state,
-            validationError: `max file size is 2 mb`,
+            validationError: `file size should be between 10 kb to 2 mb`,
           });
           return;
         }
@@ -258,6 +224,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
         districtId: initialValues.district_id,
         ulbId: initialValues.ulb_id,
         file: null,
+        isReset: !isReset
       }));
     }, 100);
   };
@@ -276,6 +243,10 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
   //     setFieldValue("ward_id", 0);
   //   }
   // };
+
+  const handleAllChange = (value: string, key: string) => {
+    setProjectDetails({ ...projectDetails, [key]: value });
+  };
 
   return (
     <>
@@ -303,8 +274,8 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
           cancel={handleBackAndReset}
         />
       )}
-      <div className="shadow-lg p-4 border bg-white">
-        {data ? (
+      <div className="grid grid-cols-3 gap-4">
+        <div className="shadow-lg p-4 col-span-2 border bg-white">
           <>
             <Formik
               initialValues={initialValues}
@@ -327,23 +298,31 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                   ref={formRef}
                   onSubmit={handleSubmit}
                   encType="multipart/form-data"
+                  className="flex flex-col justify-between h-full"
                 >
-                  <div className="grid grid-cols-2 gap-x-6 gap-4 ">
+                  <div className="grid grid-cols-1 gap-x-6 gap-4 ">
                     <TextArea
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        handleChange(e);
+                        handleAllChange(e.target.value, "title");
+                      }}
                       onBlur={handleBlur}
-                      value={values.summary}
-                      error={errors.summary}
-                      touched={touched.summary}
-                      label="Project Summary"
-                      name="summary"
-                      placeholder="Enter Project Summary"
-                      maxlength={250}
+                      value={values.title}
+                      error={errors.title}
+                      touched={touched.title}
+                      label="Project Title"
+                      name="title"
+                      placeholder="Enter Project Title"
+                      maxlength={50}
                       required
                       readonly={readonly}
+                      className="min-h-4 max-h-10"
                     />
                     <TextArea
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        handleChange(e);
+                        handleAllChange(e.target.value, "description");
+                      }}
                       onBlur={handleBlur}
                       value={values.description}
                       error={errors.description}
@@ -354,87 +333,102 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                       maxlength={500}
                       readonly={readonly}
                     />
-                    <SelectForUpdateValueWithNoAPI
-                      data={[data?.state]}
-                      onChange={handleChange}
+                    <TextArea
+                      onChange={(e) => {
+                        handleChange(e);
+                        handleAllChange(e.target.value, "address");
+                      }}
                       onBlur={handleBlur}
-                      placeholder="Please select state"
-                      value={data?.state?.id}
-                      error={errors.state_id}
-                      touched={touched.state_id}
-                      readonly={true}
-                      label="State"
-                      name="state_id"
+                      value={values.address}
+                      error={errors.address}
+                      touched={touched.address}
+                      label="Address"
+                      name="address"
+                      placeholder="Enter Address"
+                      className="min-h-20 max-h-32"
+                      maxlength={150}
                       required
-                      setFieldValue={setFieldValue}
+                      readonly={readonly}
                     />
-                    <SelectForNoApi
-                      data={data?.district}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      placeholder="Please select district"
-                      value={values.district_id}
-                      error={errors.district_id}
-                      touched={touched.district_id}
-                      label="District"
-                      name="district_id"
-                      readonly={true}
-                      required
-                      handler={(id: number | string) =>
-                        handler(id, setFieldValue)
-                      }
-                    />
-                    {/* <SelectForNoApi
-                      data={data?.departments}
-                      onChange={handleChange}
-                      value={values.execution_body}
-                      error={errors.execution_body}
-                      touched={touched.execution_body}
-                      readonly={true}
-                      label="Execution Body"
-                      name="execution_body"
-                      placeholder="Please select"
-                      required
-                      handler={(id: number | string) =>
-                        exeBodyHandler(id, setFieldValue)
-                      }
-                    /> */}
-                    {isUlb(exeBodyId) && (
-                      <SelectForNoApi
-                        data={ulbs}
-                        onChange={handleChange}
+                    <div className="grid grid-cols-2 gap-x-6 gap-4">
+                      <Input
+                        onChange={(e) => {
+                          handleChange(e);
+                          handleAllChange(e.target.value, "proposed_by");
+                        }}
                         onBlur={handleBlur}
-                        placeholder="Please select the ULB"
-                        value={values.ulb_id}
-                        error={errors.ulb_id}
-                        touched={touched.ulb_id}
-                        label="ULB Name"
-                        name="ulb_id"
+                        value={values.proposed_by}
+                        error={errors.proposed_by}
+                        touched={touched.proposed_by}
+                        label="Proposed By"
+                        name="proposed_by"
+                        placeholder="Enter Proposed By"
+                        maxlength={50}
                         required
-                        readonly={true}
-                        handler={(id: number | string) =>
-                          ulbHandler(id, setFieldValue)
-                        }
-                      />
-                    )}
-                    {isUlb(exeBodyId) && (
-                      <SelectForNoApi
-                        data={wards}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        placeholder="Please select ward no"
-                        value={values.ward_id}
-                        error={errors.ward_id}
-                        touched={touched.ward_id}
-                        label="Ward No"
-                        name="ward_id"
-                        required
+                        type="text"
                         readonly={readonly}
                       />
-                    )}
-                    <div className="flex flex-col justify-between">
-                      <Input
+                      <Select
+                        api={`${PFMS_URL.PROJ_RPOPOSAL_URL.getType}`}
                         onChange={handleChange}
+                        onBlur={handleBlur}
+                        placeholder="Please select type"
+                        value={values.type_id}
+                        error={errors.type_id}
+                        touched={touched.type_id}
+                        label="Project Type"
+                        name="type_id"
+                        required
+                        readonly={readonly}
+                        handler={(_, value) =>
+                          handleAllChange(value as string, "type")
+                        }
+                      />
+                      <Input
+                        value={user?.getDistrict()?.name}
+                        label="District"
+                        name="district_id"
+                        placeholder="Enter District"
+                        required
+                        type="text"
+                        readonly={true}
+                      />
+                      {isUlb() && (
+                        <>
+                          <Input
+                            value={user?.getUlb()?.name}
+                            label="ULB Name"
+                            name="ulb_id"
+                            placeholder="Enter ULB Name"
+                            required
+                            type="text"
+                            readonly={true}
+                          />
+                        </>
+                      )}
+                      {isUlb() && (
+                        <SelectForNoApi
+                          data={wards}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          placeholder="Please select ward no"
+                          value={values.ward_id}
+                          error={errors.ward_id}
+                          touched={touched.ward_id}
+                          label="Ward No"
+                          name="ward_id"
+                          required
+                          readonly={readonly}
+                          handler={(_, value) =>
+                            handleAllChange(value as string, "ward_no")
+                          }
+                        />
+                      )}
+                      <Input
+                        onChange={(e) => {
+                          handleChange(e);
+                          handleAllChange(e.target.value, "pin_code");
+                        }}
                         onBlur={handleBlur}
                         value={values.pin_code}
                         error={errors.pin_code}
@@ -447,98 +441,84 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                         type="number"
                         readonly={readonly}
                       />
-                      <div className="flex items-end w-full">
-                        <div className="flex flex-col min-w-28">
-                          <span className="text-secondary text-sm mb-1">
-                            Upload Letter (jpeg, jpg, pdf)
-                            <span className="ml-2 text-red-500">*</span>
-                          </span>
-                          <input
-                            id="letter"
-                            type="file"
-                            className="hidden"
-                            disabled={readonly}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                              handleUpload(e, setFieldValue, 0)
-                            }
-                            accept={".jpg, .jpeg, .pdf"}
-                          />
-                          <label
-                            className={`bg-primary_bg_indigo relative p-1 shadow-lg rounded flex text-white justify-between px-2 ${readonly ? "bg-opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
-                            htmlFor="letter"
-                          >
-                            {values.files[0]?.file_token && !inProgress
-                              ? "Uploaded"
-                              : "Upload"}
-                            {values.files[0]?.file_token && !inProgress ? (
-                              <Image
-                                src={Check}
-                                width={20}
-                                height={20}
-                                alt="letter"
-                              />
-                            ) : inProgress ? (
-                              <div className="absolute -right-2 -top-4 h-">
-                                <RunningAnimation />
-                              </div>
-                            ) : (
-                              <Image
-                                src={upload}
-                                width={20}
-                                height={20}
-                                alt="letter"
-                              />
-                            )}
-                          </label>
-                          {!values?.files[0]?.file_token &&
-                          !validationError &&
-                          touched?.files &&
-                          errors?.files &&
-                          errors?.files[0]?.file_token ? (
-                            <span className="text-red-500">
-                              {errors.files[0]?.file_token}
-                            </span>
-                          ) : validationError ? (
-                            <span className="text-red-500">
-                              {validationError}
-                            </span>
+                    </div>
+                    <div className="flex items-end w-full">
+                      <div className="flex flex-col min-w-28">
+                        <span className="text-secondary text-sm mb-1">
+                          Upload Letter (jpeg, jpg, pdf)
+                          <span className="ml-2 text-red-500">*</span>
+                        </span>
+                        <input
+                          id="letter"
+                          type="file"
+                          className="hidden"
+                          disabled={readonly}
+                          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                            handleUpload(e, setFieldValue, 0)
+                          }
+                          accept={".jpg, .jpeg, .pdf"}
+                        />
+                        <label
+                          className={`bg-primary_bg_indigo relative p-1 shadow-lg rounded flex text-white justify-between px-2 ${readonly ? "bg-opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
+                          htmlFor="letter"
+                        >
+                          {values.files[0]?.file_token && !inProgress
+                            ? "Uploaded"
+                            : "Upload"}
+                          {values.files[0]?.file_token && !inProgress ? (
+                            <Image
+                              src={Check}
+                              width={20}
+                              height={20}
+                              alt="letter"
+                            />
+                          ) : inProgress ? (
+                            <div className="absolute -right-2 -top-4 h-">
+                              <RunningAnimation />
+                            </div>
                           ) : (
-                            <span>{values.files[0]?.file_name}</span>
+                            <Image
+                              src={upload}
+                              width={20}
+                              height={20}
+                              alt="letter"
+                            />
                           )}
-                        </div>
-                        {file && (
-                          <div className="hide-scrollbar ml-4">
-                            {fileType !== "pdf" ? (
-                              <CustomImage src={file} width={100} height={80} />
-                            ) : (
-                              <Image
-                                onClick={() =>
-                                  setState({ ...state, showPopup: !showPopup })
-                                }
-                                src={pdfIcon}
-                                width={70}
-                                height={70}
-                                alt="pdf-icon"
-                              />
-                            )}
-                          </div>
+                        </label>
+                        {!values?.files[0]?.file_token &&
+                        !validationError &&
+                        touched?.files &&
+                        errors?.files &&
+                        errors?.files[0]?.file_token ? (
+                          <span className="text-red-500">
+                            {errors.files[0]?.file_token}
+                          </span>
+                        ) : validationError ? (
+                          <span className="text-red-500">
+                            {validationError}
+                          </span>
+                        ) : (
+                          <span>{values.files[0]?.file_name || <span className="text-sm text-red-500">file size should 10 kb to 2 mb</span>}</span>
                         )}
                       </div>
+                      {file && (
+                        <div className="hide-scrollbar ml-4">
+                          {fileType !== "pdf" ? (
+                            <CustomImage src={file} width={100} height={80} />
+                          ) : (
+                            <Image
+                              onClick={() =>
+                                setState({ ...state, showPopup: !showPopup })
+                              }
+                              src={pdfIcon}
+                              width={70}
+                              height={70}
+                              alt="pdf-icon"
+                            />
+                          )}
+                        </div>
+                      )}
                     </div>
-
-                    <TextArea
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.address}
-                      error={errors.address}
-                      touched={touched.address}
-                      label="Address"
-                      name="address"
-                      placeholder="Enter Address"
-                      maxlength={500}
-                      required
-                      readonly={readonly}
-                    />
                   </div>
 
                   <div className="mt-4 flex items-center gap-5 justify-end">
@@ -583,9 +563,77 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
               )}
             </Formik>
           </>
-        ) : (
-          <Loader />
-        )}
+        </div>
+        <div className="bg-white border shadow-lg p-4">
+          {projectDetails?.title && (
+            <div>
+              <header className="font-semibold">Project Title</header>
+              <span className="text-secondary text-sm">
+                {projectDetails?.title}
+              </span>
+            </div>
+          )}
+          {projectDetails?.description && (
+            <div className="my-2">
+              <header className="font-semibold">Project Description</header>
+              <span className="text-secondary text-sm">
+                {projectDetails?.description}
+              </span>
+            </div>
+          )}
+          {projectDetails?.address && (
+            <div className="my-2">
+              <header className="font-semibold">Address</header>
+              <span className="text-secondary text-sm">
+                {projectDetails?.address}
+              </span>
+            </div>
+          )}
+          {projectDetails?.proposed_by && (
+            <div className="my-2">
+              <header className="font-semibold">Proposed By</header>
+              <span className="text-secondary text-sm">
+                {projectDetails?.proposed_by}
+              </span>
+            </div>
+          )}
+          {projectDetails?.type && (
+            <div className="my-2">
+              <header className="font-semibold">Proposed Type</header>
+              <span className="text-secondary text-sm">
+                {projectDetails?.type}
+              </span>
+            </div>
+          )}
+          <div className="my-2">
+            <header className="font-semibold">District</header>
+            <span className="text-secondary text-sm">
+              {user?.getDistrict()?.name}
+            </span>
+          </div>
+          <div className="my-2">
+            <header className="font-semibold">ULB Name</header>
+            <span className="text-secondary text-sm">
+              {user?.getUlb()?.name}
+            </span>
+          </div>
+          {projectDetails?.ward_no && (
+            <div className="my-2">
+              <header className="font-semibold">Ward No</header>
+              <span className="text-secondary text-sm">
+                {projectDetails?.ward_no}
+              </span>
+            </div>
+          )}
+          {projectDetails?.pin_code && (
+            <div className="my-2">
+              <header className="font-semibold">Pin Code</header>
+              <span className="text-secondary text-sm">
+                {projectDetails?.pin_code}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
     </>
   );

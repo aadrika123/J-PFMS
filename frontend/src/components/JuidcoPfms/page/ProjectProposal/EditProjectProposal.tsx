@@ -12,6 +12,7 @@ import SuccesfullConfirmPopup from "@/components/global/molecules/general/Succes
 import toast, { Toaster } from "react-hot-toast";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 import { useUser } from "@/components/global/molecules/general/useUser";
+import ConfirmationPopup from "@/components/global/molecules/ConfirmationPopup";
 
 const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
   const user = useUser()
@@ -21,9 +22,11 @@ const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
   const queryClient = useQueryClient()
   const [state, setState] = useState({
     showNotification: false,
+    showConfirmation: false,
+    projectData: null
   });
 
-  const { showNotification } = state;
+  const { showNotification, showConfirmation, projectData } = state;
 
   ///////// Fetching Data
   const fetch = async () => {
@@ -62,7 +65,7 @@ const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
 
   const { mutate } = useMutation(handleSubmit, {
     onSuccess: () => {
-      setState({ ...state, showNotification: true });
+      setState({ ...state, showNotification: true, showConfirmation: false });
       setTimeout(() => {
         setState({ ...state, showNotification: false });
         goBack();
@@ -85,9 +88,36 @@ const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
     }));
   };
 
+  /////// Handle showing comfirmation popup
+  const handleConfirmSubmit = (values: any) => {
+    setState({
+      ...state,
+      showConfirmation: true,
+      projectData: values,
+    });
+  };
+
+  ////////////// handle cancle /////////////
+  const handleCancel = () => {
+    setState({ ...state, showConfirmation: false });
+  };
+
+  ////////////// handle cancle /////////////
+  const handleContinue = () => {
+    mutate(projectData);
+    setState({ ...state, showConfirmation: false });
+  };
+
   return (
     <>
       <Toaster />
+      {showConfirmation && (
+        <ConfirmationPopup
+          message="Are you sure you want to update proposal?"
+          cancel={handleCancel}
+          continue={handleContinue}
+        />
+      )}
       {workingAnimation}
       {showNotification && (
         <SuccesfullConfirmPopup message="Updated successfully" />
@@ -101,23 +131,31 @@ const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
       />
       {data && (
         <ProjectProposalForm
-          onSubmit={mutate}
+          onSubmit={handleConfirmSubmit}
           enableReinitialize
           initialValues={{
-            district_id: data?.district_id,
+            title: data?.title,
             description: data?.description,
-            summary: data?.summary,
-            state_id: data?.state_id,
             address: data?.address,
-            date: DateFormatter(data?.date),
-            pin_code: data?.pin_code,
+            proposed_by: data?.proposed_by,
+            type_id: data?.type_id,
+            district_id: data?.district_id,
             ulb_id: data?.ulb_id,
             ward_id: data?.ward_id,
+            pin_code: data?.pin_code,
+            files: handleFileData(data?.files),
+            state_id: data?.state_id,
+            proposed_date: DateFormatter(data?.date),
             execution_body: data?.execution_body,
             user_id: user?.getUserId(),
-            files: handleFileData(data?.files),
           }}
           readonly={parma === "view"}
+          additionalData={
+            {
+              type: data?.type,
+              ward_no: data?.ward_name
+            }
+          }
         />
       )}
     </>

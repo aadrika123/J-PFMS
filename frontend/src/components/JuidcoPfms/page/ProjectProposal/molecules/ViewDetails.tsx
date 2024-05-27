@@ -19,14 +19,14 @@ export const DetailsCards: React.FC<DetailsCardsProps<any>> = (props) => {
     <>
       <div className="border p-6 mt-4">
         <section>
-          <Title title="Project Description" />
+          <Title title="Project Title" />
           <Paragraph
             desc={projectDesc}
           />
         </section>
         <hr className="mt-3 border border-gray-400" />
         <hr className="border border-gray-400" />
-        <div className=" grid grid-cols-4 gap-4 mt-3">
+        <div className=" grid grid-cols-3 gap-2 mt-3">
           {proposalDetails.map((vendor, index) => (
             <React.Fragment key={index}>
               <BoldSpan
@@ -45,13 +45,17 @@ export const DetailsCards: React.FC<DetailsCardsProps<any>> = (props) => {
 const ViewDetails: React.FC<ViewDetailsProps<any>> = (props) => {
   const { projectDetails } = props;
   const proposalDetails = [
+    // {
+    //   label: "State",
+    //   content: projectDetails?.state_name,
+    // },
+    // {
+    //   label: "Execution Body",
+    //   content: projectDetails?.execution_body_name,
+    // },
     {
-      label: "State",
-      content: projectDetails?.state_name,
-    },
-    {
-      label: "Execution Body",
-      content: projectDetails?.execution_body_name,
+      label: "Project Type",
+      content: projectDetails?.type,
     },
     {
       label: "ULB Name",
@@ -74,9 +78,9 @@ const ViewDetails: React.FC<ViewDetailsProps<any>> = (props) => {
   return (
     <>
       <DetailsCards
-        title="Project Description"
+        title="Project Title"
         proposalDetails={proposalDetails}
-        projectDesc={projectDetails?.description}
+        projectDesc={projectDetails?.title}
       />
     </>
   );

@@ -29,7 +29,7 @@ class ProjectManagementDao {
 
 getAll = async (filters: any, page: number, limit: number, order: number): Promise<any>  => {
     return new Promise((resolve, reject) => {
-      let query = "from project_proposals b left join ulb_masters um on b.ulb_id = um.id where true";
+      let query = "from project_proposals b left join ulb_masters um on b.ulb_id = um.id left join project_types pt on b.type_id = pt.id left join ulb_ward_masters as uwm on uwm.id = b.ward_id where true";
 
       // add project proposal no filters to query
       const project_proposal_no_filters = filters['project_proposal_no'];
@@ -53,7 +53,7 @@ getAll = async (filters: any, page: number, limit: number, order: number): Promi
 
       // fetch the data
       prisma.$transaction([
-        prisma.$queryRawUnsafe(`select b.id, b.project_proposal_no, b.date, b.summary, b.ulb_id, um.ulb_name ${query} order by id ${ordering}
+        prisma.$queryRawUnsafe(`select b.id, b.project_proposal_no, b.proposed_date, b.title, b.ulb_id, um.ulb_name, b.type_id, pt.name as type, b.ward_id, uwm.ward_name ${query} order by id ${ordering}
         limit ${limit} offset ${offset};`),
         prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${query}`),
         prisma.$queryRawUnsafe<string[]>(`select distinct(project_proposal_no) ${query} order by project_proposal_no asc limit 10`)
@@ -142,7 +142,7 @@ getAll = async (filters: any, page: number, limit: number, order: number): Promi
 
       const offset = (page - 1) * limit;
 
-      const query = `select b.id, b.project_proposal_no, b.date, b.summary, b.ulb_id, um.ulb_name ${queryWithoutFieldsAndPagination} 
+      const query = `select b.id, b.project_proposal_no, b.proposed_date, b.title, b.ulb_id, um.ulb_name ${queryWithoutFieldsAndPagination} 
       order by b.id ${ordering}
       limit ${limit} offset ${offset};`;
 

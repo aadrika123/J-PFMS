@@ -36,6 +36,7 @@ type Urls = {
     getByAuth?: string;
     getByUlb?: string;
     getDepartments?: string;
+    getType?: string;
   };
 };
 
@@ -68,6 +69,7 @@ export const PFMS_URL: Urls = {
     create: "/project-perposal/create",
     update: "/project-perposal/update",
     getById: "/project-perposal/get",
+    getType: "/project-type/get-all"
   },
   BILLS_VERIFICATION: {
     getById: "bill-verification/get",

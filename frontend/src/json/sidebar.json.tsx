@@ -60,6 +60,7 @@ export const sidebarLinks: SidebarLinksProps = {
           moduleName: "Schedule Of Rates",
           icon: <Image src={houseIcons} alt="sor" width={100} height={100} />,
           path: "/engineering/schedule-of-rates",
+          roles: [ROLES.EXE_OFFICER, ROLES.CITY_MANAGER],
           subModules: [
             {moduleName: "SOR Table", path: "/engineering/schedule-of-rates"},
             {moduleName: "Add SOR", path: "/engineering/schedule-of-rates/add"}

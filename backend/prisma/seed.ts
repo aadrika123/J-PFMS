@@ -4,20 +4,16 @@ import foreign_wrapper from "./seeder/foreign_wrapper";
 import project_proposal_seeder from "./seeder/projectProposal/project_proposal_seeder";
 import project_proposal_stages_seeder from "./seeder/projectProposal/project_proposal_stages_seeder";
 import doc_type_seeder from "./seeder/masters/doc_type_seeder";
+import project_type_seeder from "./seeder/masters/project_type_seeder";
 
 const prisma = new PrismaClient();
 
-
-
 async function main() {
-
-
   // await prisma.$queryRaw`DROP TABLE users cascade`;
   // await prisma.$queryRaw`DROP TABLE wf_roles cascade`;
   // await prisma.$queryRaw`DROP TABLE wf_roleusermaps cascade`;
-
+  await project_type_seeder();
   setTimeout(async () => {
-
     await project_proposal_seeder();
 
     await project_proposal_stages_seeder();
@@ -25,12 +21,9 @@ async function main() {
     await doc_type_seeder();
   }, 8000);
 
-
   setTimeout(async () => {
     await foreign_wrapper();
   }, 9000);
-
-
 }
 main()
   .then(async () => {

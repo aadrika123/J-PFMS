@@ -22,14 +22,18 @@ export const projectProposalValidationSchema = Yup.object({
     /^[A-Za-z0-9_(),.\s']*$/,
     "special character not allowed"
   ),
-  summary: Yup.string()
-    .required("summary is required.")
+  title: Yup.string()
+    .required("title is required.")
     .matches(/^[A-Za-z0-9_(),.\s']*$/, "special character not allowed"),
+  proposed_by: Yup.string()
+    .required("proposed by is required")
+    .matches(/^[A-Za-z0-9\s']*$/, "special character not allowed"),
+  type_id: Yup.number().required("type is required"),
   state_id: Yup.number()
     .required("state is required")
     .integer()
     .min(1, "plsease select state"),
-  execution_body: Yup.string().required('please slelect execution body'),
+  execution_body: Yup.string().required("please slelect execution body"),
   // execution_body: Yup.number()
   //   .integer()
   //   .required("execution body required")
@@ -50,12 +54,9 @@ export const projectProposalValidationSchema = Yup.object({
   //       schema.min(1, "plsease select ward").required("ward is required"),
   //     otherwise: (schema) => schema.optional(),
   //   }),
-  ulb_id: Yup.number()
-    .integer()
-    .optional(),
-  ward_id: Yup.number()
-    .integer()
-    .optional(),
+  ulb_id: Yup.number().integer().optional(),
+  ward_id: Yup.number().integer().optional(),
+  wards: Yup.array().optional(),
   user_id: Yup.number().required("user is required"),
   address: Yup.string().required("address is required"),
   pin_code: Yup.string()

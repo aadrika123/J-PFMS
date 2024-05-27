@@ -15,23 +15,29 @@ import goBack from "@/utils/helper";
 import Loader from "@/components/global/atoms/Loader";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 import { useUser } from "@/components/global/molecules/general/useUser";
+import ConfirmationPopup from "@/components/global/molecules/ConfirmationPopup";
+
+type StateTypes = {
+  showNotification: boolean;
+  showConfirmation: boolean;
+  projectData: FormikValues;
+};
 
 const AddProjectProposal = () => {
   const queryClient = new QueryClient();
-  const user = useUser()
+  const user = useUser();
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
     useWorkingAnimation();
   const initialValues: ProjectProposalSchema = {
-    district_id: user?.getDistrict()?.id,
+    title: "",
     description: "",
-    summary: "",
     address: "",
-    pin_code: "",
+    proposed_by: "",
+    type_id: 0,
+    district_id: user?.getDistrict()?.id,
     ulb_id: user?.getUlb()?.id,
     ward_id: 0,
-    state_id:user?.getState()?.id,
-    user_id: user?.getUserId(),
-    execution_body: user?.getDepartmentId()?.id,
+    pin_code: "",
     files: [
       {
         document_type_id: 0,
@@ -39,12 +45,17 @@ const AddProjectProposal = () => {
         file_name: "",
       },
     ],
+    state_id: user?.getState()?.id,
+    user_id: user?.getUserId(),
+    execution_body: user?.getDepartment()?.id,
   };
 
-  const [state, setState] = useState({
+  const [state, setState] = useState<StateTypes>({
     showNotification: false,
+    showConfirmation: false,
+    projectData: initialValues,
   });
-  const { showNotification } = state;
+  const { showNotification, showConfirmation, projectData } = state;
 
   ///////////////// Handling Submit /////////////
   const handleSubmit = async (values: FormikValues) => {
@@ -62,7 +73,7 @@ const AddProjectProposal = () => {
 
   const { mutate } = useMutation(handleSubmit, {
     onSuccess: () => {
-      setState({ ...state, showNotification: true });
+      setState({ ...state, showNotification: true, showConfirmation: false });
       setTimeout(() => {
         goBack();
       }, 1000);
@@ -76,8 +87,35 @@ const AddProjectProposal = () => {
     },
   });
 
+  /////// Handle showing comfirmation popup
+  const handleConfirmSubmit = (values: any) => {
+    setState({
+      ...state,
+      showConfirmation: true,
+      projectData: values,
+    });
+  };
+
+  ////////////// handle cancle /////////////
+  const handleCancel = () => {
+    setState({ ...state, showConfirmation: false });
+  };
+
+  ////////////// handle cancle /////////////
+  const handleContinue = () => {
+    mutate(projectData);
+    setState({ ...state, showConfirmation: false });
+  };
+
   return (
     <>
+      {showConfirmation && (
+        <ConfirmationPopup
+          message="Are you sure you want to add proposal?"
+          cancel={handleCancel}
+          continue={handleContinue}
+        />
+      )}
       {workingAnimation}
       {showNotification && (
         <SuccesfullConfirmPopup message="Recorded Successfully" />
@@ -86,7 +124,10 @@ const AddProjectProposal = () => {
         <span className="text-secondary font-bold">Fill Project Details</span>
       </div>
       <Suspense fallback={<Loader />}>
-        <ProjectProposalForm onSubmit={mutate} initialValues={initialValues} />
+        <ProjectProposalForm
+          onSubmit={handleConfirmSubmit}
+          initialValues={initialValues}
+        />
       </Suspense>
     </>
   );

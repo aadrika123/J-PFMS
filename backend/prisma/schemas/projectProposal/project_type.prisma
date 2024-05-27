@@ -1,0 +1,9 @@
+///// Managed By :- Sanjiv
+model project_types {
+  id                Int                 @id @default(autoincrement())
+  name              String
+
+  project_proposals project_proposals[]
+  created_at        DateTime            @default(now()) @map("created_at")
+  updated_at        DateTime            @default(now()) @updatedAt @map("updated_at")
+}

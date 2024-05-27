@@ -2,23 +2,26 @@
 model project_proposals {
   id Int @id @default(autoincrement())
 
-  ulb_id Int?
+  ulb_id      Int?
+  type_id     Int
+  type        project_types @relation(fields: [type_id], references: [id])
+  proposed_by String
 
-  project_proposal_no        String
-  date                       DateTime                     @db.Date
-  summary                    String
-  description                String
-  state_id                   Int
-  district_id                Int
-  ward_id                    Int?
-  address                    String
-  pin_code                   Int
-  user_id                    Int
-  execution_body             Int
-  acknowledged                Boolean? @default(false)
-  
+  project_proposal_no String
+  proposed_date       DateTime @default(now()) @db.Date
+  title               String
+  description         String
+  state_id            Int
+  district_id         Int
+  ward_id             Int?
+  address             String
+  pin_code            Int
+  user_id             Int
+  execution_body      Int
+
   project_proposal_checkings project_proposal_checkings[]
   project_proposal_documents project_proposal_documents[]
+  project_propo_ward_maps    project_propo_ward_maps[]
 
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @default(now()) @updatedAt @map("updated_at")

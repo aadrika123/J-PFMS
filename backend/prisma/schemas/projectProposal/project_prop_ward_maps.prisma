@@ -1,0 +1,11 @@
+/////// Managed By :- Sanjiv
+
+model project_propo_ward_maps {
+  id                  Int               @id @default(autoincrement())
+  ward_id             Int        
+  project_proposal_id Int
+  project_proposal    project_proposals @relation(fields: [project_proposal_id], references: [id])
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @updatedAt @map("updated_at")
+}

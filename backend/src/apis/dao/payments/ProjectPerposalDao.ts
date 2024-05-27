@@ -27,12 +27,14 @@ class project_proposalsDao {
 
     const query = `select 
     pp.id,
-    pp.summary, 
+    pp.title, 
     pp.description, 
     pp.address, 
-    pp.date, 
+    pp.proposed_date, 
     pp.pin_code, 
     pp.project_proposal_no,
+    pp.proposed_by,
+    pt.name as type,
     s.name as state_name,
     um.ulb_name,
     uwm.ward_name
@@ -43,6 +45,8 @@ class project_proposalsDao {
     ulb_masters as um on um.id = pp.ulb_id
     left join
     ulb_ward_masters as uwm on uwm.id = pp.ward_id
+    left join
+    project_types as pt on pt.id = pp.type_id
     where (true ${searchCondition})
     order by pp.id ${ordering}
     limit ${limit} offset ${offset}`;
@@ -66,6 +70,8 @@ class project_proposalsDao {
   };
 
   createOne = async (data: any, docRecords: any) => {
+    const wards = data.wards;
+    delete data.wards;
     return prisma.$transaction(async (tx) => {
       const project_proposals_record = await tx.project_proposals.create({
         data: data,
@@ -79,6 +85,12 @@ class project_proposalsDao {
           data: docRecords,
         });
       }
+      const wardData = wards.map((i: number) => {
+        return { ward_id: i, project_proposal_id: project_proposals_record.id };
+      });
+      await tx.project_propo_ward_maps.createMany({
+        data: wardData,
+      });
       return project_proposals_record;
     });
   };
@@ -86,16 +98,19 @@ class project_proposalsDao {
   getById = async (id: number): Promise<[]> => {
     const query = `select 
     pp.id,
-    pp.summary, 
+    pp.title, 
     pp.description, 
     pp.address, 
-    pp.date, 
+    pp.proposed_date, 
     pp.pin_code, 
     pp.project_proposal_no,
+    pp.proposed_by,
+    pp.type_id,
     pp.state_id,
     pp.ulb_id,
     pp.ward_id,
     pp.district_id,
+    pt.name as type,
     ms.name as state_name,
     um.ulb_name,
     uwm.ward_name,
@@ -110,6 +125,8 @@ class project_proposalsDao {
     ulb_ward_masters as uwm on uwm.id = pp.ward_id
     left join
     department_masters as dm on dm.id = pp.execution_body
+    left join
+    project_types as pt on pt.id = pp.type_id
     where pp.id=${id}`;
     const data: any = await prisma.$queryRawUnsafe<[]>(query);
     const doc = await prisma.$queryRaw`
@@ -137,6 +154,8 @@ class project_proposalsDao {
   };
 
   update = async (id: number, data: any, docRecords: any): Promise<any> => {
+    const wards = data.wards;
+    delete data.wards;
     return prisma.$transaction(async (tx) => {
       const project_proposals_record = await tx.project_proposals.update({
         where: {
@@ -147,7 +166,7 @@ class project_proposalsDao {
       if (docRecords.length > 0) {
         await Promise.all(
           docRecords.map(async (docRecord: any) => {
-            if(docRecord.doc_type_id === 0){
+            if (docRecord.doc_type_id === 0) {
               await tx.project_proposal_documents.updateMany({
                 where: {
                   project_proposal_id: id,
@@ -162,12 +181,23 @@ class project_proposalsDao {
               path = ${docRecord.path},
               doc_type_id = ${docRecord.doc_type_id}
               where project_proposal_id = ${id} and doc_type_id != 0
-              `
+              `;
             }
-            
           })
         );
       }
+
+      // const wardData = wards.map((i: number) => {
+      //   return { ward_id: i, project_proposal_id: project_proposals_record.id };
+      // });
+      // for(const w of wards){
+      //   await tx.project_propo_ward_maps.update({
+      //     data: wardData,
+      //     where:{
+      //       project_proposal_id: 21
+      //     }
+      //   });
+      // }
       return project_proposals_record;
     });
   };

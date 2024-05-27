@@ -1,4 +1,11 @@
 "use client";
+/**
+ * | Author- Sanjiv Kumar
+ * | Created On- 03-05-2024
+ * | Created for- Input Field
+ * | Status- open
+ */
+
 import { HeaderWidget } from "@/components/Helpers/Widgets/HeaderWidget";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
@@ -41,10 +48,11 @@ const HeroProjectProposal = () => {
 
 
   const columns = [
-    { name: "id", caption: "Sr. No.", width: "w-[5%]" },
-    { name: "date", caption: "Date", width: "w-[20%]", type: "date" },
-    { name: "project_proposal_no", caption: "Project Proposal No.", width: "w-[20%]" },
-    { name: "ulb_name", caption: "Ulb Name", width: "w-[20%]" },
+    { name: "id", caption: "Sr. No." },
+    { name: "title", caption: "Project Title" },
+    { name: "type", caption: "Project Type" },
+    { name: "proposed_date", caption: "Proposed Date", type: "date" },
+    { name: "ward_name", caption: "Ward No" },
     // { name: "summary", caption: "Summary", width: "w-[20%]", align: "left"}
   ];
 

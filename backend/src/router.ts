@@ -7,6 +7,7 @@ import DashboardRoute from "./apis/route/dashboard/dashboardRoute";
 import DistrictRoute from "./apis/route/masters/districtRoute";
 import StateRoute from "./apis/route/masters/stateRoute";
 import UlbRoute from "./apis/route/masters/ulbRoute";
+import ProjectTypeRoute from "./apis/route/masters/projectTypeRoute";
 
 /*
 |--------------------------------------------------------------------------
@@ -36,7 +37,9 @@ class FinanceRoute {
 
     (new StateRoute("3", app)).configure();  // 3
 
-    (new UlbRoute("4", app)).configure();  // 3
+    (new UlbRoute("4", app)).configure();  // 4
+    
+    (new ProjectTypeRoute("5", app)).configure();  // 5
 
 
     (new BillsRoute("50", app)).configure();

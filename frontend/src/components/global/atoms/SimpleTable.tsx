@@ -40,7 +40,7 @@ const SimpleTable = <T,>({ columns, data, onViewButtonClick, rowIndexStart }: Si
   ) : (
     data?.map((row, index) => {
       return (
-        <tr key={`row-${index}`} className="border border-zinc-100 text-secondary">
+        <tr key={`row-${index}`} className="border border-zinc-100 text-secondary text-nowrap">
           {columns.map((column, index2) => {
 
             let value;
@@ -99,7 +99,7 @@ const SimpleTable = <T,>({ columns, data, onViewButtonClick, rowIndexStart }: Si
 
   return (
     <>
-      <div className="overflow-x-auto">
+      <div className="hide-scrollbar overflow-x-auto">
         <table className="table table-md">
 
           <thead className="  text-[1rem] bg-primary_bg_indigo text-white">
