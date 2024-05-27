@@ -11,9 +11,6 @@ import details from "@/assets/svg/details.svg";
 
 import { Icons } from "@/assets/svg/icons";
 
-
-
-
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 import { FilterButton } from "@/components/global/atoms/FilterButton";
@@ -22,11 +19,8 @@ import { usePagination } from "@/hooks/Pagination";
 
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 
-
 import qs from "qs";
 import goBack from "@/utils/helper";
-
-
 
 const usePrimaryTabs = (defaultTabIndex: number, changeAllowed: boolean): [ReactNode, number, (index: number) => void] => {
 
@@ -39,7 +33,6 @@ const usePrimaryTabs = (defaultTabIndex: number, changeAllowed: boolean): [React
 
     const tabs = (
         <div className="flex">
-
             {items.map((item, index) => {
                 return (
                     <>

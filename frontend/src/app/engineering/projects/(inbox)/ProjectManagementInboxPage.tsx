@@ -10,7 +10,6 @@ import SimpleTable from "@/components/global/atoms/SimpleTable";
 import { useProjectProposalsInboxList } from "@/hooks/data/ProjectProposalsHooks";
 import { FilterButton } from "@/components/global/atoms/FilterButton";
 
-
 import SearchPanel from "../../../../components/global/molecules/SearchPanel";
 import qs from "qs";
 import { usePagination } from "@/hooks/Pagination";
@@ -43,11 +42,16 @@ const ProjectManagementInboxPage = () => {
   ];
 
   const columns = [
-    { name: "id", caption: "Sr. No.", width: "w-[5%]" },
-    { name: "date", caption: "Date", width: "w-[20%]", type: "date" },
-    { name: "project_proposal_no", caption: "Project Proposal No.", width: "w-[20%]" },
-    { name: "ulb_name", caption: "Ulb Name", width: "w-[20%]" },
-    { name: "summary", caption: "Summary", width: "w-[20%]", align: "left" }
+    // { name: "id", caption: "Sr. No.", width: "w-[5%]" },
+    // { name: "date", caption: "Date", width: "w-[20%]", type: "date" },
+    // { name: "project_proposal_no", caption: "Project Proposal No.", width: "w-[20%]" },
+    // { name: "ulb_name", caption: "Ulb Name", width: "w-[20%]" },
+    // { name: "summary", caption: "Summary", width: "w-[20%]", align: "left" }
+    { name: "id", caption: "Sr. No." },
+    { name: "title", caption: "Project Title" },
+    { name: "type", caption: "Project Type" },
+    { name: "proposed_date", caption: "Proposed Date", type: "date" },
+    { name: "ward_name", caption: "Ward No" },
   ];
 
 

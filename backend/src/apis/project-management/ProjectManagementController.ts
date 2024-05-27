@@ -143,8 +143,8 @@ class ProjectManagementController {
 
         const user = req.body.user;
 
-        if (user.isExecutiveOfficer()) {
-          console.log("Executive officer Inbox");
+        if (user.isJuniorEngineer()) {
+          console.log(user.getRole() + " Inbox");
 
           this.commonCallFunction(
             req,
