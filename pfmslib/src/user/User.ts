@@ -26,6 +26,11 @@ class User {
     return this.user?.role?.includes(ROLES.JUNIOR_ENGINEER);
   }
 
+  isAssistantEngineer = () => {
+    return this.user?.role?.includes(ROLES.ASSISTANT_ENGINEER);
+  }
+
+
   isExecutiveOfficer = () => {
     return this.user?.role?.includes(ROLES.EXE_OFFICER);
   }

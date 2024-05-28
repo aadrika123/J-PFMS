@@ -7,7 +7,7 @@
 type PfmsUrlKeys =
   | "MUNICIPILATY_CODE_URL"
   | "AUTH_URL"
-  | "BILLS_VERIFICATION"
+  | "PROJECT_VERIFICATION"
   | "DASHBOARD"
   | "ULB_URL"
   | "WARD_URL"
@@ -71,13 +71,13 @@ export const PFMS_URL: Urls = {
     getById: "/project-perposal/get",
     getType: "/project-type/get-all"
   },
-  BILLS_VERIFICATION: {
-    getById: "bill-verification/get",
-    approve: "bill-verification/approve",
-    sendBack: "bill-verification/send-back",
-    getDoc: "bill-verification/document/get",
-    approveDoc: "bill-verification/document/approve",
-    rejectDoc: "bill-verification/document/reject",
+  PROJECT_VERIFICATION: {
+    getById: "project-verification/get",
+    approve: "project-verification/approve",
+    sendBack: "project-verification/send-back",
+    getDoc: "project-verification/document/get",
+    approveDoc: "project-verification/document/approve",
+    rejectDoc: "project-verification/document/reject",
   },
   DASHBOARD: {
     getCollection: "dashboard/collection/get",

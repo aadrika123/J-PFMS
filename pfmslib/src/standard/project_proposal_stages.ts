@@ -12,6 +12,6 @@
 
 export const ProjectProposalStages = Object.freeze({
   ApprovedByBackOffice: 1,
-  ApprovedByExecutiveOfficer: 2,
-  ApprovedByCityManager: 3,
+  ApprovedByJuniorEngineer: 2,
+  ApprovedByAssistantEngineer: 3,
 });
