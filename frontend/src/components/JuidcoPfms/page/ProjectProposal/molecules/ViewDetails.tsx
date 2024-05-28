@@ -27,12 +27,12 @@ export const DetailsCards: React.FC<DetailsCardsProps<any>> = (props) => {
         <hr className="mt-3 border border-gray-400" />
         <hr className="border border-gray-400" />
         <div className=" grid grid-cols-3 gap-2 mt-3">
-          {proposalDetails.map((vendor, index) => (
+          {proposalDetails.map((wards, index) => (
             <React.Fragment key={index}>
               <BoldSpan
                 className="flex flex-col"
-                label={vendor?.label}
-                content={vendor?.content}
+                label={wards?.label}
+                content={wards?.content}
               />
             </React.Fragment>
           ))}
@@ -67,7 +67,7 @@ const ViewDetails: React.FC<ViewDetailsProps<any>> = (props) => {
     },
     {
       label: "Ward No",
-      content: projectDetails?.ward_name,
+      content: projectDetails?.wards,
     },
     {
       label: "Address",

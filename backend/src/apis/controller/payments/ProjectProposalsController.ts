@@ -61,7 +61,7 @@ class project_proposalsController {
   create = async (req: Request): Promise<APIv1Response> => {
     //validate
     await projectProposalValidationSchema.validate(req.body.data);
-    req.body.data.wards=[1,2];
+    // req.body.data.wards=[1,2];
 
     // collect the input
     const record = req.body.data;
@@ -89,25 +89,34 @@ class project_proposalsController {
 
       fs.mkdirSync(destDir, { recursive: true });
 
+      let src = "";
+      let dst = "";
+
       for (const file of files) {
         const fileDetails = JSON.parse(decryptV1(file.file_token));
 
         const relativePath = `${relativeDir}/${fileDetails.fileName}`;
         const destPath = `${rootDir}/${relativePath}`;
 
-        fs.renameSync(`./${fileDetails.path}`, destPath);
+        src = fileDetails.path;
+        dst = destPath;
+        
 
         const docRecord = {
           description: file.file_name,
           path: relativePath,
           doc_type_id: file.document_type_id,
         };
+
+        
         docRecords.push(docRecord);
       }
       delete record.files;
 
       await this.dao.createOne(record, docRecords);
+      fs.renameSync(`./${src}`, dst);
     }
+    
 
     // call dao
     // const result = await this.dao.create(data)
@@ -143,7 +152,7 @@ class project_proposalsController {
     // collect the input
     const record = req.body.data;
     const id = Number(req.params.id);
-    req.body.data.wards=[1, 3];
+    // req.body.data.wards=[1, 3];
 
     const date = new Date();
     const year = date.getFullYear();

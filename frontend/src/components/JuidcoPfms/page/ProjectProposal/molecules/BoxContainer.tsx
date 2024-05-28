@@ -22,7 +22,7 @@ export const BoldSpan: React.FC<SpanProps> = (props) => {
   return (
     <span className={`mb-2 text-secondary ${className} `}>
       {label && <b>{label}&nbsp;</b>}
-      {content}
+      {Array.isArray(content) ? content.map((i) => i.ward_name).join(',') : content}
     </span>
   );
 };
@@ -41,9 +41,9 @@ const BoxContainer: React.FC<BoxContainerPropsType<any>> = (props) => {
         <BoldSpan content="Proposal Date" />
         <div className="flex items-center mb-2">
           <Image src={home} alt="calender" />
-          {/* <span className="ml-1 text-red-500">
-            {`${projectDetails?.proposed_date.split("T")[0] == new Date().toISOString().split("T")[0] ? "Today" : moment(projectDetails?.date).fromNow()}`}
-          </span> */}
+          <span className="ml-1 text-red-500">
+            {`${projectDetails?.proposed_date.split("T")[0] == new Date().toISOString().split("T")[0] ? "Today" : moment(projectDetails?.proposed_date).fromNow()}`}
+          </span>
         </div>
       </div>
       <div className="bg-gray-100 border flex flex-col py-4 px-8 h-52 w-full rounded">

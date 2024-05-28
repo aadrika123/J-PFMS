@@ -56,7 +56,11 @@ const SimpleTable = <T,>({ columns, data, onViewButtonClick, rowIndexStart }: Si
               value = new Date(row[column.name as keyof typeof row] as string);
             }
             else {
-              value = row[column.name as keyof typeof row];
+              const d = row[column.name as keyof typeof row];
+              if(Array.isArray(d)){
+                value = d.join(',')
+              }else
+              value = d;
             }
 
 

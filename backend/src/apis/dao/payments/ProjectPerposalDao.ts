@@ -115,7 +115,14 @@ class project_proposalsDao {
     um.ulb_name,
     uwm.ward_name,
     dm.department_name as execution_body_name,
-    dm.id as execution_body
+    dm.id as execution_body,
+    jsonb_agg(
+      jsonb_build_object(
+        'id', ppwms.id,
+        'ward_id', ppwms.ward_id,
+        'ward_name', ppwms.ward_name
+      )
+    ) as wards
     from project_proposals as pp
     left join
     m_states as ms on ms.id = pp.state_id
@@ -127,7 +134,35 @@ class project_proposalsDao {
     department_masters as dm on dm.id = pp.execution_body
     left join
     project_types as pt on pt.id = pp.type_id
-    where pp.id=${id}`;
+    left join 
+    (
+      select ppwm.id, ppwm.project_proposal_id, puwm.ward_name, ppwm.ward_id
+      from 
+      project_propo_ward_maps as ppwm
+      left join
+      ulb_ward_masters as puwm on puwm.id = ppwm.ward_id
+    ) as ppwms on ppwms.project_proposal_id = pp.id
+    where pp.id=${id}
+    GROUP BY
+    pp.id, 
+    pp.title, 
+    pp.description, 
+    pp.address, 
+    pp.proposed_date, 
+    pp.pin_code, 
+    pp.project_proposal_no,
+    pp.proposed_by,
+    pp.type_id,
+    pp.state_id,
+    pp.ulb_id,
+    pp.ward_id,
+    pp.district_id,
+    pt.name,
+    ms.name,
+    um.ulb_name,
+    uwm.ward_name,
+    dm.department_name,
+    dm.id`;
     const data: any = await prisma.$queryRawUnsafe<[]>(query);
     const doc = await prisma.$queryRaw`
     select
@@ -139,6 +174,7 @@ class project_proposalsDao {
     project_proposal_documents
     where project_proposal_id = ${data[0]?.id}
     `;
+
     // const doc = await prisma.project_proposal_documents.findMany({
     //   select: {
     //     path: true,
@@ -150,6 +186,7 @@ class project_proposalsDao {
     // });
     const newData = data[0];
     newData.files = doc;
+
     return newData;
   };
 
@@ -186,18 +223,18 @@ class project_proposalsDao {
           })
         );
       }
-
-      // const wardData = wards.map((i: number) => {
-      //   return { ward_id: i, project_proposal_id: project_proposals_record.id };
-      // });
-      // for(const w of wards){
-      //   await tx.project_propo_ward_maps.update({
-      //     data: wardData,
-      //     where:{
-      //       project_proposal_id: 21
-      //     }
-      //   });
-      // }
+    
+      if(wards.length){
+        const wardData = wards.map((i: number) => {
+          return { ward_id: i, project_proposal_id: project_proposals_record.id };
+        });
+        await tx.project_propo_ward_maps.deleteMany({
+          where: { project_proposal_id: id },
+        });
+        await tx.project_propo_ward_maps.createMany({
+          data: wardData,
+        });
+      }
       return project_proposals_record;
     });
   };

@@ -9,7 +9,7 @@ import Image from "next/image";
 import upload from "@/assets/svg/upload.svg";
 import axios from "@/lib/axiosConfig";
 import { useQuery } from "react-query";
-import SelectForNoApi from "@/components/global/atoms/SelectForNoApi";
+// import SelectForNoApi from "@/components/global/atoms/SelectForNoApi";
 const RunningAnimation = dynamic(
   () =>
     import("./Animations").then((module) => {
@@ -29,6 +29,7 @@ import pdfIcon from "@/assets/svg/pdf_icon.svg";
 import Popup from "@/components/global/molecules/Popup";
 import { useUser } from "@/components/global/molecules/general/useUser";
 import Select from "@/components/global/atoms/Select";
+import MultiSelect from "@/components/global/atoms/MultiSelect";
 
 type FileTypes = {
   document_type_id: number;
@@ -52,6 +53,7 @@ export type ProjectProposalSchema = {
   address: string;
   pin_code: number | string;
   files: FileTypes[];
+  wards: any[];
 };
 
 type AddNewProjectProposalProps = {
@@ -85,7 +87,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     validationError: null,
     fileType: initialValues.files[0]?.path?.split(".")[1],
     showPopup: false,
-    isReset: false
+    isReset: false,
   });
   const {
     ulbId,
@@ -96,11 +98,11 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     file,
     fileType,
     showPopup,
-    isReset
+    isReset,
   } = state;
   const [projectDetails, setProjectDetails] = useState<any>();
 
-  useEffect(() =>{
+  useEffect(() => {
     setProjectDetails({
       title: initialValues.title || null,
       description: initialValues.description || null,
@@ -109,8 +111,8 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
       type: additionalData?.type || null,
       ward_no: additionalData?.ward_no || null,
       pin_code: initialValues.pin_code || null,
-    })
-  },[isReset])
+    });
+  }, [isReset]);
 
   ////// Fetching data
   const fetch = async (endpoint: string, dependence?: any) => {
@@ -159,7 +161,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     try {
       if (e.target.files) {
         const file = e.target.files[0];
-        if (file.size > 2 * 1024 * 1024 || file.size !< 9 * 1024) {
+        if (file.size > 2 * 1024 * 1024 || file.size! < 9 * 1024) {
           setState({
             ...state,
             validationError: `file size should be between 10 kb to 2 mb`,
@@ -224,7 +226,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
         districtId: initialValues.district_id,
         ulbId: initialValues.ulb_id,
         file: null,
-        isReset: !isReset
+        isReset: !isReset,
       }));
     }, 100);
   };
@@ -318,6 +320,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                       readonly={readonly}
                       className="min-h-4 max-h-10"
                     />
+                    
                     <TextArea
                       onChange={(e) => {
                         handleChange(e);
@@ -332,6 +335,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                       placeholder="Enter Project Description"
                       maxlength={500}
                       readonly={readonly}
+                      required
                     />
                     <TextArea
                       onChange={(e) => {
@@ -406,7 +410,27 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                           />
                         </>
                       )}
-                      {isUlb() && (
+                     {isUlb() && ( <MultiSelect
+                      handler={(value: any) =>{ 
+                        const v = value.map((i:any) => i.label).join(',')
+                        handleAllChange(v, "ward_no")
+                      }}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.wards}
+                      error={errors.wards}
+                      touched={touched.wards}
+                      label="Wards"
+                      name="wards"
+                      placeholder="Enter Project Title"
+                      required
+                      readonly={readonly}
+                      data={wards?.map((ward: any) => {
+                        return { value: ward.id, label: ward.name };
+                      })}
+                    />
+                    )} 
+                      {/* {isUlb() && (
                         <SelectForNoApi
                           data={wards}
                           onChange={handleChange}
@@ -423,7 +447,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                             handleAllChange(value as string, "ward_no")
                           }
                         />
-                      )}
+                      )} */}
                       <Input
                         onChange={(e) => {
                           handleChange(e);
@@ -498,7 +522,13 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                             {validationError}
                           </span>
                         ) : (
-                          <span>{values.files[0]?.file_name || <span className="text-sm text-red-500">file size should 10 kb to 2 mb</span>}</span>
+                          <span>
+                            {values.files[0]?.file_name || (
+                              <span className="text-sm text-red-500">
+                                file size should 10 kb to 2 mb
+                              </span>
+                            )}
+                          </span>
                         )}
                       </div>
                       {file && (
