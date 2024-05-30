@@ -12,7 +12,7 @@ import goBack from "@/utils/helper";
 import { Formik, FormikValues } from "formik";
 import { tenderBasicDetailsSchema } from "pfmslib";
 import React, { ChangeEvent, useRef, useState } from "react";
-import CheckboxComponent from "../molicules/CheckboComponent";
+import CheckboxComponent from "../molecules/CheckboComponent";
 import {
   bg_color,
   contractFormList,
@@ -21,9 +21,9 @@ import {
   payment_mode,
   tenderCategoryList,
   tenderTypeList,
-} from "../molicules/checkList";
-import RadioComponent from "../molicules/RadioComponent";
-import RadioYesNoComponent from "../molicules/RadioYesNoComponent";
+} from "../molecules/checkList";
+import RadioComponent from "../molecules/RadioComponent";
+import RadioYesNoComponent from "../molecules/RadioYesNoComponent";
 import CustomImage from "@/components/global/molecules/general/CustomImage";
 import Image from "next/image";
 import { PFMS_URL } from "@/utils/api/urls";
@@ -216,7 +216,7 @@ const TenderBasicDetailsForm = () => {
           cancel={handleBackAndReset}
         />
       )}
-      <div className="flex items-center bg-primary_bg_indigo px-3 py-1 rounded mb-3">
+      <div className="flex items-center bg-primary_bg_indigo px-3 py-1 rounded mb-3 shadow-lg">
         <Image src={FolderIcon} height={30} width={30} alt="tender-icon" />
         <header className="font-bold ml-2 text-white">Basic Details</header>
       </div>
@@ -515,7 +515,7 @@ const TenderBasicDetailsForm = () => {
                     variant="primary"
                     className="animate-pulse"
                   >
-                    Submit
+                    Save & Next
                   </Button>
                 </>
               )}

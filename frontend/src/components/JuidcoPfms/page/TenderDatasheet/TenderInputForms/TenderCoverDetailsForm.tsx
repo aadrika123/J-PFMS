@@ -10,21 +10,20 @@ import Button from "@/components/global/atoms/buttons/Button";
 import goBack from "@/utils/helper";
 import { Formik, FormikValues } from "formik";
 import { tenderBasicDetailsSchema } from "pfmslib";
-import React, { ChangeEvent, useRef, useState } from "react";
-import { bg_color, coverList } from "../molicules/checkList";
-import RadioComponent from "../molicules/RadioComponent";
+import React, { useRef, useState } from "react";
+import { bg_color, coverList } from "../molecules/checkList";
+import RadioComponent from "../molecules/RadioComponent";
 import Image from "next/image";
-import toast, { Toaster } from "react-hot-toast";
-const RunningAnimation = dynamic(
-  () =>
-    import("../../ProjectProposal/Animations").then((module) => {
-      return { default: module.RunningAnimation };
-    }),
-  {
-    ssr: false,
-  }
-);
-import dynamic from "next/dynamic";
+// const RunningAnimation = dynamic(
+//   () =>
+//     import("../../ProjectProposal/Animations").then((module) => {
+//       return { default: module.RunningAnimation };
+//     }),
+//   {
+//     ssr: false,
+//   }
+// );
+// import dynamic from "next/dynamic";
 import Popup from "@/components/global/molecules/Popup";
 import LosingDataConfirmPopup from "@/components/global/molecules/general/LosingDataConfirmPopup";
 import CoverIcon from "@/assets/svg/Parchment.svg";
@@ -84,57 +83,6 @@ const TenderCoverDetailsForm = () => {
   const onSubmit = (values: FormikValues) => {
     console.log("Basic Details", values);
   };
-
-  ///////////// Checking File Type
-  const validateFileType = (file: any) => {
-    const fileTypes = ["jpeg", "jpg", "pdf"];
-
-    return fileTypes.some((type) => file?.type?.includes(type));
-  };
-
-  ////// Handle Upload
-  // const handleUpload = async (
-  //   e: ChangeEvent<HTMLInputElement>,
-  //   setFieldValue: (key: string, value: any) => void,
-  //   key: string
-  // ) => {
-  //   setState((prev: any) => {
-  //     return { ...prev, inProgress: true };
-  //   });
-  //   try {
-  //     if (e.target.files) {
-  //       const file = e.target.files[0];
-  //       if (file.size > 2 * 1024 * 1024 || file.size! < 9 * 1024) {
-  //         setState({
-  //           ...state,
-  //           validationError: `file size should be between 10 kb to 2 mb`,
-  //         });
-  //         return;
-  //       }
-  //       if (!validateFileType(file)) {
-  //         setState({
-  //           ...state,
-  //           validationError: `'${file.type.split("/")[1]}' file not allowed`,
-  //         });
-  //         return;
-  //       }
-
-  //       setFieldValue(`${key}`, file);
-  //       setState({
-  //         ...state,
-  //         validationError: null,
-  //         [key]: URL.createObjectURL(file),
-  //         fileType: file?.type?.includes("pdf") ? "pdf" : "",
-  //       });
-  //     }
-  //   } catch (error: any) {
-  //     setFieldValue(`fee_file`, "");
-  //     toast.error(error);
-  //     console.log(error);
-  //   } finally {
-  //     setState((prev: any) => ({ ...prev, inProgress: false }));
-  //   }
-  // };
 
   ///// handlBackAndReset
   const handleBackAndReset = (trigger?: () => void) => {
@@ -225,7 +173,6 @@ const TenderCoverDetailsForm = () => {
 
   return (
     <>
-      <Toaster />
       {showPopup && (
         <Popup padding="0">
           <iframe
@@ -366,7 +313,7 @@ const TenderCoverDetailsForm = () => {
                     variant="primary"
                     className="animate-pulse"
                   >
-                    Submit
+                    Save & Next
                   </Button>
                 </>
               )}

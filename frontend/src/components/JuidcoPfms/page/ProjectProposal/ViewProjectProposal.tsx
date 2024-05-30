@@ -49,39 +49,55 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
       level: 1,
       others: [
         {
-          info: "EXECUTIVE OFFICER",
+          info: "JUNIOR ENGINEER",
           img: admi,
           approvalAmount: 200,
         },
         {
-          info: "NEW BACK OFFICE",
+          info: "ASSISTANT ENGINEER",
           img: admi,
           approvalAmount: 300,
         },
         {
-          info: "NEW CITY MANAGER",
+          info: "EXECUTIVE ENGINEER",
+          img: admi,
+          approvalAmount: 400,
+        },
+        {
+          info: "SUPERINTENDENT ENGINEER",
+          img: admi,
+          approvalAmount: 400,
+        },
+
+        {
+          info: "CHIEF ENGINEER",
           img: admi,
           approvalAmount: 400,
         },
       ],
     },
     {
-      info: "ADD DEPARTMENT",
+      info: "ADMINISTRATIVE DEPARTMENT",
       img: admi,
       level: 2,
       others: [
         {
-          info: "ADD OFFICER",
+          info: "DEPARTMENTAL SECRETARY",
           img: admi,
           approvalAmount: 200,
         },
         {
-          info: "ADD BACK OFFICE",
+          info: "DEPARTMENTAL MINISTER",
           img: admi,
           approvalAmount: 300,
         },
         {
-          info: "ADD CITY MANAGER",
+          info: "YOJNA PRADHIKRIT SAMITI",
+          img: admi,
+          approvalAmount: 400,
+        },
+        {
+          info: "CABINET",
           img: admi,
           approvalAmount: 400,
         },
@@ -189,7 +205,7 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
             <ProjectProposalApprovalStepper
               level={1}
               subLevel={0}
-              budget={300}
+              budget={400}
               items={items}
             />
             <BoxContainer projectDetails={data} />

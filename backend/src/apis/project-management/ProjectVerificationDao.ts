@@ -37,8 +37,9 @@ class ProjectVerificationDao {
         left join ulb_ward_masters as ppuwm on ppwm.ward_id = ppuwm.id
           ) as ppwml on ppwml.project_proposal_id = b.id
           where true
-        group by b.id, um.ulb_name, pt.name
       `;
+
+      const grouping = "group by b.id, um.ulb_name, pt.name";
 
       // add project proposal no filters to query
       const project_proposal_no_filters = filters['project_proposal_no'];
@@ -62,11 +63,10 @@ class ProjectVerificationDao {
 
       // fetch the data
       prisma.$transaction([
-        prisma.$queryRawUnsafe(`select b.id, b.project_proposal_no, b.proposed_date, b.title, b.ulb_id, um.ulb_name, b.type_id, pt.name as type, ARRAY_AGG(ppwml.ward_name::text) as ward_name ${query} order by id ${ordering}
+        prisma.$queryRawUnsafe(`select b.id, b.project_proposal_no, b.proposed_date, b.title, b.ulb_id, um.ulb_name, b.type_id, pt.name as type, ARRAY_AGG(ppwml.ward_name::text) as ward_name ${query} ${grouping} order by id ${ordering}
         limit ${limit} offset ${offset};`),
         prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${query}`),
         prisma.$queryRawUnsafe<string[]>(`select distinct(project_proposal_no) ${query} order by project_proposal_no asc limit 10`)
-
       ]).then(([records, c, project_proposal_nos]) => {
 
 

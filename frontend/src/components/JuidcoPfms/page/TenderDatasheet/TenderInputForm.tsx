@@ -7,13 +7,13 @@
  */
 
 import React, { useState } from "react";
-import CheckboxComponent from "./molicules/CheckboComponent";
-import RadioYesNoComponent from "./molicules/RadioYesNoComponent";
-import RadioComponent from "./molicules/RadioComponent";
+import CheckboxComponent from "./molecules/CheckboComponent";
+import RadioYesNoComponent from "./molecules/RadioYesNoComponent";
+import RadioComponent from "./molecules/RadioComponent";
 import TenderBasicDetailsForm from "./TenderInputForms/TenderBasicDetailsForm";
 import Image from "next/image";
 import TenderIcon from "@/assets/svg/tender_form.svg";
-import { tabList } from "./molicules/checkList";
+import { tabList } from "./molecules/checkList";
 import TenderCoverDetailsForm from "./TenderInputForms/TenderCoverDetailsForm";
 
 const TenderInputForm = ({ PageNo }: { PageNo: number }) => {

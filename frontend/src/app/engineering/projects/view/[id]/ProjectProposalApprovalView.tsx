@@ -13,7 +13,6 @@ import { usePathname, useRouter } from "next/navigation";
 
 import list from "@/assets/svg/list.svg";
 import details from "@/assets/svg/details.svg";
-import ProjectProposalApprovalStepper from "@/components/JuidcoPfms/page/ProjectProposal/molecules/ProjectProposalApprovalStepper";
 import admi from "@/assets/svg/admi.svg";
 import { Icons } from "@/assets/svg/icons";
 import goBack, { DateFormatter } from "@/utils/helper";
@@ -35,6 +34,7 @@ import { usePagination } from "@/hooks/Pagination";
 
 import moment from "moment";
 import Loader from "@/components/global/atoms/Loader";
+import ProjectProposalApprovalStepper from "@/components/JuidcoPfms/projectProposalMolecules/ProjectProposalApprovalStepper";
 
 
 
@@ -646,46 +646,61 @@ const items = [
     level: 1,
     others: [
       {
-        info: "EXECUTIVE OFFICER",
+        info: "JUNIOR ENGINEER",
         img: admi,
         approvalAmount: 200,
       },
       {
-        info: "NEW BACK OFFICE",
+        info: "ASSISTANT ENGINEER",
         img: admi,
         approvalAmount: 300,
       },
       {
-        info: "NEW CITY MANAGER",
+        info: "EXECUTIVE ENGINEER",
+        img: admi,
+        approvalAmount: 400,
+      },
+      {
+        info: "SUPERINTENDENT ENGINEER",
+        img: admi,
+        approvalAmount: 400,
+      },
+
+      {
+        info: "CHIEF ENGINEER",
         img: admi,
         approvalAmount: 400,
       },
     ],
   },
   {
-    info: "ADD DEPARTMENT",
+    info: "ADMINISTRATIVE DEPARTMENT",
     img: admi,
     level: 2,
     others: [
       {
-        info: "ADD OFFICER",
+        info: "DEPARTMENTAL SECRETARY",
         img: admi,
         approvalAmount: 200,
       },
       {
-        info: "ADD BACK OFFICE",
+        info: "DEPARTMENTAL MINISTER",
         img: admi,
         approvalAmount: 300,
       },
       {
-        info: "ADD CITY MANAGER",
+        info: "YOJNA PRADHIKRIT SAMITI",
+        img: admi,
+        approvalAmount: 400,
+      },
+      {
+        info: "CABINET",
         img: admi,
         approvalAmount: 400,
       },
     ],
   },
 ];
-
 
 
 const usePrimaryTabs = (defaultTabIndex: number, changeAllowed: boolean): [ReactNode, number, (index: number) => void] => {
@@ -950,9 +965,9 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
       <div className="shadow-lg p-4 border">
 
         <ProjectProposalApprovalStepper
-          level={2}
+          level={1}
           subLevel={0}
-          budget={300}
+          budget={400}
           items={items}
         />
 
