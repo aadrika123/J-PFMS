@@ -23,10 +23,12 @@ interface InputProps {
   icon?: ReactNode;
   iconAlign?: "left" | "right";
   maxlength?: number;
+  labelColor?: string;
 }
 
 const Input: React.FC<InputProps> = (props) => {
   const fieldId = "id_" + props.name;
+  const {labelColor = "secondary"} = props;
 
   ///// If the Input type will be number then MouseWheeler will be disabled ////////////
   const handleFocus = (e: any) => {
@@ -57,7 +59,7 @@ const Input: React.FC<InputProps> = (props) => {
   return (
     <>
       <div className="flex flex-col gap-1">
-        <label className="text-secondary text-sm" htmlFor={fieldId}>
+        <label className={`text-${labelColor} text-sm`} htmlFor={fieldId}>
           {props.label}
           {props.required ? <span className="text-red-600 pl-2">*</span> : ""}
         </label>
@@ -74,7 +76,7 @@ const Input: React.FC<InputProps> = (props) => {
             type={props.type}
             value={props?.value}
             // onInput={handleOnInput}
-            className={`text-primary h-[40px] p-3 bg-transparent outline-none  w-full`}
+            className={`text-primary h-[40px] p-3 bg-white rounded outline-none  w-full`}
             name={props.name}
             id={fieldId}
           />

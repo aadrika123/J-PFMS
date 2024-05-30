@@ -7,6 +7,7 @@ import { multiProjectProposalValidationSchema, projectProposalValidationSchema }
 import User from "./user/User";
 import {ROLES} from "./user";
 import {ProjectProposalStages} from "./standard/project_proposal_stages"
+import {tenderBasicDetailsSchema} from "./validations/TenderInputFormValidation/TenderBasicDetailsValidation";
 
 // escape input string for in regular expressions
 const escapeRegExp = (text:string):string => {
@@ -36,5 +37,6 @@ export {
   projectProposalValidationSchema,
   ROLES,
   ProjectProposalStages,
+  tenderBasicDetailsSchema,
   docType, executionBody
 };

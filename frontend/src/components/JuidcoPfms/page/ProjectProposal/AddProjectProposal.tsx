@@ -1,4 +1,11 @@
 "use client";
+/**
+ * | Author- Sanjiv Kumar
+ * | Created On- 05-05-2024
+ * | Created for- Project Proposal Add
+ * | Status- open
+ */
+
 import React, { useState, lazy, Suspense } from "react";
 import { ProjectProposalSchema } from "./ProjectProposalForm";
 const ProjectProposalForm = lazy(() =>
@@ -95,8 +102,6 @@ const AddProjectProposal = () => {
 
   /////// Handle showing comfirmation popup
   const handleConfirmSubmit = (values: any) => {
-    console.log("first", values)
-
     setState({
       ...state,
       showConfirmation: true,

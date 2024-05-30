@@ -1,33 +1,35 @@
 "use client";
+
 /**
  * | Author- Sanjiv Kumar
- * | Created On- 07-05-2024
- * | Created for- Project Proposal View Screen
+ * | Created On- 28-05-2024
+ * | Created for- Tender Datasheet View Details
  * | Status- open
  */
 
 import React, { useState } from "react";
+import Loader from "@/components/global/atoms/Loader";
+import Image from "next/image";
 import Table from "@/components/global/molecules/Table";
-import admi from "@/assets/svg/admi.svg";
 import { useQuery } from "react-query";
-// import { usePathname } from "next/navigation";
-import { useUser } from "@/components/global/molecules/general/useUser";
 import axios from "@/lib/axiosConfig";
 import { PFMS_URL } from "@/utils/api/urls";
-import { HeaderWidget } from "./HeaderWidget";
-import Popup from "@/components/global/molecules/Popup";
-import Button from "@/components/global/atoms/buttons/Button";
-import Loader from "@/components/global/atoms/Loader";
 import pdfIcon from "@/assets/svg/pdf_icon.svg";
-import Image from "next/image";
 import BoxContainer from "../../projectProposalMolecules/BoxContainer";
 import Steps from "../../projectProposalMolecules/Steps";
 import ViewDetails from "../../projectProposalMolecules/ViewDetails";
-import ProjectProposalApprovalStepper from "../../projectProposalMolecules/ProjectProposalApprovalStepper";
+import Popup from "@/components/global/molecules/Popup";
+import Button from "@/components/global/atoms/buttons/Button";
+import goBack from "@/utils/helper";
+import { Icons } from "@/assets/svg/icons";
+import { usePathname, useRouter } from "next/navigation";
+import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 
-const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
-  const user = useUser();
-  //   const pathname = usePathname();
+const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
+  const router = useRouter();
+  const [, activateWorkingAnimation] = useWorkingAnimation();
+
+  const pathName = usePathname();
   const [state, setState] = useState<any>({
     activeStep: 0,
     showPopup: false,
@@ -36,58 +38,6 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
   });
 
   const { activeStep, showPopup, docData } = state;
-  const items = [
-    {
-      info: "BACK OFFICE",
-      img: admi,
-      level: 0,
-      approvalAmount: 100,
-    },
-    {
-      info: "TECHNICAL DEPARTMENT",
-      img: admi,
-      level: 1,
-      others: [
-        {
-          info: "EXECUTIVE OFFICER",
-          img: admi,
-          approvalAmount: 200,
-        },
-        {
-          info: "NEW BACK OFFICE",
-          img: admi,
-          approvalAmount: 300,
-        },
-        {
-          info: "NEW CITY MANAGER",
-          img: admi,
-          approvalAmount: 400,
-        },
-      ],
-    },
-    {
-      info: "ADD DEPARTMENT",
-      img: admi,
-      level: 2,
-      others: [
-        {
-          info: "ADD OFFICER",
-          img: admi,
-          approvalAmount: 200,
-        },
-        {
-          info: "ADD BACK OFFICE",
-          img: admi,
-          approvalAmount: 300,
-        },
-        {
-          info: "ADD CITY MANAGER",
-          img: admi,
-          approvalAmount: 400,
-        },
-      ],
-    },
-  ];
 
   ///////// Fetching Data
   const fetch = async () => {
@@ -127,6 +77,12 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
         )}
       </div>
     );
+  };
+
+  ////////////// handleOpenTenderInputForm //////////
+  const handleOpenTenderInputForm = () => {
+    activateWorkingAnimation();
+    router.push(`${pathName.split('/view')[0]}/add/1`);
   };
 
   ///////////// Handling step click ///////////
@@ -173,25 +129,31 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
           </div>
         </Popup>
       )}
-      <HeaderWidget
-        title="Project Details"
-        variant={"view"}
-        editVisible={true}
-        isDisabled={user?.getUserLevel() && user?.getUserLevel() > 2}
-        // user?.getUserLevel() && user?.getUserLevel() < 2
-        //  handleEditMode?: () => void;
-      />
       <div className="shadow-lg bg-white p-4 border">
         {!data ? (
           <Loader />
         ) : (
           <>
-            <ProjectProposalApprovalStepper
-              level={1}
-              subLevel={0}
-              budget={300}
-              items={items}
-            />
+            <div className="flex justify-between items-center">
+              <Button
+                variant="cancel"
+                className="border-none shadow-none text-primary_bg_indigo hover:text-primary_bg_indigo hover:bg-inherit"
+                onClick={goBack}
+              >
+                {Icons.back}
+                <b>Back</b>
+              </Button>
+              <Button
+                variant="primary"
+                className="border-none"
+                onClick={handleOpenTenderInputForm}
+              >
+                <b>Prepare Tender Input Form</b>
+                <div className="h-4 w-4 bg-white text-black rounded-full flex justify-center items-center">
+                  +
+                </div>
+              </Button>
+            </div>
             <BoxContainer projectDetails={data} />
             <Steps
               handleClick={handleStepClick}
@@ -214,4 +176,4 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
   );
 };
 
-export default ViewProjectProposal;
+export default ViewTenderingProject;
