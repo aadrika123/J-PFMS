@@ -49,7 +49,7 @@ const TextArea: React.FC<TextareaProps> = (props) => {
       <div className="flex flex-col gap-1">
         <label className="text-secondary text-sm" htmlFor={fieldId}>
           {props.label}
-          {props.required ? <span className="text-red-600 pl-2">*</span> : ""}
+          {props.required ? <span className="text-red-600 ">*</span> : ""}
         </label>
         <div
           className={`relative flex items-center justify-between rounded border bg-transparent border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none ${props.icon && props.iconAlign === "left" && "flex-row-reverse"} ${props.readonly ? `bg-gray-300` : ""}`}

@@ -45,7 +45,7 @@ const ImageUploadUi: React.FC<ImageUploadUiPropType> = (props) => {
       return { ...prev, inProgress: true };
     });
     try {
-      if (e.target.files) {
+      if (e.target.files?.length) {
         const file = e.target.files[0];
         if (file.size > 2 * 1024 * 1024 || file.size! < 9 * 1024) {
           throw Error(`file size should be between 10 kb to 2 mb`);
@@ -78,6 +78,7 @@ const ImageUploadUi: React.FC<ImageUploadUiPropType> = (props) => {
         error: status.error,
       }));
       status.delete = error;
+      e.target.value = '';
     }
   };
 
@@ -119,7 +120,7 @@ const ImageUploadUi: React.FC<ImageUploadUiPropType> = (props) => {
       </div>
       {/* Document List */}
       <div className="grid gap-3">
-        {fileInfo?.files?.length &&
+        {fileInfo?.files?.length > 0 &&
           fileInfo?.files.map((file: any, index: number) => (
             <div
               key={index}

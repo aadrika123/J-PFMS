@@ -64,7 +64,7 @@ const MultiSelect: React.FC<SelectProps> = (props) => {
       >
         <label className="text-secondary text-sm" htmlFor={fieldId}>
           {props.label}
-          {props.required ? <span className="text-red-600 pl-2">*</span> : ""}
+          {props.required ? <span className="text-red-600 ">*</span> : ""}
         </label>
 
         <Select

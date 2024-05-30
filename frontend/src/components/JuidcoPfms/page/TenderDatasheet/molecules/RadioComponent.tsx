@@ -52,7 +52,7 @@ const RadioComponent: React.FC<RadioComponentType> = (props) => {
         className={`text-sm font-medium ${props.touched && props.error ? "text-red-600" : "text-black"}`}
       >
         {checkList.title}
-        {props.required ? <span className="text-red-600 pl-2">*</span> : ""}
+        {props.required ? <span className="text-red-600">*</span> : ""}
       </label>
       <div
         className={`flex ${optionAlign === "raw" ? "flex-wrap" : "flex-col"}`}
@@ -69,7 +69,7 @@ const RadioComponent: React.FC<RadioComponentType> = (props) => {
                 checked={props.value === option.value}
                 value={option.value}
                 onBlur={props.onBlur}
-                className={`radio radio-primary border-primary_bg_indigo h-4 w-4 ${optionAlign === "col" || (labelAlign === "raw" && "mr-2")}`}
+                className={`radio radio-xs radio-primary border-primary_bg_indigo ${optionAlign === "col" || (labelAlign === "raw" && "mr-2")}`}
                 onChange={internalHandleChange}
                 id={props.name + index}
               />

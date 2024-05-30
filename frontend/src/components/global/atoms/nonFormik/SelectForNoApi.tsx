@@ -49,7 +49,7 @@ const SelectForNoApi: React.FC<SelectProps> = (props) => {
       <div className={`flex flex-col gap-1 ${props.readonly && 'dropdown-container'}`}>
         <label className="text-secondary text-sm" >
           {props.label}
-          {props.required ? <span className="text-red-600 pl-2">*</span> : ""}
+          {props.required ? <span className="text-red-600 ">*</span> : ""}
         </label>
         <select
           disabled={props.readonly}

@@ -24,7 +24,7 @@ import Image from "next/image";
 //   }
 // );
 // import dynamic from "next/dynamic";
-import Popup from "@/components/global/molecules/Popup";
+// import Popup from "@/components/global/molecules/Popup";
 import LosingDataConfirmPopup from "@/components/global/molecules/general/LosingDataConfirmPopup";
 import CoverIcon from "@/assets/svg/Parchment.svg";
 import ImageUploadUi from "./ImageUploadUi";
@@ -51,12 +51,6 @@ const TenderCoverDetailsForm = () => {
     tabNo: 1,
     coverNo: "1",
     files: [],
-    ///////////////////
-    file: "",
-    showPopup: false,
-    inProgress: false,
-    validationError: null,
-    fileType: "",
     showWarning: false,
     triggerFun: null,
     showFinalError: false,
@@ -66,9 +60,6 @@ const TenderCoverDetailsForm = () => {
     tabNo,
     coverNo,
     files,
-    ///////////
-    file,
-    showPopup,
     showWarning,
     triggerFun,
     showFinalError,
@@ -173,7 +164,7 @@ const TenderCoverDetailsForm = () => {
 
   return (
     <>
-      {showPopup && (
+      {/* {showPopup && (
         <Popup padding="0">
           <iframe
             width={1000}
@@ -189,7 +180,7 @@ const TenderCoverDetailsForm = () => {
             </Button>
           </div>
         </Popup>
-      )}
+      )} */}
       {showWarning && (
         <LosingDataConfirmPopup
           continue={handleCompleteReset}

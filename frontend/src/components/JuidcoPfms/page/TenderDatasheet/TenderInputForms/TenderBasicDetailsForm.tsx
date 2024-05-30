@@ -12,7 +12,7 @@ import goBack from "@/utils/helper";
 import { Formik, FormikValues } from "formik";
 import { tenderBasicDetailsSchema } from "pfmslib";
 import React, { ChangeEvent, useRef, useState } from "react";
-import CheckboxComponent from "../molecules/CheckboComponent";
+import CheckboxComponent from "../molecules/CheckboxComponent";
 import {
   bg_color,
   contractFormList,
@@ -112,7 +112,7 @@ const TenderBasicDetailsForm = () => {
       return { ...prev, inProgress: true };
     });
     try {
-      if (e.target.files) {
+      if (e.target.files?.length) {
         const file = e.target.files[0];
         if (file.size > 2 * 1024 * 1024 || file.size! < 9 * 1024) {
           setState({
@@ -124,7 +124,7 @@ const TenderBasicDetailsForm = () => {
         if (!validateFileType(file)) {
           setState({
             ...state,
-            validationError: `'${file.type.split("/")[1]}' file not allowed`,
+            validationError: `'${file.name.substring(file.name.lastIndexOf('.'))}' file is not allowed`,
           });
           return;
         }
@@ -339,10 +339,10 @@ const TenderBasicDetailsForm = () => {
                     className={`text-sm font-medium ${touched?.file?.file_token && errors?.file?.file_token ? "text-red-600" : "text-black"}`}
                   >
                     NIT Document
-                    <span className="text-red-600 pl-2">*</span>
+                    <span className="text-red-600">*</span>
                   </label>
                   <span className="text-xs">
-                    {"(Only .jpg, .jpeg and .pdf files are supported)"}
+                    {"(Only .jpg, .jpeg and .pdf files are supported )"}
                   </span>
                 </div>
                 {values?.file?.file_token && (

@@ -56,7 +56,7 @@ const CheckboxComponent: React.FC<CheckboxComponentType> = (props) => {
         className={`text-sm font-medium ${props.touched?.length === 0 && props.error ? "text-red-600" : "text-black"}`}
       >
         {checkList.title}
-        {props.required ? <span className="text-red-600 pl-2">*</span> : ""}
+        {props.required ? <span className="text-red-600">*</span> : ""}
       </label>
       <div className={`flex ${optionAlign === 'raw' ? 'grid grid-cols-3' : 'flex-col'}`}>
         {checkList.options?.map((option: any, index: number) => (
@@ -71,7 +71,7 @@ const CheckboxComponent: React.FC<CheckboxComponentType> = (props) => {
                 checked={props.value.includes(option.value)}
                 value={option.value}
                 onBlur={props.onBlur}
-                className={`checkbox border-primary_bg_indigo h-4 w-4 rounded hover:border-primary_bg_indigo checkbox-prima ${(optionAlign === "col" || labelAlign === "raw") && "mr-2"}`}
+                className={`checkbox border-primary_bg_indigo h-4 w-4 rounded hover:border-primary_bg_indigo checkbox-primary ${(optionAlign === "col" || labelAlign === "raw") && "mr-2"}`}
                 onChange={internalHandleChange}
                 id={props.name + index}
               />

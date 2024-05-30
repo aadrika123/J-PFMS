@@ -62,7 +62,7 @@ const RadioYesNoComponent: React.FC<RadioYesNoComponentType> = (props) => {
         className={`text-sm font-medium ${props.touched && props.error ? "text-red-600" : "text-black"}`}
       >
         {title}
-        {props.required ? <span className="text-red-600 pl-2">*</span> : ""}
+        {props.required ? <span className="text-red-600">*</span> : ""}
       </label>
       <div
         className={`flex ${optionAlign === "raw" ? "flex-wrap" : "flex-col"}`}
@@ -79,7 +79,7 @@ const RadioYesNoComponent: React.FC<RadioYesNoComponentType> = (props) => {
                 checked={props.value === option.value}
                 value={option.value}
                 onBlur={props.onBlur}
-                className={`radio border-primary_bg_indigo h-4 w-4 hover:border-primary_bg_indigo checked:bg-primary_bg_indigo ${optionAlign === "col" || (labelAlign === "raw" && "mr-2")}`}
+                className={`radio radio-xs border-primary_bg_indigo hover:border-primary_bg_indigo checked:bg-primary_bg_indigo ${optionAlign === "col" || (labelAlign === "raw" && "mr-2")}`}
                 onChange={internalHandleChange}
                 id={props.name + index}
               />

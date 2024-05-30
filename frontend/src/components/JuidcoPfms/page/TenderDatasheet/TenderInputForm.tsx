@@ -7,9 +7,6 @@
  */
 
 import React, { useState } from "react";
-import CheckboxComponent from "./molecules/CheckboComponent";
-import RadioYesNoComponent from "./molecules/RadioYesNoComponent";
-import RadioComponent from "./molecules/RadioComponent";
 import TenderBasicDetailsForm from "./TenderInputForms/TenderBasicDetailsForm";
 import Image from "next/image";
 import TenderIcon from "@/assets/svg/tender_form.svg";
@@ -27,6 +24,7 @@ const TenderInputForm = ({ PageNo }: { PageNo: number }) => {
   const handleTabChange = (tabNo: number) =>{
     setState({...state, tabNo})
   }
+  console.log("pageNo", PageNo);
 
   return (
     <div>
