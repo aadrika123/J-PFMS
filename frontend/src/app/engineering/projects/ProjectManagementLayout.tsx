@@ -7,14 +7,9 @@ import { usePathname } from "next/navigation";
 import React, { ReactNode } from "react";
 
 
-
-
-
-
 interface ProjectManagementLayoutProps {
   children: ReactNode
 }
-
 
 export const ProjectManagementLayout = ({ children }: ProjectManagementLayoutProps) => {
   const pathName = usePathname();

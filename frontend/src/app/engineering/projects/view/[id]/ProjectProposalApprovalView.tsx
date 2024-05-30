@@ -34,6 +34,7 @@ import * as Yup from "yup";
 import { usePagination } from "@/hooks/Pagination";
 
 import moment from "moment";
+import Loader from "@/components/global/atoms/Loader";
 
 
 
@@ -764,7 +765,7 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
 
 
 
-  const { data: projectProposalDetails, refetch: refetchProjectProposalDetails } = useProjectProposalDetails(ProProposalId);
+  const { isLoading: isLoading, data: projectProposalDetails, refetch: refetchProjectProposalDetails } = useProjectProposalDetails(ProProposalId);
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] = useWorkingAnimation();
 
   const [primaryTabs, activePrimaryTabIndex, setActivePrimaryTabIndex] = usePrimaryTabs(1, false);
@@ -864,8 +865,9 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
     <>
       {workingAnimation}
 
-
-      <div className="flex items-center justify-between border-b-2 pb-4 mb-4">
+      {isLoading? <Loader /> : (
+        <>
+              <div className="flex items-center justify-between border-b-2 pb-4 mb-4">
         <Button
           variant="cancel"
           className="border-none text-primary_bg_indigo hover:text-primary_bg_indigo hover:bg-inherit"
@@ -1138,6 +1140,12 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
         </Tabs >
 
       </div >
+
+
+        </>
+      )}
+
+
     </>
   );
 };
