@@ -1,4 +1,5 @@
 import { PrismaClient, project_proposals } from "@prisma/client";
+import { ProjectProposalStages } from "pfmslib";
 
 const prisma = new PrismaClient();
 
@@ -425,7 +426,6 @@ class ProjectVerificationDao {
         reject(error);
       });
     });
-
   };
 
   getOutboxItemCount = async (ulbId: number, level?: number) => {
@@ -439,6 +439,59 @@ class ProjectVerificationDao {
           select max(id) from project_proposal_checkings bc2 group by bc2.project_proposal_id
         )
       ) x on b.id = x.project_proposal_id where ${filterCondition}`;
+
+      prisma.$queryRawUnsafe<CountQueryResult[]>(`select count(*) ${queryWithoutFieldsAndPagination}`).then((c) => {
+        const count = Number(c[0]?.count);
+        resolve(count);
+      }).catch((error)=>{
+        reject(error);
+      });
+    });
+  }
+
+
+  // getLevel0JuniorEngineerInboxItemCount = async (ulbId: number, level?: number) => {
+  //   return new Promise((resolve, reject) => {
+  //     const filterCondition = `b.ulb_id = ${ulbId} and x.project_proposal_id is null`;
+
+  //     const queryWithoutFieldsAndPagination = `from project_proposals b 
+  //     left join 
+  //     (
+  //       select project_proposal_id from project_proposal_checkings bc1 where bc1.id in (
+  //         select max(id) from project_proposal_checkings bc2 group by bc2.project_proposal_id
+  //       )
+  //     ) 
+  //     x on b.id = x.project_proposal_id
+  //     where ${filterCondition}`;
+
+  //     prisma.$queryRawUnsafe<CountQueryResult[]>(`select count(*) ${queryWithoutFieldsAndPagination}`).then((c) => {
+  //       const count = Number(c[0]?.count);
+  //       resolve(count);
+  //     }).catch((error)=>{
+  //       reject(error);
+  //     });
+  //   });
+  // }
+
+  getHigherLevelInboxItemCount = async (ulbId: number, level: number) => {
+    return new Promise((resolve, reject) => {
+      
+      const filterCondition = (level ==  ProjectProposalStages.ApprovedByBackOffice?
+        `b.ulb_id = ${ulbId} and x.project_proposal_id is null`:
+      `b.ulb_id = ${ulbId} and x.approval_stage_id = ${level}`);
+
+    
+      const queryWithoutFieldsAndPagination = `from project_proposals b 
+      left join 
+      (
+        select project_proposal_id from project_proposal_checkings bc1 where bc1.id in (
+          select max(id) from project_proposal_checkings bc2 group by bc2.project_proposal_id
+        )
+      ) 
+      x on b.id = x.project_proposal_id
+      where ${filterCondition}`;
+
+      console.log(queryWithoutFieldsAndPagination);
 
       prisma.$queryRawUnsafe<CountQueryResult[]>(`select count(*) ${queryWithoutFieldsAndPagination}`).then((c) => {
         const count = Number(c[0]?.count);
