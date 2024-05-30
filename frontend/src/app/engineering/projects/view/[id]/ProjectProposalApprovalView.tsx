@@ -1054,7 +1054,7 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
                   </div>
 
 
-                  <div>
+                  {/* <div>
                     <div className="font-bold">
                       Execution Body
                     </div>
@@ -1062,7 +1062,7 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
                       {data?.execution_body_name}
 
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
