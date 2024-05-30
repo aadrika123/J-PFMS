@@ -13,6 +13,7 @@ const projectProposalsOutboxApi = `${baseURL}/project-verification/outbox`;
 const projectProposalsArchiveApi = `${baseURL}/project-verification/archive`;
 const projectProposalAcknowledgementApi = `${baseURL}/project-verification/acknowledge`;
 const projectProposalOutboxItemCountApi = `${baseURL}/project-verification/get-outbox-item-count`;
+const projectProposalInboxItemCountApi = `${baseURL}/project-verification/get-inbox-item-count`;
 
 
 export const useProjectProposalList = (searchQuery: string, limit: number, page: number) => {
@@ -123,6 +124,25 @@ export const useProjectProposalOutboxItemCount = () => {
   return useQuery(["outbox-item-count", pathName], (): Promise<ItemCountAPIResponse> => {
     return new Promise((resolve, reject) => {
       axios.get(`${projectProposalOutboxItemCountApi}`).then(resp => {
+        console.log(resp.data.message);
+        if (!resp.data.status) {
+          reject(resp.data.message);
+        } else {
+          resolve(resp.data.data);
+        }
+      }).catch((reason) => {
+        reject(reason);
+      });
+    });
+  });
+}
+
+
+export const useProjectProposalInboxItemCount = () => {
+  const pathName = usePathname();
+  return useQuery(["inbox-item-count", pathName], (): Promise<ItemCountAPIResponse> => {
+    return new Promise((resolve, reject) => {
+      axios.get(`${projectProposalInboxItemCountApi}`).then(resp => {
         console.log(resp.data.message);
         if (!resp.data.status) {
           reject(resp.data.message);

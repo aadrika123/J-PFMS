@@ -17,6 +17,7 @@ class ProjectVerificationRoute extends APIv1_New{
     this.addGetRoute(`outbox`, this.controller.getOutbox);
     this.addGetRoute(`archive`, this.controller.getArchive);
     this.addGetRoute('get-outbox-item-count', this.controller.getOutboxItemCount);
+    this.addGetRoute('get-inbox-item-count', this.controller.getInboxItemCount);
 
 
     // mutable routes: use post

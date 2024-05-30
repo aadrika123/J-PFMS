@@ -554,9 +554,6 @@ const ScheduleOfRatesRegistrationPage = () => {
   }
 
 
-
-
-
   const collectData = async () => {
 
     const allData: any[] = [];
@@ -582,7 +579,6 @@ const ScheduleOfRatesRegistrationPage = () => {
     else{
       console.log(allData);
       showSuccessDialog();
-
     }
   }
 

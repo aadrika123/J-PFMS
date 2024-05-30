@@ -931,7 +931,7 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
               </div>
               <div className="flex justify-end">
                 <span className="text-red-500">*</span>
-                Please acknowledge the form to submit measurement * other details
+                Please acknowledge the form to submit measurement & other details
               </div>
             </>
           )}
@@ -1017,15 +1017,7 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
 
                 </div>
                 <div className="flex gap-10">
-                  <div>
-                    <div className="font-bold">
-                      State
-                    </div>
-                    <div>
-                      {data?.state_name}
-                    </div>
-                  </div>
-
+                  
                   <div>
                     <div className="font-bold">
                       ULB Name

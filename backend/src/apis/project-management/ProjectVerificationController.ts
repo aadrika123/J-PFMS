@@ -252,6 +252,23 @@ class ProjectVerificationController {
     });
   }
 
+  getInboxItemCount = (req: Request): Promise<APIv1Response> => {
+    return new Promise((resolve, reject) => {
+      const { user } = req.body;
+      let level = -1;
+      const ulbId = user.getUlbId();
+
+      if (user.isJuniorEngineer()) level = ProjectProposalStages.ApprovedByBackOffice;
+      else if (user.isAssistantEngineer()) level = ProjectProposalStages.ApprovedByJuniorEngineer;
+
+      this.dao.getHigherLevelInboxItemCount(ulbId, level).then((count: any) => {
+        const result = { status: true, code: 200, message: "Not Found", data: { count: count } };
+        resolve(result);
+      }).catch((error) => {
+        reject(error);
+      });
+    });
+  }
 
   recordMeasurements = (req: Request): Promise<APIv1Response> => {
     return new Promise((resolve, reject) => {

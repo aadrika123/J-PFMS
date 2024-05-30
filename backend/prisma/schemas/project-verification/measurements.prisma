@@ -1,7 +1,7 @@
 //// OTPs
 model measurements {
   id            Int         @id   @default(autoincrement())
-
+  
   description   String
   nos           Int
 
