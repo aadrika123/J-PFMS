@@ -16,7 +16,7 @@ import details from "@/assets/svg/details.svg";
 import ProjectProposalApprovalStepper from "@/components/JuidcoPfms/page/ProjectProposal/molecules/ProjectProposalApprovalStepper";
 import admi from "@/assets/svg/admi.svg";
 import { Icons } from "@/assets/svg/icons";
-import goBack from "@/utils/helper";
+import goBack, { DateFormatter } from "@/utils/helper";
 import { LinkWithLoader } from "@/components/global/atoms/LinkWithLoader";
 import Table from "@/components/global/molecules/Table";
 import { useMutation, useQuery, useQueryClient } from "react-query";
@@ -32,6 +32,9 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 
 import { usePagination } from "@/hooks/Pagination";
+
+import moment from "moment";
+import Loader from "@/components/global/atoms/Loader";
 
 
 
@@ -356,11 +359,11 @@ const MeasurementRecord = () => {
         )}
       </Formik >
 
-        {editable? (
-          <div onClick={save}>Save</div>
-        ) : (
-          <div onClick={() => setEditable(!editable)}>Edit</div>
-        )}
+      {editable ? (
+        <div onClick={save}>Save</div>
+      ) : (
+        <div onClick={() => setEditable(!editable)}>Edit</div>
+      )}
     </>
 
   )
@@ -375,14 +378,14 @@ const MeasurementTable = () => {
   return (
     <>
 
-{measurementFormVisible && (
+      {measurementFormVisible && (
         <Popup width={80} zindex={30}>
           <AddMeasurementComponent onBack={() => setMeasurementFormVisible(false)} />
         </Popup>
 
       )}
 
-    
+
       <div className="mx-2 p-2">
         <div className="overflow-x-auto">
           <div className="text-xs table border-2">
@@ -440,7 +443,7 @@ const MeasurementTable = () => {
           {paginator}
 
           <div className="flex justify-end">
-              <Button variant="primary" onClick={() => setMeasurementFormVisible(true)}>Add New Measurement(s)</Button>
+            <Button variant="primary" onClick={() => setMeasurementFormVisible(true)}>Add New Measurement(s)</Button>
           </div>
 
         </div>
@@ -477,11 +480,11 @@ const Action: React.FC<ActionPropsType> = (props) => {
 
   const handleApprove = async () => {
     const res = await axios({
-      url: `${FINANCE_URL.BILLS_VERIFICATION.approve}`,
+      url: `${PFMS_URL.PROJECT_VERIFICATION.approve}`,
       method: "POST",
       data: {
         data: {
-          bill_id: billId,
+          proposalId: proposalId,
           comment,
         },
       },
@@ -495,7 +498,7 @@ const Action: React.FC<ActionPropsType> = (props) => {
   const { mutate } = useMutation(handleApprove, {
     onSuccess: () => {
       toast.success("Forwarded Successfully");
-      window.location.replace("/finance/bills-verify/outbox");
+      window.location.replace("/pfms/engineering/projects/outbox");
     },
     onError: () => {
       console.log("error");
@@ -510,7 +513,7 @@ const Action: React.FC<ActionPropsType> = (props) => {
 
   const handleSendBack = async () => {
     const res = await axios({
-      url: `${FINANCE_URL.BILLS_VERIFICATION.sendBack}`,
+      url: `${PFMS_URL.PROJECT_VERIFICATION.sendBack}`,
       method: "POST",
       data: {
         data: {
@@ -762,7 +765,7 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
 
 
 
-  const { data: projectProposalDetails, refetch: refetchProjectProposalDetails } = useProjectProposalDetails(ProProposalId);
+  const { isLoading: isLoading, data: projectProposalDetails, refetch: refetchProjectProposalDetails } = useProjectProposalDetails(ProProposalId);
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] = useWorkingAnimation();
 
   const [primaryTabs, activePrimaryTabIndex, setActivePrimaryTabIndex] = usePrimaryTabs(1, false);
@@ -799,6 +802,7 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
 
     if (!res.data.status) throw "Someting Went Wrong!!";
 
+    console.log(data);
     return res.data.data;
   };
 
@@ -861,8 +865,9 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
     <>
       {workingAnimation}
 
-
-      <div className="flex items-center justify-between border-b-2 pb-4 mb-4">
+      {isLoading? <Loader /> : (
+        <>
+              <div className="flex items-center justify-between border-b-2 pb-4 mb-4">
         <Button
           variant="cancel"
           className="border-none text-primary_bg_indigo hover:text-primary_bg_indigo hover:bg-inherit"
@@ -957,23 +962,26 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
               className="text-secondary_black mb-4 text-center"
               label={""}
             />
-            <BoldSpan label={"BiLL nO"} />
-            <BoldSpan content="Proposal Date" />
+            <BoldSpan label={data?.project_proposal_no} />
+            <BoldSpan content={DateFormatter(data?.proposed_date)} />
             <div className="flex items-center mb-2">
               <Image src={home} alt="calender" />
               <BoldSpan
-                className="mt-2 ml-1 text-red-500"
-                content={""}
+                content="Proposal Date"
               />
             </div>
-            <div>
-              time delta information
+            <div
+            >
+              <span className="ml-1 text-red-500">
+                {`${data?.proposed_date.split("T")[0] == new Date().toISOString().split("T")[0] ? "Today" : moment(data?.proposed_date).fromNow()}`}
+              </span>
+
             </div>
           </div>
           <div className="bg-gray-100 border flex flex-col py-4 px-8 h-52 w-full rounded">
             <section>
               <Title title="Project Summary" />
-              <Paragraph desc={projectProposalDetails?.summary} />
+              <Paragraph desc={projectProposalDetails?.description} />
             </section>
           </div>
           <div>
@@ -1004,7 +1012,7 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
                     Project Description
                   </div>
                   <div>
-                    Description Text Description Text Description Text Description Text Description Text Description Text Description Text Description Text Description Text Description Text Description Text Description Text Description Text Description Text Description Text Description Text
+                    {data?.description}
                   </div>
 
                 </div>
@@ -1014,16 +1022,16 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
                       State
                     </div>
                     <div>
-                      Jharkhand
+                      {data?.state_name}
                     </div>
                   </div>
 
                   <div>
                     <div className="font-bold">
-                      UTB Name
+                      ULB Name
                     </div>
                     <div>
-                      Xyz value
+                      {data?.ulb_name}
                     </div>
                   </div>
                   <div>
@@ -1031,7 +1039,7 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
                       PIN Code
                     </div>
                     <div>
-                      Xyz value
+                      {data?.pin_code}
                     </div>
                   </div>
 
@@ -1040,7 +1048,7 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
                       Ward No
                     </div>
                     <div>
-                      Xyz value
+                      {data?.ward_name}
                     </div>
                   </div>
 
@@ -1049,7 +1057,7 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
                       Address
                     </div>
                     <div>
-                      Xyz value
+                      {data?.address}
                     </div>
                   </div>
 
@@ -1059,7 +1067,8 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
                       Execution Body
                     </div>
                     <div>
-                      Xyz value
+                      {data?.execution_body_name}
+
                     </div>
                   </div>
                 </div>
@@ -1131,6 +1140,12 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
         </Tabs >
 
       </div >
+
+
+        </>
+      )}
+
+
     </>
   );
 };

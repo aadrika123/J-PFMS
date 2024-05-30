@@ -22,7 +22,6 @@ interface InputProps {
 const Input: React.FC<InputProps> = (props) => {
     const fieldId = "id_" + props.name;
 
-
     return (
         <>
             <div className="flex justify-center">
@@ -120,7 +119,7 @@ interface CanProvideData {
     getData(): Promise<any>;
 }
 
-const SORRecordRow = forwardRef<CanProvideData>((props, ref) => {
+const MeasurementRecord = forwardRef<CanProvideData>((props, ref) => {
 
     const formikRef = useRef<FormikProps<any>>(null);
 
@@ -138,25 +137,25 @@ const SORRecordRow = forwardRef<CanProvideData>((props, ref) => {
 
     }));
 
-    // const initialValues = {
-    //   description: "",
-    //   unit: "Sqm",
-    //   quantity: "0",
-    //   rate: "0.0",
-    //   cost: 0,
-    //   year: "",
-    //   remarks: ""
-    // };
-
     const initialValues = {
-        description: "fdsf",
-        unit: "Sqm",
-        quantity: "5",
-        rate: "5",
-        cost: 10,
-        year: "2024",
-        remarks: "fsdf fdsf"
+      description: "",
+      unit: "Sqm",
+      quantity: "0",
+      rate: "0.0",
+      cost: 0,
+      year: "",
+      remarks: ""
     };
+
+    // const initialValues = {
+    //     description: "fdsf",
+    //     unit: "Sqm",
+    //     quantity: "5",
+    //     rate: "5",
+    //     cost: 10,
+    //     year: "2024",
+    //     remarks: "fsdf fdsf"
+    // };
 
 
     const validationSchema = Yup.object({
@@ -333,7 +332,8 @@ const SORRecordRow = forwardRef<CanProvideData>((props, ref) => {
 
     );
 });
-SORRecordRow.displayName = "SORRecordRow";
+
+MeasurementRecord.displayName = "SORRecordRow";
 
 
 
@@ -341,11 +341,11 @@ interface SORTableProps {
     tableIndex: number,
 }
 
-const SORTable = forwardRef<CanProvideData, SORTableProps>((props: SORTableProps, ref) => {
+const MeasurementTable = forwardRef<CanProvideData, SORTableProps>((props: SORTableProps, ref) => {
     const [rowCountInputValue, setRowCountInputValue] = useState<number>(1);
 
     const [rows, setRows] = useState<any[]>([
-        <SORRecordRow key="row-0" ref={(element: any) => { addRowRef(0, element) }} />
+        <MeasurementRecord key="row-0" ref={(element: any) => { addRowRef(0, element) }} />
     ]);
 
     const [rowRefs, setRowRefs] = useState<any | null>({});
@@ -360,7 +360,7 @@ const SORTable = forwardRef<CanProvideData, SORTableProps>((props: SORTableProps
     const addRow = () => {
         const index = rows.length;
         const newRows = [...rows,
-        <SORRecordRow key={`row-${index}`} ref={(element: any) => { addRowRef(index, element) }} />
+        <MeasurementRecord key={`row-${index}`} ref={(element: any) => { addRowRef(index, element) }} />
         ];
         setRows(newRows);
     }
@@ -389,7 +389,7 @@ const SORTable = forwardRef<CanProvideData, SORTableProps>((props: SORTableProps
         const newRows = [...rows];
         for (let index = existingRowCount; index < existingRowCount + n; index++) {
             newRows.push(
-                <SORRecordRow key={`row-${index}`} ref={(element: any) => { addRowRef(index, element) }} />
+                <MeasurementRecord key={`row-${index}`} ref={(element: any) => { addRowRef(index, element) }} />
             );
         }
         setRows(newRows);
@@ -418,7 +418,7 @@ const SORTable = forwardRef<CanProvideData, SORTableProps>((props: SORTableProps
                 //        console.log("row: " + i, rowData);
             }
 
-            return atleastOneFormInvalid ? null : { title: title, 'records': data };
+            return atleastOneFormInvalid ? null : { 'records': data };
         }
     }));
 
@@ -504,12 +504,12 @@ const SORTable = forwardRef<CanProvideData, SORTableProps>((props: SORTableProps
     );
 });
 
-SORTable.displayName = "SORTable";
+MeasurementTable.displayName = "SORTable";
 
 
-interface DocumentsState{
+interface DocumentsState {
     items: []
-};
+}
 
 // class Documents extends React.Component {
 //     state: DocumentSte1
@@ -535,18 +535,31 @@ interface AddMeasurementComponentProps {
 
 export const AddMeasurementComponent = ({ onBack }: AddMeasurementComponentProps) => {
     // const documents = new Documents(10);
-    
+    const [tableRefs, setTableRefs] = useState<any | null>({});
+    const addTableRef = ((index: number, element: any) => {
+        if (element != null) {
+            tableRefs[index] = element;
+        }
+    })
+
+
+    const onSubmit = async () => {
+        const table = tableRefs[0];
+        const data = await table.getData();
+        console.log(data);
+    }
+
     return (
         <>
             <div>
-                <SORTable tableIndex={1} />
+                <MeasurementTable tableIndex={0} ref={(element: any) => {addTableRef(0,element) }} />
             </div>
 
             {/* {documents.render()} */}
 
             <div className="flex gap-2 justify-end">
                 <div>
-                    <Button variant="primary">Save and Acknowledge</Button>
+                    <Button variant="primary" onClick={onSubmit}>Save and Acknowledge</Button>
                 </div>
                 <div>
                     <Button variant="primary" onClick={onBack}>Back</Button>

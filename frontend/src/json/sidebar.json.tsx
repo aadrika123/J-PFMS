@@ -31,13 +31,13 @@ export const sidebarLinks: SidebarLinksProps = {
           moduleName: "Project Proposal",
           icon: <Image src={project} alt="home" width={100} height={100} />,
           path: "/project-proposal",
-          roles: [ROLES.BACK_OFFICE, ROLES.JUNIOR_ENGINEER],
+          roles: [ROLES.BACK_OFFICE],
         },
         {
           moduleName: "Engineering Section",
           icon: <Image src={project} alt="home" width={100} height={100} />,
           path: "/engineering",
-          roles: [ROLES.JUNIOR_ENGINEER, ROLES.EXE_OFFICER, ROLES.CITY_MANAGER],
+          roles: [ROLES.JUNIOR_ENGINEER, ROLES.ASSISTANT_ENGINEER],
 
           subModules: [
             {

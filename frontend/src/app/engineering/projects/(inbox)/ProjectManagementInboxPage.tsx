@@ -44,10 +44,10 @@ const ProjectManagementInboxPage = () => {
   const columns = [
     // { name: "id", caption: "Sr. No.", width: "w-[5%]" },
     // { name: "date", caption: "Date", width: "w-[20%]", type: "date" },
-    // { name: "project_proposal_no", caption: "Project Proposal No.", width: "w-[20%]" },
     // { name: "ulb_name", caption: "Ulb Name", width: "w-[20%]" },
     // { name: "summary", caption: "Summary", width: "w-[20%]", align: "left" }
     { name: "id", caption: "Sr. No." },
+    { name: "project_proposal_no", caption: "Project Proposal No.", width: "w-[20%]" },
     { name: "title", caption: "Project Title" },
     { name: "type", caption: "Project Type" },
     { name: "proposed_date", caption: "Proposed Date", type: "date" },

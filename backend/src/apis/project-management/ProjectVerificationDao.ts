@@ -13,13 +13,13 @@ const joinStringValues = (items: []) => {
   return withCommasInBetween
 }
 
-class ProjectManagementDao {
+class ProjectVerificationDao {
 
   get = async (proposalId: number): Promise<project_proposals | null> => {
     return new Promise((resolve) => {
       prisma.$queryRaw<any[]>`select * from project_proposals 
       where id=${proposalId}`.then((result) => {
-        if(result.length == 0)
+        if (result.length == 0)
           resolve(null);
         else
           resolve(result[0]);
@@ -27,7 +27,7 @@ class ProjectManagementDao {
     });
   }
 
-getAll = async (filters: any, page: number, limit: number, order: number): Promise<any>  => {
+  getAll = async (filters: any, page: number, limit: number, order: number): Promise<any> => {
     return new Promise((resolve, reject) => {
       let query = `from project_proposals b 
       left join ulb_masters um on b.ulb_id = um.id 
@@ -89,7 +89,7 @@ getAll = async (filters: any, page: number, limit: number, order: number): Promi
   }
 
 
-  getLevel0ExecutiveOfficerInbox = async (
+  getLevel0JuniorEngineerInbox = async (
     filters: any,
     ulbId: number,
     page: number,
@@ -105,10 +105,10 @@ getAll = async (filters: any, page: number, limit: number, order: number): Promi
     return new Promise((resolve, reject) => {
       // console.log(level);
 
-      
+
       let filterCondition = `b.ulb_id = ${ulbId} and x.project_proposal_id is null`;
 
-      
+
       // generate the filter condition for project proposal no
       const project_proposal_no_filters = filters['project_proposal_no'];
 
@@ -126,10 +126,10 @@ getAll = async (filters: any, page: number, limit: number, order: number): Promi
       // generate the filter condition for ulb name
       const ulb_name_filters = filters['ulb_name'];
       let ulb_name_filters_is_string: boolean = true;
-      if(ulb_name_filters){
-        if(typeof ulb_name_filters == 'string') {
+      if (ulb_name_filters) {
+        if (typeof ulb_name_filters == 'string') {
           filterCondition += ` and ulb_name ilike '%${ulb_name_filters}%'`;
-        }else{
+        } else {
           filterCondition += ` and ulb_name in (${joinStringValues(ulb_name_filters)})`;
           ulb_name_filters_is_string = false;
         }
@@ -161,7 +161,7 @@ getAll = async (filters: any, page: number, limit: number, order: number): Promi
         prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${queryWithoutFieldsAndPagination}`),
         prisma.$queryRawUnsafe<string[]>(`select distinct(project_proposal_no) ${queryWithoutFieldsAndPagination} order by project_proposal_no asc limit 10`),
         prisma.$queryRawUnsafe<string[]>(`select distinct(ulb_name) ${queryWithoutFieldsAndPagination} order by ulb_name asc limit 10`)
-      
+
       ]).then(([records, c, project_proposal_nos, ulb_names]) => {
 
 
@@ -176,7 +176,7 @@ getAll = async (filters: any, page: number, limit: number, order: number): Promi
         if (project_proposal_no_filters_is_string)
           result['project_proposal_no'] = project_proposal_nos;
 
-        if(ulb_name_filters_is_string)
+        if (ulb_name_filters_is_string)
           result['ulb_name'] = ulb_names;
 
         // console.log(result);
@@ -190,20 +190,19 @@ getAll = async (filters: any, page: number, limit: number, order: number): Promi
   };
 
 
-
-  getHigherLevelOutbox = async (
+  getHigherLevelInbox = async (
     filters: any,
     ulbId: number,
     page: number,
     limit: number,
     order: number,
-    level?: number
-  ) : Promise<any> => {
+    level: number
+  ): Promise<any> => {
 
     return new Promise((resolve, reject) => {
+      let filterCondition = `b.ulb_id = ${ulbId} and x.approval_stage_id = ${level
+        }`;
 
-      let filterCondition = `b.ulb_id = ${ulbId} and x.approval_stage_id >= ${level}`;
-      
       // generate the filter condition for project proposal no
       const project_proposal_no_filters = filters['project_proposal_no'];
 
@@ -221,10 +220,105 @@ getAll = async (filters: any, page: number, limit: number, order: number): Promi
       // generate the filter condition for ulb name
       const ulb_name_filters = filters['ulb_name'];
       let ulb_name_filters_is_string: boolean = true;
-      if(ulb_name_filters){
-        if(typeof ulb_name_filters == 'string') {
+      if (ulb_name_filters) {
+        if (typeof ulb_name_filters == 'string') {
           filterCondition += ` and ulb_name ilike '%${ulb_name_filters}%'`;
-        }else{
+        } else {
+          filterCondition += ` and ulb_name in (${joinStringValues(ulb_name_filters)})`;
+          ulb_name_filters_is_string = false;
+        }
+      }
+
+
+
+      const queryWithoutFieldsAndPagination = `from project_proposals b 
+      left join 
+      (
+        select project_proposal_id, approval_stage_id from project_proposal_checkings bc1 where bc1.id in (
+          select max(id) from project_proposal_checkings bc2 group by bc2.project_proposal_id
+        )
+      ) x on b.id = x.project_proposal_id 
+      left join ulb_masters um on b.ulb_id = um.id
+      left join project_types pt on b.type_id = pt.id left join ulb_ward_masters as uwm on uwm.id = b.ward_id
+      where ${filterCondition}`;
+
+      const ordering = order == -1 ? "desc" : "asc";
+
+      const offset = (page - 1) * limit;
+
+      const query = `select b.id, b.project_proposal_no, b.proposed_date, b.title, b.ulb_id, um.ulb_name, b.type_id, pt.name as type, b.ward_id, uwm.ward_name ${queryWithoutFieldsAndPagination} 
+      order by b.id ${ordering}
+      limit ${limit} offset ${offset};`;
+
+      // fetch the data
+
+      prisma.$transaction([
+        prisma.$queryRawUnsafe<[]>(query),
+        prisma.$queryRawUnsafe<CountQueryResult[]>(`select count(*) ${queryWithoutFieldsAndPagination}`),
+        prisma.$queryRawUnsafe<string[]>(`select distinct(project_proposal_no) ${queryWithoutFieldsAndPagination} order by project_proposal_no asc limit 10`),
+        prisma.$queryRawUnsafe<string[]>(`select distinct(ulb_name) ${queryWithoutFieldsAndPagination} order by ulb_name asc limit 10`)
+      ]).then(([records, c, project_proposal_nos, ulb_names]) => {
+        const result: any = {};
+        console.log(c);
+        const count = Number(c[0]?.count);
+
+        console.log(count);
+
+        result['count'] = count;
+        result['totalPage'] = Math.ceil(count / limit)
+        result['currentPage'] = page;
+        result['records'] = records;
+
+        if (project_proposal_no_filters_is_string)
+          result['project_proposal_no'] = project_proposal_nos;
+
+        if (ulb_name_filters_is_string)
+          result['ulb_name'] = ulb_names;
+
+        console.log(result);
+        resolve(result);
+      }).catch((error) => {
+        reject(error);
+      });
+    });
+  };
+
+
+
+  getHigherLevelOutbox = async (
+    filters: any,
+    ulbId: number,
+    page: number,
+    limit: number,
+    order: number,
+    level?: number
+  ): Promise<any> => {
+
+    return new Promise((resolve, reject) => {
+
+      let filterCondition = `b.ulb_id = ${ulbId} and x.approval_stage_id >= ${level}`;
+
+      // generate the filter condition for project proposal no
+      const project_proposal_no_filters = filters['project_proposal_no'];
+
+      let project_proposal_no_filters_is_string: boolean = true;
+      if (project_proposal_no_filters) {
+        if (typeof project_proposal_no_filters == 'string') {
+          filterCondition += ` and project_proposal_no ilike '%${project_proposal_no_filters}%'`;
+        }
+        else {
+          filterCondition += ` and project_proposal_no in (${joinStringValues(project_proposal_no_filters)})`;
+          project_proposal_no_filters_is_string = false;
+        }
+      }
+
+      // generate the filter condition for ulb name
+      const ulb_name_filters = filters['ulb_name'];
+      let ulb_name_filters_is_string: boolean = true;
+      if (ulb_name_filters) {
+        if (typeof ulb_name_filters == 'string') {
+          filterCondition += ` and ulb_name ilike '%${ulb_name_filters}%'`;
+        } else {
           filterCondition += ` and ulb_name in (${joinStringValues(ulb_name_filters)})`;
           ulb_name_filters_is_string = false;
         }
@@ -245,7 +339,7 @@ getAll = async (filters: any, page: number, limit: number, order: number): Promi
 
       const offset = (page - 1) * limit;
 
-      const query = `select b.id, b.project_proposal_no, b.date, b.ulb_id, um.ulb_name ${queryWithoutFieldsAndPagination} 
+      const query = `select b.id, b.project_proposal_no, b.proposed_date, b.ulb_id, um.ulb_name ${queryWithoutFieldsAndPagination} 
       order by b.id ${ordering}
       limit ${limit} offset ${offset};`;
 
@@ -255,7 +349,7 @@ getAll = async (filters: any, page: number, limit: number, order: number): Promi
         prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${queryWithoutFieldsAndPagination}`),
         prisma.$queryRawUnsafe<string[]>(`select distinct(project_proposal_no) ${queryWithoutFieldsAndPagination} order by project_proposal_no asc limit 10`),
         prisma.$queryRawUnsafe<string[]>(`select distinct(ulb_name) ${queryWithoutFieldsAndPagination} order by ulb_name asc limit 10`)
-      
+
       ]).then(([records, c, project_proposal_nos, ulb_names]) => {
 
 
@@ -264,13 +358,13 @@ getAll = async (filters: any, page: number, limit: number, order: number): Promi
 
         result['count'] = count;
         result['totalPage'] = Math.ceil(count / limit)
-        result['currentPage'] = records.length>0?page:1;
+        result['currentPage'] = records.length > 0 ? page : 1;
         result['records'] = records;
 
         if (project_proposal_no_filters_is_string)
           result['project_proposal_no'] = project_proposal_nos;
 
-        if(ulb_name_filters_is_string)
+        if (ulb_name_filters_is_string)
           result['ulb_name'] = ulb_names;
 
         // console.log(result);
@@ -297,8 +391,64 @@ getAll = async (filters: any, page: number, limit: number, order: number): Promi
     });
   }
 
-  
+
+  getLastProposalCheckingRecordByProposalId = async (proposalId: number) => {
+    return new Promise((resolve, reject) => {
+      prisma.project_proposal_checkings.aggregate({
+        where: {
+          id: proposalId,
+        },
+        _max: {
+          id: true,
+        },
+      }).then((result) => {
+
+        if (result._max.id == null)
+          resolve(null);
+        else
+          resolve(result);
+      }).catch((error) => {
+        reject(error);
+      });
+
+    });
+
+  };
+
+  approveProposal = async (data: any) => {
+    return new Promise((resolve, reject) => {
+      prisma.project_proposal_checkings.create({
+        data,
+      }).then((result) => {
+        resolve(result);
+      }).catch((error) => {
+        reject(error);
+      });
+    });
+
+  };
+
+  getOutboxItemCount = async (ulbId: number, level?: number) => {
+    return new Promise((resolve, reject) => {
+      const filterCondition = `b.ulb_id = ${ulbId} and x.approval_stage_id = ${level}`;
+      
+      const queryWithoutFieldsAndPagination = `from project_proposals b 
+      left join 
+      (
+        select project_proposal_id, approval_stage_id from project_proposal_checkings bc1 where bc1.id in (
+          select max(id) from project_proposal_checkings bc2 group by bc2.project_proposal_id
+        )
+      ) x on b.id = x.project_proposal_id where ${filterCondition}`;
+
+      prisma.$queryRawUnsafe<CountQueryResult[]>(`select count(*) ${queryWithoutFieldsAndPagination}`).then((c) => {
+        const count = Number(c[0]?.count);
+        resolve(count);
+      }).catch((error)=>{
+        reject(error);
+      });
+    });
+  }
 
 }
 
-export default ProjectManagementDao;
+export default ProjectVerificationDao;

@@ -1,9 +1,11 @@
 import { Icons } from "@/assets/svg/icons";
 import Button from "@/components/global/atoms/buttons/Button";
 import { LinkWithLoader } from "@/components/global/atoms/LinkWithLoader";
+import { useProjectProposalOutboxItemCount } from "@/hooks/data/ProjectProposalsHooks";
 import goBack from "@/utils/helper";
 import { usePathname } from "next/navigation";
 import React, { ReactNode } from "react";
+
 
 interface ProjectManagementLayoutProps {
   children: ReactNode
@@ -11,6 +13,7 @@ interface ProjectManagementLayoutProps {
 
 export const ProjectManagementLayout = ({ children }: ProjectManagementLayoutProps) => {
   const pathName = usePathname();
+  const { isFetching, isLoading, data: outboxItemCount } = useProjectProposalOutboxItemCount();
 
   return (
     <>
@@ -43,7 +46,8 @@ export const ProjectManagementLayout = ({ children }: ProjectManagementLayoutPro
             className={`${!pathName.includes("outbox") && "bg-gray-200 text-gray-500"}`}
           >
             {Icons.outbox}
-            Outbox
+            Outbox 
+            <div className="badge badge-secondary">({outboxItemCount?.count})</div>
           </Button>
         </LinkWithLoader>
 
@@ -53,7 +57,7 @@ export const ProjectManagementLayout = ({ children }: ProjectManagementLayoutPro
             className={`${!pathName.includes("archive") && "bg-gray-200 text-gray-500"}`}
           >
             {Icons.outbox}
-            Archive
+            Archive 
           </Button>
         </LinkWithLoader>
       </div>
