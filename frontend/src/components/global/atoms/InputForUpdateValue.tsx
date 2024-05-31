@@ -72,7 +72,7 @@ const InputForUpdateField: React.FC<InputProps> = (props) => {
             onFocus={handleFocus}
             type={props.type}
             value={props?.value}
-            className={`text-primary h-[40px] p-3 bg-transparent outline-none  w-full`}
+            className={`text-primary h-[40px] p-3 outline-none  w-full ${props.readonly ? 'cursor-not-allowed bg-[#f0f0f0]' : 'bg-white '}`}
             name={props.name}
             id={fieldId}
           />

@@ -12,6 +12,9 @@ import Image from "next/image";
 import TenderIcon from "@/assets/svg/tender_form.svg";
 import { tabList } from "./molecules/checkList";
 import TenderCoverDetailsForm from "./TenderInputForms/TenderCoverDetailsForm";
+import TenderWorkDetailsForm from "./TenderInputForms/TenderWordDetailsForm";
+import TenderFeeDetailsForm from "./TenderInputForms/TenderFeeDetailsForm";
+import TenderCriticalDatesForm from "./TenderInputForms/TenderCriticalDatesForm";
 
 const TenderInputForm = ({ PageNo }: { PageNo: number }) => {
   const [state, setState] = useState({
@@ -57,7 +60,7 @@ const TenderInputForm = ({ PageNo }: { PageNo: number }) => {
       </div>
 
       {/* Tender Forms */}
-      {tabNo === 1 ? <TenderBasicDetailsForm /> : tabNo === 2 &&  <TenderCoverDetailsForm /> }
+      {tabNo === 1 ? <TenderBasicDetailsForm /> : tabNo === 2 ?  <TenderCoverDetailsForm /> : tabNo === 3 ? <TenderWorkDetailsForm/> : tabNo === 4 ? <TenderFeeDetailsForm/> : tabNo === 5 &&  <TenderCriticalDatesForm/>}
     </div>
   );
 };

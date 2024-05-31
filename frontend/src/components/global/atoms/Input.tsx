@@ -58,7 +58,7 @@ const Input: React.FC<InputProps> = (props) => {
 
   return (
     <>
-      <div className="flex flex-col gap-1">
+      <div className={`flex flex-col gap-1`}>
         <label className={`text-${labelColor} text-sm`} htmlFor={fieldId}>
           {props.label}
           {props.required ? <span className="text-red-600 ">*</span> : ""}
@@ -68,7 +68,7 @@ const Input: React.FC<InputProps> = (props) => {
         >
           <input
             disabled={props.readonly}
-            required={props.required}
+            // required={props.required}
             placeholder={props.placeholder}
             onChange={handleChange}
             onBlur={props.onBlur}
@@ -76,7 +76,7 @@ const Input: React.FC<InputProps> = (props) => {
             type={props.type}
             value={props?.value}
             // onInput={handleOnInput}
-            className={`text-primary h-[40px] p-3 bg-white rounded outline-none  w-full`}
+            className={`text-primary h-[40px] p-3 rounded outline-none  w-full ${props.readonly ? 'cursor-not-allowed bg-[#f0f0f0]' : 'bg-white '}`}
             name={props.name}
             id={fieldId}
           />

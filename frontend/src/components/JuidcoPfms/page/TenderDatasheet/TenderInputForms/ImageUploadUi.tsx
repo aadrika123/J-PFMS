@@ -20,7 +20,6 @@ const ImageUploadUi: React.FC<ImageUploadUiPropType> = (props) => {
     fileUrl: "",
     fileType: "",
   });
-
   const { inProgress, error } = state;
 
   const handleUploadDoc = () => {
@@ -120,8 +119,8 @@ const ImageUploadUi: React.FC<ImageUploadUiPropType> = (props) => {
       </div>
       {/* Document List */}
       <div className="grid gap-3">
-        {fileInfo?.files?.length > 0 &&
-          fileInfo?.files.map((file: any, index: number) => (
+        {fileInfo?.tab_files?.length > 0 &&
+          fileInfo?.tab_files.map((file: any, index: number) => (
             <div
               key={index}
               className="bg-gray-100 px-4 py-1 flex items-center justify-between rounded-lg"

@@ -33,6 +33,20 @@ export const coverList = {
   ],
 };
 
+export const emd_fee_type = {
+  title: "EMD Fee Type",
+  options: [
+    {
+      label: "Fixed",
+      value: "fixed",
+    },
+    {
+      label: "Percentage",
+      value: "percentage",
+    },
+  ],
+};
+
 export const contractFormList = {
   title: "Form of Contract",
   options: [
@@ -170,6 +184,136 @@ export const offline_instument = {
   ],
 };
 
+export const product_category = {
+  title: "Product Category",
+  options: [
+    {
+      label: "Civil Works",
+      value: "civil-works",
+    },
+    {
+      label: "Electrical Works",
+      value: "electrical-works",
+    },
+    {
+      label: "Fleet Management",
+      value: "fleet-management",
+    },
+    {
+      label: "Computer Systems",
+      value: "computer-systems",
+    },
+  ],
+};
+
+export const tender_value = {
+  title: "Tender Value",
+  options: [
+    {
+      label: "INR",
+      value: "INR",
+    },
+    {
+      label: "US",
+      value: "US",
+    },
+    {
+      label: "EUR",
+      value: "EUR",
+    },
+  ],
+};
+
+export const contract_type = {
+  title: "Contract Type",
+  options: [
+    {
+      label: "Tender",
+      value: "tender",
+    },
+    {
+      label: "Empanelment",
+      value: "empanelment",
+    },
+  ],
+};
+
+export const bid_validity = {
+  title: "Bid Validity (Days)",
+  options: [
+    {
+      label: "120",
+      value: "120",
+    },
+    {
+      label: "90",
+      value: "90",
+    },
+    {
+      label: "60",
+      value: "60",
+    },
+    {
+      label: "30",
+      value: "30",
+    },
+    {
+      label: "Others",
+      value: "others",
+    },
+  ],
+};
+
+export const tenderer_class = {
+  title: "Tender Class",
+  options: [
+    {
+      label: "A",
+      value: "a",
+    },
+    {
+      label: "B",
+      value: "b",
+    },
+    {
+      label: "C",
+      value: "c",
+    },
+    {
+      label: "D",
+      value: "d",
+    },
+    {
+      label: "E",
+      value: "e",
+    },
+    {
+      label: "I",
+      value: "i",
+    },
+    {
+      label: "II",
+      value: "ii",
+    },
+    {
+      label: "III",
+      value: "iii",
+    },
+    {
+      label: "IV",
+      value: "iv",
+    },
+    {
+      label: "V",
+      value: "v",
+    },
+    {
+      label: "Others",
+      value: "others",
+    },
+  ],
+};
+
 //////////// Tab List
 export const tabList = [
   {
@@ -195,7 +339,7 @@ export const tabList = [
   {
     id: 5,
     icon: CriticalIcon,
-    title: "Critical Details",
+    title: "Critical Dates",
   },
   {
     id: 6,

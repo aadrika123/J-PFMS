@@ -20,6 +20,7 @@ type CheckboxComponentType = {
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   required?: boolean | false;
   className?: string;
+  gridClass?: string; 
   optionAlign?: "col" | "raw";
   labelAlign?: "col" | "raw";
 };
@@ -31,6 +32,7 @@ const CheckboxComponent: React.FC<CheckboxComponentType> = (props) => {
     optionAlign = "raw",
     labelAlign = "raw",
     readonly = false,
+    gridClass="grid-cols-3"
   } = props;
   const [, , helpers] = useField(props.name);
   const { setValue } = helpers;
@@ -58,7 +60,7 @@ const CheckboxComponent: React.FC<CheckboxComponentType> = (props) => {
         {checkList.title}
         {props.required ? <span className="text-red-600">*</span> : ""}
       </label>
-      <div className={`flex ${optionAlign === 'raw' ? 'grid grid-cols-3' : 'flex-col'}`}>
+      <div className={`flex ${optionAlign === 'raw' ? `grid ${gridClass}` : 'flex-col'}`}>
         {checkList.options?.map((option: any, index: number) => (
           <div key={index} className="inline-flex mr-2 items-start flex-col">
             <label
@@ -68,10 +70,10 @@ const CheckboxComponent: React.FC<CheckboxComponentType> = (props) => {
               <span className="label-text text-nowrap">{option?.label}</span>
               <input
                 type="checkbox"
-                checked={props.value.includes(option.value)}
+                checked={props.value?.includes(option.value)}
                 value={option.value}
                 onBlur={props.onBlur}
-                className={`checkbox border-primary_bg_indigo h-4 w-4 rounded hover:border-primary_bg_indigo checkbox-primary ${(optionAlign === "col" || labelAlign === "raw") && "mr-2"}`}
+                className={`checkbox border-primary_bg_indigo h-4 w-4 rounded hover:border-primary_bg_indigo checkbox-primary ${(optionAlign === "col" || labelAlign === "raw") && "mr-2"} ${readonly && 'cursor-not-allowed bg-[#f0f0f0]'}`}
                 onChange={internalHandleChange}
                 id={props.name + index}
               />

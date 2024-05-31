@@ -124,7 +124,7 @@ const TenderBasicDetailsForm = () => {
         if (!validateFileType(file)) {
           setState({
             ...state,
-            validationError: `'${file.name.substring(file.name.lastIndexOf('.'))}' file is not allowed`,
+            validationError: `'${file.name.substring(file.name.lastIndexOf("."))}' file is not allowed`,
           });
           return;
         }
@@ -414,10 +414,16 @@ const TenderBasicDetailsForm = () => {
                       <span className="text-red-500">
                         {errors.file.file_token}
                       </span>
+                    ) : validationError ? (
+                      <span className="text-red-500">{validationError}</span>
                     ) : (
-                      validationError && (
-                        <span className="text-red-500">{validationError}</span>
-                      )
+                      <span>
+                        {values.files?.file_name || (
+                          <span className="text-sm text-red-500">
+                            file size should 10 kb to 2 mb
+                          </span>
+                        )}
+                      </span>
                     )}
                   </div>
                   {file && (

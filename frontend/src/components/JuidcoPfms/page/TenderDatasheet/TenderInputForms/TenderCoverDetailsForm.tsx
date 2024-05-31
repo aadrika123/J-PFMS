@@ -1,15 +1,15 @@
 "use client";
 /**
  * | Author- Sanjiv Kumar
- * | Created On- 29-05-2024
- * | Created for- Tender Basic Details Form
+ * | Created On- 30-05-2024
+ * | Created for- Tender Cover Details Form
  * | Status- open
  */
 
 import Button from "@/components/global/atoms/buttons/Button";
 import goBack from "@/utils/helper";
 import { Formik, FormikValues } from "formik";
-import { tenderBasicDetailsSchema } from "pfmslib";
+import { tenderCoverDetailsSchema } from "pfmslib";
 import React, { useRef, useState } from "react";
 import { bg_color, coverList } from "../molecules/checkList";
 import RadioComponent from "../molecules/RadioComponent";
@@ -28,22 +28,14 @@ import Image from "next/image";
 import LosingDataConfirmPopup from "@/components/global/molecules/general/LosingDataConfirmPopup";
 import CoverIcon from "@/assets/svg/Parchment.svg";
 import ImageUploadUi from "./ImageUploadUi";
-import TextArea from "@/components/global/atoms/Textarea";
+import Input from "@/components/global/atoms/Input";
 
 const TenderCoverDetailsForm = () => {
   const formRef = useRef<HTMLFormElement>(null);
   const initialValues = {
     cover_no: "1",
-    fee_img: "",
     content: "",
-    files: [
-      {
-        file_type: "",
-        file_name: "",
-        path: "",
-        size: "",
-      },
-    ],
+    files: [],
   };
 
   const readonly = false;
@@ -56,14 +48,8 @@ const TenderCoverDetailsForm = () => {
     showFinalError: false,
   });
 
-  const {
-    tabNo,
-    coverNo,
-    files,
-    showWarning,
-    triggerFun,
-    showFinalError,
-  } = state;
+  const { tabNo, coverNo, files, showWarning, triggerFun, showFinalError } =
+    state;
 
   ////////////// Handle Cover No Change ////////////
   const handleTabChange = (tabNo: number) => {
@@ -96,7 +82,10 @@ const TenderCoverDetailsForm = () => {
   };
 
   /////// Handle Upload
-  const handleUpload = (status: any) => {
+  const handleUpload = (
+    status: any,
+    setFieldValue: (key: string, value: any[]) => void
+  ) => {
     const lists: string[] =
       coverList?.options?.find((cover: any) => cover.value === coverNo)?.list ||
       [];
@@ -108,10 +97,10 @@ const TenderCoverDetailsForm = () => {
     };
 
     const prevFile = state.files.find((f: any) => f.type === tabName);
-    
+
     if (prevFile) {
-      tabFile.files = [
-        ...prevFile.files,
+      tabFile.tab_files = [
+        ...prevFile.tab_files,
         {
           file_name: status.file_name,
           path: "",
@@ -119,7 +108,7 @@ const TenderCoverDetailsForm = () => {
         },
       ];
     } else {
-      tabFile.files = [
+      tabFile.tab_files = [
         {
           file_name: status.file_name,
           path: "",
@@ -128,39 +117,72 @@ const TenderCoverDetailsForm = () => {
       ];
     }
 
+    const newArray = [
+      ...state.files.filter((i: any) => i.type !== tabName),
+      tabFile,
+    ];
+    setFieldValue("files", newArray);
     setState({
       ...state,
-      files: [...state.files.filter((i: any) => i.type !== tabName), tabFile],
+      files: newArray,
     });
   };
 
   ////// Find Current File Tab Name
-  const findCurrentTabFiles = (files : any[]) =>{
+  const findCurrentTabFiles = (files: any[]) => {
     return files.find(
       (i: any) =>
         i.type ===
         coverList?.options
           ?.find((cover: any) => cover.value === coverNo)
           ?.list[tabNo - 1]?.toLowerCase()
-    )
-  }
+    );
+  };
 
-  /////////////// Handle Delete File 
-  const handleDeleteFile = (type: string, index: number) =>{
+  /////////////// Handle Delete File
+  const handleDeleteFile = (
+    type: string,
+    index: number,
+    setFieldValue: (key: string, value: any) => void
+  ) => {
     const allFiles = [...state.files];
 
     const tabInfo = findCurrentTabFiles(allFiles);
 
-    const files = tabInfo.files.filter((item:any, i:number) => i !== index);
+    const notChangedFiles = [
+      ...state.files.filter((i: any) => i.type !== tabInfo.type),
+    ];
+    if (tabInfo.tab_files.length === 1) {
+      setState({
+        ...state,
+        files: notChangedFiles,
+      });
+      setFieldValue("files", notChangedFiles);
+    } else {
+      const tab_files = tabInfo.tab_files.filter(
+        (item: any, i: number) => i !== index
+      );
 
-    const updatedTabInfo = {...tabInfo, files};
+      const updatedTabInfo = { ...tabInfo, tab_files };
 
+      setState({
+        ...state,
+        files: [...notChangedFiles, updatedTabInfo],
+      });
+      setFieldValue("files", [...notChangedFiles, updatedTabInfo]);
+    }
+  };
 
-    setState({
-      ...state,
-      files: [...state.files.filter((i: any) => i.type !== tabInfo.type), updatedTabInfo],
-    });
-  }
+  //////////// Get List of Remaing file tab ///////////
+  const handleIsMissning = (error: any, item: string) => {
+    if (error && Array.isArray(error)) {
+      return false;
+    } else {
+      return error
+        ? error.split(" ")[0]?.split(",").includes(`${item}`)
+        : false;
+    }
+  };
 
   return (
     <>
@@ -196,7 +218,7 @@ const TenderCoverDetailsForm = () => {
       {/* Form section */}
       <Formik
         initialValues={initialValues}
-        validationSchema={tenderBasicDetailsSchema}
+        validationSchema={tenderCoverDetailsSchema}
         onSubmit={onSubmit}
         enableReinitialize={true}
       >
@@ -209,6 +231,7 @@ const TenderCoverDetailsForm = () => {
           handleSubmit,
           dirty,
           handleReset,
+          setFieldValue,
         }: any) => (
           <form
             ref={formRef}
@@ -242,7 +265,7 @@ const TenderCoverDetailsForm = () => {
                     <div
                       key={index}
                       onClick={() => handleTabChange(index + 1)}
-                      className={`px-3 py-1 rounded cursor-pointer ${index + 1 === tabNo ? "bg-primary_bg_indigo text-white" : "bg-gray-200 text-secondary"}`}
+                      className={`px-3 py-1 rounded cursor-pointer ${index + 1 === tabNo ? `${handleIsMissning(errors.files, item) ? "text-red-600 border border-red-600" : " text-white"} bg-primary_bg_indigo` : handleIsMissning(errors.files, item) ? "text-red-600 border border-red-600 bg-gray-200" : "bg-gray-200 text-secondary"}`}
                     >
                       {item}
                     </div>
@@ -251,12 +274,16 @@ const TenderCoverDetailsForm = () => {
 
               {/* File Upload */}
               <ImageUploadUi
-                handleUpload={handleUpload}
-                handleDeleteFile={handleDeleteFile}
+                handleUpload={(status: any) =>
+                  handleUpload(status, setFieldValue)
+                }
+                handleDeleteFile={(type: string, index: number) =>
+                  handleDeleteFile(type, index, setFieldValue)
+                }
                 fileInfo={findCurrentTabFiles(files)}
               />
 
-              <TextArea
+              <Input
                 onChange={handleChange}
                 onBlur={handleBlur}
                 value={values.content}
@@ -265,9 +292,10 @@ const TenderCoverDetailsForm = () => {
                 label="Content"
                 name="content"
                 placeholder="Enter content"
-                maxlength={50}
+                maxlength={100}
                 required
                 readonly={readonly}
+                labelColor="black font-medium"
               />
             </div>
             {Object.keys(errors).length !== 0 && showFinalError && (

@@ -69,7 +69,7 @@ const RadioComponent: React.FC<RadioComponentType> = (props) => {
                 checked={props.value === option.value}
                 value={option.value}
                 onBlur={props.onBlur}
-                className={`radio radio-xs radio-primary border-primary_bg_indigo ${optionAlign === "col" || (labelAlign === "raw" && "mr-2")}`}
+                className={`radio radio-xs radio-primary border-primary_bg_indigo ${optionAlign === "col" || (labelAlign === "raw" && "mr-2")} ${readonly && 'cursor-not-allowed bg-[#f0f0f0]'}`}
                 onChange={internalHandleChange}
                 id={props.name + index}
               />

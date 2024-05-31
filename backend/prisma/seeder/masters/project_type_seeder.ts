@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 const project_type_seeder = async () => {
   ///////////////// Receipt Types ////////////////////////
 
-  const records: string[] = ["Road Cunstruction", "Building Cunstruction", "Strit Light", "Sewage Cunstruction"];
+  const records: string[] = ["Road Construction", "Building Construction", "Strit Light", "Sewage Construction"];
 
   for (const item of records) {
     await prisma.project_types.create({
