@@ -1,4 +1,4 @@
-import { PrismaClient, project_proposals } from "@prisma/client";
+import { measurements, PrismaClient, project_proposals } from "@prisma/client";
 import { ProjectProposalStages } from "pfmslib";
 
 const prisma = new PrismaClient();
@@ -450,29 +450,6 @@ class ProjectVerificationDao {
   }
 
 
-  // getLevel0JuniorEngineerInboxItemCount = async (ulbId: number, level?: number) => {
-  //   return new Promise((resolve, reject) => {
-  //     const filterCondition = `b.ulb_id = ${ulbId} and x.project_proposal_id is null`;
-
-  //     const queryWithoutFieldsAndPagination = `from project_proposals b 
-  //     left join 
-  //     (
-  //       select project_proposal_id from project_proposal_checkings bc1 where bc1.id in (
-  //         select max(id) from project_proposal_checkings bc2 group by bc2.project_proposal_id
-  //       )
-  //     ) 
-  //     x on b.id = x.project_proposal_id
-  //     where ${filterCondition}`;
-
-  //     prisma.$queryRawUnsafe<CountQueryResult[]>(`select count(*) ${queryWithoutFieldsAndPagination}`).then((c) => {
-  //       const count = Number(c[0]?.count);
-  //       resolve(count);
-  //     }).catch((error)=>{
-  //       reject(error);
-  //     });
-  //   });
-  // }
-
   getHigherLevelInboxItemCount = async (ulbId: number, level: number) => {
     return new Promise((resolve, reject) => {
       
@@ -501,6 +478,85 @@ class ProjectVerificationDao {
       });
     });
   }
+
+
+  recordMeasurements = async  (data: any) => {
+    return new Promise((resolve, reject) => {
+      prisma.measurements.createMany({
+        data: data
+      }).then((result) => {
+        resolve(result);
+      }).catch((error) => {
+        reject(error);
+      });
+    })
+  };
+
+  getMeasurements = async (proposal_id: number, filters: any, page: number, limit: number, order: number): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      const query = `from measurements where proposal_id=${proposal_id}`;
+      
+      const ordering = order == -1 ? "desc" : "asc";
+
+      const offset = (page - 1) * limit;
+
+
+      // fetch the data
+      prisma.$transaction([
+        prisma.$queryRawUnsafe(`select * ${query} order by id ${ordering} limit ${limit} offset ${offset}`),
+        prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*)  ${query}`),
+      ]).then(([records, c]) => {
+        
+        const count = Number(c[0]?.count);
+        const result = {
+          count: count,
+          totalPage: Math.ceil(count/limit),
+          currentPage: page,
+          records: records
+        };
+        
+        resolve(result);
+
+
+      }).catch((error) => {
+        reject(error);
+      })
+    }); 
+  }
+
+  getScheduleOfRates = async (search: string | undefined) => {
+    return new Promise((resolve, reject) => {
+
+      const query =      search ? 
+      `select * from schedule_of_rates where description ilike '%${search}%' or sno ilike '%${search}%' limit 10` :
+      `select * from schedule_of_rates limit 10`;
+
+      prisma.$transaction([
+        prisma.$queryRawUnsafe(query)
+      ]).then(([records]) => {
+        resolve(records);
+      }).catch((error) => {
+        reject(error);
+      });
+    });
+  }
+
+  updateMeasurement = async (data: measurements) => {
+    return new Promise((resolve, reject) => {
+      prisma.measurements.update({
+        where: {
+          id: data.id,
+        },
+        data: data
+      }).then((result) => {
+        resolve(result);
+      }).catch((error) => {
+        reject(error);
+      });
+
+    });
+  }
+
 
 }
 

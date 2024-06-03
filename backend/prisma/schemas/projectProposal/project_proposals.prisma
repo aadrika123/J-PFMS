@@ -19,9 +19,12 @@ model project_proposals {
   user_id             Int
   execution_body      Int
 
+  acknowledged        Boolean @default(false)
+
   project_proposal_checkings project_proposal_checkings[]
   project_proposal_documents project_proposal_documents[]
   project_propo_ward_maps    project_propo_ward_maps[]
+  measurements        measurements[]
 
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @default(now()) @updatedAt @map("updated_at")

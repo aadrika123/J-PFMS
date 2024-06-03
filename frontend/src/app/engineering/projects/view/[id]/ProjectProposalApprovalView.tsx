@@ -7,8 +7,6 @@ import { acknowledgeProposal, useProjectProposalDetails } from "@/hooks/data/Pro
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 import Image from "next/image";
 import home from "@/assets/svg/list.svg";
-import Popup from "@/components/global/molecules/general/Popup";
-import { AddMeasurementComponent } from "./AddMeasurementComponent";
 import { usePathname, useRouter } from "next/navigation";
 
 import list from "@/assets/svg/list.svg";
@@ -28,436 +26,10 @@ import toast, { Toaster } from "react-hot-toast";
 
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
-import { Formik } from "formik";
-import * as Yup from "yup";
-
-import { usePagination } from "@/hooks/Pagination";
 
 import moment from "moment";
 import Loader from "@/components/global/atoms/Loader";
-
-
-
-const units = ["Sqm", "Day"];
-
-interface InputProps {
-  name?: string;
-  type?: string;
-  readonly?: boolean;
-  placeholder?: string | "";
-  value?: string | number | undefined;
-  error?: string | undefined;
-  touched?: boolean | undefined;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  required?: boolean | false;
-}
-
-const Input: React.FC<InputProps> = (props) => {
-  const fieldId = "id_" + props.name;
-
-  return (
-    <>
-      <div className="flex justify-center">
-        <div className="flex flex-col gap-1 w-[80%]">
-          <div
-            className={`flex items-center w-[100px] justify-between rounded border shadow-lg bg-transparent border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none overflow-hidden`}
-          >
-            <input
-              disabled={props.readonly}
-              required={props.required}
-              placeholder={props.placeholder}
-              onChange={props.onChange}
-              type={props.type}
-              value={props?.value}
-              className={`text-primary h-[40px] p-3 bg-transparent outline-none`}
-              name={props.name}
-              id={fieldId}
-            />
-          </div>
-
-          <div>
-            {props.touched && props.error && (
-              <div className="text-red-500">{props.error}</div>
-            )}
-          </div>
-
-        </div>
-      </div>
-    </>
-  );
-};
-
-
-interface DDLOptions {
-  name: string;
-  caption: string;
-}
-
-interface DDLProps {
-  name?: string;
-  type?: string;
-  readonly?: boolean;
-  value?: string | number | undefined;
-  error?: string | undefined;
-  touched?: boolean | undefined;
-  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  required?: boolean | false;
-  options: DDLOptions[];
-}
-
-const DDL: React.FC<DDLProps> = (props) => {
-  const fieldId = "id_" + props.name;
-
-
-  return (
-    <>
-      <div className="flex justify-center">
-        <div className="flex flex-col gap-1 w-[80%]">
-          <div
-            className={`flex items-center justify-between rounded border shadow-lg bg-transparent border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none`}
-          >
-            <select
-              disabled={props.readonly}
-              required={props.required}
-              onChange={props.onChange}
-              value={props?.value}
-              className={`text-primary h-[40px] p-3 bg-transparent outline-none`}
-              name={props.name}
-              id={fieldId}
-            >
-
-              {props.options.map((item, index) => {
-                return (
-                  <option key={`${item.name}-option-${index}`} value={item.name}>{item.caption}</option>
-                );
-              })}
-            </select>
-          </div>
-
-          <div>
-            {props.touched && props.error && (
-              <div className="text-red-500">{props.error}</div>
-            )}
-          </div>
-
-        </div>
-      </div>
-    </>
-  );
-};
-
-
-
-
-
-const MeasurementRecord = () => {
-
-  const [editable, setEditable] = useState<boolean>(false);
-
-  // const initialValues = {
-  //   description: "",
-  //   unit: "Sqm",
-  //   quantity: "0",
-  //   rate: "0.0",
-  //   cost: 0,
-  //   year: "",
-  //   remarks: ""
-  // };
-
-  const initialValues = {
-    description: "fdsf",
-    unit: "Sqm",
-    quantity: "5",
-    rate: "5",
-    cost: 10,
-    year: "2024",
-    remarks: "fsdf fdsf"
-  };
-
-
-  const validationSchema = Yup.object({
-    description: Yup.string().required(),
-    unit: Yup.string().oneOf(units),
-    quantity: Yup.number().required().moreThan(0),
-    rate: Yup.number().required().moreThan(0),
-    cost: Yup.number().required().moreThan(0),
-    year: Yup.number().required().moreThan(2023).lessThan(2025),
-    remarks: Yup.string().required(),
-  });
-
-
-  const save = () => {
-    // save
-    setEditable(false);
-  }
-
-  return (
-
-    <>
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={() => { }}
-
-      >
-        {({ values, handleChange, errors, touched }: any) => (
-
-          <>
-            <div className="table-cell text-color-primary">
-
-              <Input
-                onChange={handleChange}
-                value={values.description}
-                error={errors.description}
-                touched={touched.description}
-                name="description"
-                placeholder="Enter Description"
-                required
-                type="text"
-                readonly={!editable}
-              />
-            </div>
-            <div className="table-cell text-color-secondary pt-2">
-              <Input
-                onChange={handleChange}
-                value={values.quantity}
-                error={errors.quantity}
-                touched={touched.quantity}
-                name="quantity"
-                placeholder="Enter quantity"
-                required
-                type="text"
-                readonly={!editable}
-              />
-            </div>
-            <div className="table-cell text-color-secondary pt-2">
-              <Input
-                onChange={handleChange}
-                value={values.rate}
-                error={errors.rate}
-                touched={touched.rate}
-                name="rate"
-                placeholder="Enter rate"
-                required
-                type="text"
-                readonly={!editable}
-              />
-            </div>
-
-            <div className="table-cell text-color-secondary pt-2">
-              <Input
-                onChange={handleChange}
-                value={values.cost}
-                error={errors.cost}
-                touched={touched.cost}
-                name="cost"
-                placeholder="Enter Cost"
-                required
-                type="text"
-                readonly={!editable}
-              />
-            </div>
-
-            <div className="table-cell text-color-secondary pt-2">
-              <Input
-                onChange={handleChange}
-                value={values.year}
-                error={errors.year}
-                touched={touched.year}
-                name="year"
-                placeholder="Enter Year"
-                required
-                type="text"
-                readonly={!editable}
-              />
-            </div>
-
-
-            <div className="table-cell text-color-secondary pt-2">
-              <Input
-                onChange={handleChange}
-                value={values.remarks}
-                error={errors.remarks}
-                touched={touched.remarks}
-                name="remarks"
-                placeholder="Enter Remarks"
-                required
-                type="text"
-                readonly={!editable}
-              />
-            </div>
-
-
-
-            <div className="table-cell text-color-secondary pt-2">
-              <DDL
-                onChange={handleChange}
-                value={values.unit}
-                error={errors.unit}
-                touched={touched.unit}
-                name="unit"
-                required
-                type="text"
-                readonly={!editable}
-                options={
-                  [
-                    { name: "Sqm", caption: "Sqm" },
-                    { name: "Day", caption: "Day" },
-
-                  ]}
-              />
-
-
-            </div>
-
-
-            <div className="table-cell text-color-secondary pt-2">
-              <Input
-                onChange={handleChange}
-                value={values.remarks}
-                error={errors.remarks}
-                touched={touched.remarks}
-                name="remarks"
-                placeholder="Enter Remarks"
-                required
-                type="text"
-                readonly={!editable}
-              />
-            </div>
-
-            <div className="table-cell text-color-secondary pt-2">
-              <Input
-                onChange={handleChange}
-                value={values.remarks}
-                error={errors.remarks}
-                touched={touched.remarks}
-                name="remarks"
-                placeholder="Enter Remarks"
-                required
-                type="text"
-                readonly={!editable}
-              />
-            </div>
-
-            <div className="table-cell text-color-secondary pt-2">
-              <Input
-                onChange={handleChange}
-                value={values.remarks}
-                error={errors.remarks}
-                touched={touched.remarks}
-                name="remarks"
-                placeholder="Enter Remarks"
-                required
-                type="text"
-                readonly={!editable}
-              />
-            </div>
-
-          </>
-
-
-        )}
-      </Formik >
-
-      {editable ? (
-        <div onClick={save}>Save</div>
-      ) : (
-        <div onClick={() => setEditable(!editable)}>Edit</div>
-      )}
-    </>
-
-  )
-}
-
-
-const MeasurementTable = () => {
-  const [limit, page, paginator, resetPaginator] = usePagination();
-  const [measurementFormVisible, setMeasurementFormVisible] = useState<boolean>(false);
-
-
-  return (
-    <>
-
-      {measurementFormVisible && (
-        <Popup width={80} zindex={30}>
-          <AddMeasurementComponent onBack={() => setMeasurementFormVisible(false)} />
-        </Popup>
-
-      )}
-
-
-      <div className="mx-2 p-2">
-        <div className="overflow-x-auto">
-          <div className="text-xs table border-2">
-            <div className="table-caption" title="Double click to change the title">
-              <div className="flex justify-between bg-primary_bg_indigo p-2">
-                <div></div>
-                <div className="flex justify-center text-2xl text-white font-bold">
-                  Prepare Cost Estimation
-                </div>
-
-                <div>
-                  {/* {!titleEditable && (<Button variant="primary" onClick={() => setTitleEditable(!titleEditable)}>Edit</Button>)} */}
-                </div>
-              </div>
-
-            </div>
-
-
-            <div className="table-row p-6 border text-center">
-              <div className="table-cell text-color-secondary p-2">Sr. No</div>
-              <div className="table-cell text-color-primary">Description</div>
-              <div className="table-cell text-color-primary">No</div>
-              <div className="table-cell text-color-primary">Length</div>
-              <div className="table-cell text-color-primary">Breadth</div>
-              <div className="table-cell text-color-primary">Height</div>
-              <div className="table-cell text-color-primary">Quantity</div>
-              <div className="table-cell text-color-primary">Unit</div>
-              <div className="table-cell text-color-primary">SOR Rate</div>
-              <div className="table-cell text-color-primary">Amount</div>
-              <div className="table-cell text-color-primary">Remarks</div>
-              <div className="table-cell text-color-primary">Edit</div>
-            </div>
-
-            <form className="table-row border">
-              <div className="table-cell text-color-secondary text-center">1</div>
-              <MeasurementRecord />
-
-            </form>
-
-
-            <form className="table-row border">
-              <div className="table-cell text-color-secondary text-center">1</div>
-              <MeasurementRecord />
-
-            </form>
-
-
-            <form className="table-row border">
-              <div className="table-cell text-color-secondary text-center">1</div>
-              <MeasurementRecord />
-            </form>
-
-          </div>
-
-          {paginator}
-
-          <div className="flex justify-end">
-            <Button variant="primary" onClick={() => setMeasurementFormVisible(true)}>Add New Measurement(s)</Button>
-          </div>
-
-        </div>
-
-      </div>
-
-
-    </>
-
-  )
-};
-
-
-
+import { MeasurementManagementComponent } from "./MeasurementManagementComponent";
 
 
 type StateType = {
@@ -533,7 +105,7 @@ const Action: React.FC<ActionPropsType> = (props) => {
   //// handling comming comment stage
   const handleGetStage = (proposalDetails: any) => {
     if (proposalDetails?.status === "rejected")
-      return proposalDetails?.approval_stage_id ? user?.getProjectProposalStage(proposalDetails?.approval_stage_id + 2) : user?.getBillStage(2);
+      return proposalDetails?.approval_stage_id ? user?.getProjectProposalStage(proposalDetails?.approval_stage_id + 2) : user?.getProjectProposalStage(2);
     if (!proposalDetails?.approval_stage_id) return "Vendor";
     if (!user?.getProjectProposalStage(proposalDetails?.approval_stage_id)) return user?.getProjectProposalStage(proposalDetails?.approval_stage_id + 1)
     return user?.getProjectProposalStage(proposalDetails?.approval_stage_id)
@@ -751,9 +323,6 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
 
   const router = useRouter();
 
-  const [ceTableExists, setCeTableExists] = useState(true);
-
-
   const [state, setState] = useState<any>({
     activeStep: 0,
     showPopup: false,
@@ -768,7 +337,7 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
   const { isLoading: isLoading, data: projectProposalDetails, refetch: refetchProjectProposalDetails } = useProjectProposalDetails(ProProposalId);
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] = useWorkingAnimation();
 
-  const [primaryTabs, activePrimaryTabIndex, setActivePrimaryTabIndex] = usePrimaryTabs(1, false);
+  const [primaryTabs] = usePrimaryTabs(1, false);
 
   console.log(projectProposalDetails);
 
@@ -865,196 +434,196 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
     <>
       {workingAnimation}
 
-      {isLoading? <Loader /> : (
+      {isLoading ? <Loader /> : (
         <>
-              <div className="flex items-center justify-between border-b-2 pb-4 mb-4">
-        <Button
-          variant="cancel"
-          className="border-none text-primary_bg_indigo hover:text-primary_bg_indigo hover:bg-inherit"
-          onClick={goBack}
-        >
-          {Icons.back}
-          <b>Back</b>
-        </Button>
-        <h2 className="text-black">
-          <b>Project Proposal Details</b>
-        </h2>
-      </div>
-
-
-      <div className="flex justify-between">
-        <div className="flex items-center mb-2 gap-2">
-          <LinkWithLoader href={`/engineering/projects`}>
+          <div className="flex items-center justify-between border-b-2 pb-4 mb-4">
             <Button
-              variant="primary"
-              className={`${(pathName.includes("outbox") || pathName.includes("archive")) && "bg-gray-200 text-gray-500"}`}
+              variant="cancel"
+              className="border-none text-primary_bg_indigo hover:text-primary_bg_indigo hover:bg-inherit"
+              onClick={goBack}
             >
-              {Icons.outbox}
-              Inbox
+              {Icons.back}
+              <b>Back</b>
             </Button>
-          </LinkWithLoader>
-          <LinkWithLoader href={`/engineering/projects/outbox`}>
-            <Button
-              variant="primary"
-              className={`${!pathName.includes("outbox") && "bg-gray-200 text-gray-500"}`}
-            >
-              {Icons.outbox}
-              Outbox
-            </Button>
-          </LinkWithLoader>
-
-          <LinkWithLoader href={'/engineering/projects/archive'}>
-            <Button
-              variant="primary"
-              className={`${!pathName.includes("archive") && "bg-gray-200 text-gray-500"}`}
-            >
-              {Icons.outbox}
-              Archive
-            </Button>
-          </LinkWithLoader>
-
-        </div>
+            <h2 className="text-black">
+              <b>Project Proposal Details</b>
+            </h2>
+          </div>
 
 
-        <div>
-          {projectProposalDetails?.acknowledged ? (
-            <>
-              <div className="flex gap-2 justify-end">
-                <Button variant="primary">Add BOQ</Button>
-                <Button variant="primary">Upload</Button>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="flex justify-end mt-4">
-                <Button variant="primary" onClick={() => setAcknowledgetmentPopupVisible(true)}>Acknowledge</Button>
-              </div>
-              <div className="flex justify-end">
-                <span className="text-red-500">*</span>
-                Please acknowledge the form to submit measurement & other details
-              </div>
-            </>
-          )}
+          <div className="flex justify-between">
+            <div className="flex items-center mb-2 gap-2">
+              <LinkWithLoader href={`/engineering/projects`}>
+                <Button
+                  variant="primary"
+                  className={`${(pathName.includes("outbox") || pathName.includes("archive")) && "bg-gray-200 text-gray-500"}`}
+                >
+                  {Icons.outbox}
+                  Inbox
+                </Button>
+              </LinkWithLoader>
+              <LinkWithLoader href={`/engineering/projects/outbox`}>
+                <Button
+                  variant="primary"
+                  className={`${!pathName.includes("outbox") && "bg-gray-200 text-gray-500"}`}
+                >
+                  {Icons.outbox}
+                  Outbox
+                </Button>
+              </LinkWithLoader>
 
-        </div>
-      </div>
+              <LinkWithLoader href={'/engineering/projects/archive'}>
+                <Button
+                  variant="primary"
+                  className={`${!pathName.includes("archive") && "bg-gray-200 text-gray-500"}`}
+                >
+                  {Icons.outbox}
+                  Archive
+                </Button>
+              </LinkWithLoader>
+
+            </div>
 
 
-      <div className="mt-10">{primaryTabs}</div>
+            <div>
+              {projectProposalDetails?.acknowledged ? (
+                <>
+                  {/* <div className="flex gap-2 justify-end">
+                    <Button variant="primary">Add BOQ</Button>
+                    <Button variant="primary">Upload</Button>
+                  </div> */}
+                </>
+              ) : (
+                <>
+                  <div className="flex justify-end mt-4">
+                    <Button variant="primary" onClick={() => setAcknowledgetmentPopupVisible(true)}>Acknowledge</Button>
+                  </div>
+                  <div className="flex justify-end">
+                    <span className="text-red-500">*</span>
+                    Please acknowledge the form to submit measurement & other details
+                  </div>
+                </>
+              )}
+
+            </div>
+          </div>
 
 
-      {acknowledgementPopupVisible && (<ConfirmationPopup message="Acknowledge the assignement?" cancel={() => setAcknowledgetmentPopupVisible(false)} continue={acknowledge} />)}
+          <div className="mt-10">{primaryTabs}</div>
+
+
+          {acknowledgementPopupVisible && (<ConfirmationPopup message="Acknowledge the assignment?" cancel={() => setAcknowledgetmentPopupVisible(false)} continue={acknowledge} />)}
 
 
 
-      <div className="shadow-lg p-4 border">
+          <div className="shadow-lg p-4 border">
 
-        <ProjectProposalApprovalStepper
-          level={2}
-          subLevel={0}
-          budget={300}
-          items={items}
-        />
-
-        <div className="flex items-center gap-2 mt-4">
-          <div className="bg-gray-100 border flex flex-col p-4 h-52 w-1/3 items-center justify-center rounded">
-            <BoldSpan
-              className="text-secondary_black mb-4 text-center"
-              label={""}
+            <ProjectProposalApprovalStepper
+              level={2}
+              subLevel={0}
+              budget={300}
+              items={items}
             />
-            <BoldSpan label={data?.project_proposal_no} />
-            <BoldSpan content={DateFormatter(data?.proposed_date)} />
-            <div className="flex items-center mb-2">
-              <Image src={home} alt="calender" />
-              <BoldSpan
-                content="Proposal Date"
-              />
-            </div>
-            <div
-            >
-              <span className="ml-1 text-red-500">
-                {`${data?.proposed_date.split("T")[0] == new Date().toISOString().split("T")[0] ? "Today" : moment(data?.proposed_date).fromNow()}`}
-              </span>
 
-            </div>
-          </div>
-          <div className="bg-gray-100 border flex flex-col py-4 px-8 h-52 w-full rounded">
-            <section>
-              <Title title="Project Summary" />
-              <Paragraph desc={projectProposalDetails?.description} />
-            </section>
-          </div>
-          <div>
-
-          </div>
-        </div>
-
-
-        <div className="mt-10">
-        </div>
-
-
-        <Tabs>
-          <TabList>
-            <Tab>VIEW DETAILS</Tab>
-            <Tab>PREPARE COST ESTIMATION</Tab>
-            <Tab>VERIFY DOCUMENTS</Tab>
-            <Tab>ACTION</Tab>
-          </TabList>
-
-          <TabPanel>
-
-            <>
-              {/* View Detailas */}
-              <div className="mt-4 p-4 border-2 bg-gray-100 rounded">
-                <div className="mb-10">
-                  <div className="font-bold">
-                    Project Description
-                  </div>
-                  <div>
-                    {data?.description}
-                  </div>
+            <div className="flex items-center gap-2 mt-4">
+              <div className="bg-gray-100 border flex flex-col p-4 h-52 w-1/3 items-center justify-center rounded">
+                <BoldSpan
+                  className="text-secondary_black mb-4 text-center"
+                  label={""}
+                />
+                <BoldSpan label={data?.project_proposal_no} />
+                <BoldSpan content={DateFormatter(data?.proposed_date)} />
+                <div className="flex items-center mb-2">
+                  <Image src={home} alt="calender" />
+                  <BoldSpan
+                    content="Proposal Date"
+                  />
+                </div>
+                <div
+                >
+                  <span className="ml-1 text-red-500">
+                    {`${data?.proposed_date.split("T")[0] == new Date().toISOString().split("T")[0] ? "Today" : moment(data?.proposed_date).fromNow()}`}
+                  </span>
 
                 </div>
-                <div className="flex gap-10">
-                  
-                  <div>
-                    <div className="font-bold">
-                      ULB Name
-                    </div>
-                    <div>
-                      {data?.ulb_name}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="font-bold">
-                      PIN Code
-                    </div>
-                    <div>
-                      {data?.pin_code}
-                    </div>
-                  </div>
+              </div>
+              <div className="bg-gray-100 border flex flex-col py-4 px-8 h-52 w-full rounded">
+                <section>
+                  <Title title="Project Summary" />
+                  <Paragraph desc={projectProposalDetails?.description} />
+                </section>
+              </div>
+              <div>
 
-                  <div>
-                    <div className="font-bold">
-                      Ward No
-                    </div>
-                    <div>
-                      {data?.ward_name}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="font-bold">
-                      Address
-                    </div>
-                    <div>
-                      {data?.address}
-                    </div>
-                  </div>
+              </div>
+            </div>
 
 
-                  {/* <div>
+            <div className="mt-10">
+            </div>
+
+
+            <Tabs>
+              <TabList>
+                <Tab>VIEW DETAILS</Tab>
+                <Tab>COST ESTIMATION</Tab>
+                <Tab>VERIFY DOCUMENTS</Tab>
+                <Tab>ACTION</Tab>
+              </TabList>
+
+              <TabPanel>
+
+                <>
+                  {/* View Detailas */}
+                  <div className="mt-4 p-4 border-2 bg-gray-100 rounded">
+                    <div className="mb-10">
+                      <div className="font-bold">
+                        Project Description
+                      </div>
+                      <div>
+                        {data?.description}
+                      </div>
+
+                    </div>
+                    <div className="flex gap-10">
+
+                      <div>
+                        <div className="font-bold">
+                          ULB Name
+                        </div>
+                        <div>
+                          {data?.ulb_name}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-bold">
+                          PIN Code
+                        </div>
+                        <div>
+                          {data?.pin_code}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="font-bold">
+                          Ward No
+                        </div>
+                        <div>
+                          {data?.ward_name}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="font-bold">
+                          Address
+                        </div>
+                        <div>
+                          {data?.address}
+                        </div>
+                      </div>
+
+
+                      {/* <div>exit
                     <div className="font-bold">
                       Execution Body
                     </div>
@@ -1063,75 +632,70 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
 
                     </div>
                   </div> */}
-                </div>
-              </div>
-
-            </>
-          </TabPanel>
-          <TabPanel>
-            {ceTableExists ? (
-              <>
-                {/* Table of existing measurements */}
-                <div>
-                  <MeasurementTable />
-                </div>
-
-                <div>
-                  <div className="pt-10 border-b">
-                    Reference Docs
+                    </div>
                   </div>
-                  <div>
-                    <div className="flex gap-10">
-                      <div>Doc1</div>
-                      <div>View</div>
-                      <div>Download</div>
+
+                </>
+              </TabPanel>
+              <TabPanel>
+                {projectProposalDetails?.acknowledged ? (
+                  <>
+                    {/* Table of existing measurements */}
+                    <div>
+                      <MeasurementManagementComponent proposal_id={projectProposalDetails.id} />
                     </div>
 
-                    <div className="flex gap-10">
-                      <div>Doc2</div>
-                      <div>View</div>
-                      <div>Download</div>
-                    </div>
+                    {/* <div>
+                      <div className="pt-10 border-b">
+                        Reference Docs
+                      </div>
+                      <div>
+                        <div className="flex gap-10">
+                          <div>Doc1</div>
+                          <div>View</div>
+                          <div>Download</div>
+                        </div>
+
+                        <div className="flex gap-10">
+                          <div>Doc2</div>
+                          <div>View</div>
+                          <div>Download</div>
+                        </div>
 
 
-                    <div className="flex gap-10">
-                      <div>Doc3</div>
-                      <div>View</div>
-                      <div>Download</div>
-                    </div>
+                        <div className="flex gap-10">
+                          <div>Doc3</div>
+                          <div>View</div>
+                          <div>Download</div>
+                        </div>
 
+                      </div>
+                      <div>
+                        <Button variant="primary"> Upload New</Button>
+                      </div>
+                    </div> */}
+
+                  </>
+                ) : (
+                  <div className="w-full flex justify-center gap-4 text-center bg-primary_bg_indigo p-4 text-white rounded font-bold">
+                    Kindly acknowledge the proposal first to be able to record measurements.
                   </div>
-                  <div>
-                    <Button variant="primary"> Upload New</Button>
-                  </div>
+                )}
+
+              </TabPanel >
+
+              <TabPanel>
+                <div className="mt-4">
+                  <Table columns={columns} data={data?.files} center />
                 </div>
+              </TabPanel>
 
-              </>
-            ) : (
-              <div className="w-full flex justify-center gap-4 text-center bg-primary_bg_indigo p-4 text-white rounded font-bold">
-                <div>
-                  Prepare Cost Estimation
-                </div>
-                <div className="bg-white text-black rounded-full p-1 h-8 w-8">
-                  +
-                </div>
-              </div>
-            )}
+              <TabPanel>
+                <Action proposalId={Number(ProProposalId)} proposalDetails={projectProposalDetails} />
+              </TabPanel>
+            </Tabs >
 
-          </TabPanel >
-
-          <TabPanel>
-            <div className="mt-4">
-              <Table columns={columns} data={data?.files} center />
-            </div>
-          </TabPanel>
-
-          <TabPanel>
-            <Action proposalId={Number(ProProposalId)} proposalDetails={projectProposalDetails} />
-          </TabPanel>
-        </Tabs >
-
-      </div >
+          </div >
 
 
         </>
