@@ -8,25 +8,31 @@ const measurementUnitList = ["sqm", "nos", "metre", "litre", "hour", "tonne.km",
 const measurementRecordValidationSchema = Yup.object({
   proposal_id: Yup.number().required(),
   description: Yup.string().required(),
-  nos: Yup.number().required(),
-
-  length: Yup.number().when('unit', (unit, schema) => {
+  nos: Yup.number().optional().when('unit', (unit, schema) => {
     if (unit[0] === "cum" || unit[0] === "sqm" || unit[0] === "metre")
       return schema.required()
     else
       return schema;
   }),
 
-  breadth: Yup.number().when('unit', (unit, schema) => {
-    if (unit[0] === "cum" || unit[0] === "sqm")
-      return schema.required()
+  length: Yup.number().optional().when('unit', (unit, schema) => {
+    console.log("Select unit: ", unit);
+    if (unit[0] === "cum" || unit[0] === "sqm" || unit[0] === "metre")
+      return schema.required("It is required");
     else
       return schema;
   }),
 
-  height: Yup.number().when('unit', (unit, schema) => {
+  breadth: Yup.number().optional().when('unit', (unit, schema) => {
+    if (unit[0] === "cum" || unit[0] === "sqm")
+      return schema.required();
+    else
+      return schema;
+  }),
+
+  height: Yup.number().optional().when('unit', (unit, schema) => {
   if (unit[0] === "cum")
-    return schema.required()
+    return schema.required();
   else
     return schema;
 }),

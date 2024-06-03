@@ -7,6 +7,9 @@ import axios, { baseURL } from '@/lib/axiosConfig';
 import { useWorkingAnimation } from "@/app/v/atoms/useWorkingAnimation";
 import { useSORList } from "@/hooks/data/ProjectProposalsHooks";
 
+import * as Yup from "yup";
+import toast, { Toaster } from "react-hot-toast";
+
 interface InputProps {
     name?: string;
     type?: string;
@@ -29,7 +32,9 @@ const Input: React.FC<InputProps> = (props) => {
             <div className="flex justify-center">
                 <div className="flex flex-col gap-1 w-[80%]">
                     <div
-                        className={`flex items-center justify-between rounded border shadow-lg bg-transparent border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none`}
+                        className={props.readonly ? 
+                            `flex items-center justify-between rounded border shadow-lg bg-gray-200 border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none`: 
+                            `flex items-center justify-between rounded border shadow-lg bg-transparent border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none`}
                     >
                         <input
                             disabled={props.readonly}
@@ -38,7 +43,7 @@ const Input: React.FC<InputProps> = (props) => {
                             onChange={props.onChange}
                             type={props.type}
                             value={props?.value}
-                            className={`text-primary h-[40px] p-3 bg-transparent outline-none`}
+                            className={"text-primary h-[40px] p-3 bg-transparent outline-none"}
                             name={props.name}
                             id={fieldId}
                             onFocus={props?.onFocus}
@@ -46,16 +51,17 @@ const Input: React.FC<InputProps> = (props) => {
                             autoComplete="off"
                             title={`${props?.value}`}
                         />
-                    </div>
-
-                    <div>
-                        {props.touched && props.error && (
-                            <div className="text-red-500">{props.error}</div>
-                        )}
-                    </div>
-
+                    
                 </div>
+
+                <div>
+                    {props.touched && props.error && (
+                        <div className="text-red-500">{props.error}</div>
+                    )}
+                </div>
+
             </div>
+        </div >
         </>
     );
 };
@@ -89,22 +95,24 @@ const DDL: React.FC<DDLProps> = (props) => {
                     <div
                         className={`flex items-center justify-between rounded border shadow-lg bg-transparent border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none`}
                     >
-                        <select
-                            disabled={props.readonly}
-                            required={props.required}
-                            onChange={props.onChange}
-                            value={props?.value}
-                            className={`text-primary h-[40px] p-3 bg-transparent outline-none`}
-                            name={props.name}
-                            id={fieldId}
-                        >
+                        <div className={props.readonly ? "bg-gray-200 border border-1 border-gray-200" : ""}>
+                            <select
+                                disabled={props.readonly}
+                                required={props.required}
+                                onChange={props.onChange}
+                                value={props?.value}
+                                className={`text-primary h-[40px] p-3 bg-transparent outline-none`}
+                                name={props.name}
+                                id={fieldId}
+                            >
+                                {props.options.map((item, index) => {
+                                    return (
+                                        <option key={`${item.name}-option-${index}`} value={item.name}>{item.caption}</option>
+                                    );
+                                })}
+                            </select>
+                        </div>
 
-                            {props.options.map((item, index) => {
-                                return (
-                                    <option key={`${item.name}-option-${index}`} value={item.name}>{item.caption}</option>
-                                );
-                            })}
-                        </select>
                     </div>
 
                     <div>
@@ -130,19 +138,35 @@ interface MeasurementRecordProps {
 }
 
 const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((props: MeasurementRecordProps, ref) => {
+    // const initialValues = {
+    //     proposal_id: props.proposal_id,
+    //     description: "Aluminium Sheets",
+    //     nos: 10,
+    //     length: 10,
+    //     breadth: 10,
+    //     height: 2,
+    //     quantity: 10,
+    //     unit: "cum",
+    //     rate: 10,
+    //     amount: 300,
+    //     remarks: "to be used on doors, windows etc."
+    // };
+
+
+
     const initialValues = {
-        proposal_id: props.proposal_id,
-        description: "Aluminium Sheets",
-        nos: 10,
-        length: 10,
-        breadth: 10,
-        height: 2,
-        quantity: 10,
-        unit: "cum",
-        rate: 10,
-        amount: 300,
-        remarks: "to be used on doors, windows etc."
+        description: "",
+        nos: "",
+        length: "",
+        breadth: "",
+        height: "",
+        quantity: "",
+        unit: "",
+        rate: "",
+        amount: "",
+        remarks: ""
     };
+
 
 
     const [currentValues, setCurrentValues] = useState<any>(initialValues);
@@ -151,9 +175,11 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
     const { isFetching: isFetching, isLoading: isLoading, data: sorQueryResponseData, refetch: refetchSORList } = useSORList(searchText);
     const [sorListVisible, setSorListVisible] = useState<boolean>(false);
 
-    const [lengthFieldEnabled, setLengthFieldEnabled] = useState<boolean>(true);
-    const [breadthFieldEnabled, setBreadthFieldEnabled] = useState<boolean>(true);
-    const [heightFieldEnabled, setHeightFieldEnalbed] = useState<boolean>(true);
+    const [nosFieldEnabled, setNosFieldEnabled] = useState<boolean>(false);
+    const [lengthFieldEnabled, setLengthFieldEnabled] = useState<boolean>(false);
+    const [breadthFieldEnabled, setBreadthFieldEnabled] = useState<boolean>(false);
+    const [heightFieldEnabled, setHeightFieldEnalbed] = useState<boolean>(false);
+    const [quantityFieldEnabled, setQuantityFieldEnabled] = useState<boolean>(false);
 
 
     const formikRef = useRef<FormikProps<any>>(null);
@@ -166,24 +192,12 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                 const d = formikRef.current?.values;
                 return d;
             } else {
+                toast.error(data[Object.keys(data)[0]]);
                 return null;
             }
         },
 
     }));
-
-    // const initialValues = {
-    //     description: "",
-    //     nos: "",
-    //     length: "",
-    //     breadth: "",
-    //     height: "",
-    //     quantity: "",
-    //     unit: "",
-    //     rate: "",
-    //     amount: "",
-    //     remarks: ""
-    // };
 
 
     const unitOptions = MeasurementRecordValidation.measurementUnitList.map((unit) => {
@@ -192,26 +206,107 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
 
 
     const enableDisableFieldsBasedOnUnitValue = (unit: string) => {
-        if(unit === "metre"){
-            setCurrentValues({...currentValues, breadth: undefined, height: undefined});
+    
+        if (unit === "metre") {
+            setNosFieldEnabled(true);
+            setLengthFieldEnabled(true);
+            setBreadthFieldEnabled(false);
+            setHeightFieldEnalbed(false);
+            setQuantityFieldEnabled(false);
 
+            return { ...currentValues, breadth: "", height: "" };
+            
+        } else if (unit === "sqm") {
+            
+            setNosFieldEnabled(true);
+            setLengthFieldEnabled(true);
+            setBreadthFieldEnabled(true);
+            setHeightFieldEnalbed(false);
+            setQuantityFieldEnabled(false);
+
+            return { ...currentValues, height: "" };
+
+        } else if (unit === "cum") {
+            setNosFieldEnabled(true);
+            setLengthFieldEnabled(true);
+            setBreadthFieldEnabled(true);
+            setHeightFieldEnalbed(true);
+            setQuantityFieldEnabled(false);
+        } else {
+
+            
+            setNosFieldEnabled(false);
+            setQuantityFieldEnabled(true);
+            setLengthFieldEnabled(false);
+            setBreadthFieldEnabled(false);
+            setHeightFieldEnalbed(false);
+
+            return { ...currentValues, nos: "", length: "", breadth: "", height: "" };
         }
+
+    }
+
+    const computeThings = (fieldName: string) => {
         
     }
 
     const selectItem = (index: number) => {
         console.log("selected item", sorQueryResponseData[index]);
         setSorListVisible(false);
+        const modifiedValues = enableDisableFieldsBasedOnUnitValue(sorQueryResponseData[index].unit);
+
         setCurrentValues({
-           ...currentValues, 
-           description: sorQueryResponseData[index].description,
-           unit: sorQueryResponseData[index].unit,
+            ...modifiedValues,
+            description: sorQueryResponseData[index].description,
+            unit: sorQueryResponseData[index].unit,
             rate: sorQueryResponseData[index].rate
         });
-
-        enableDisableFieldsBasedOnUnitValue(sorQueryResponseData[index].description);
-
     }
+
+
+    const measurementUnitList = ["sqm", "nos", "metre", "litre", "hour", "tonne.km", "kg", "Day", "tonne", "cum"];
+
+
+    const measurementRecordValidationSchema = Yup.object({
+        description: Yup.string().required(),
+        nos: Yup.number().optional().when('unit', (unit, schema) => {
+          if (unit[0] === "cum" || unit[0] === "sqm" || unit[0] === "metre")
+            return schema.required()
+          else
+            return schema;
+        }),
+      
+        length: Yup.number().optional().when('unit', (unit, schema) => {
+          console.log("Select unit: ", unit);
+          if (unit[0] === "cum" || unit[0] === "sqm" || unit[0] === "metre")
+            return schema.required("length is required");
+          else
+            return schema;
+        }),
+      
+        breadth: Yup.number().optional().when('unit', (unit, schema) => {
+          if (unit[0] === "cum" || unit[0] === "sqm")
+            return schema.required("breadth is required");
+          else
+            return schema;
+        }),
+      
+        height: Yup.number().optional().when('unit', (unit, schema) => {
+        if (unit[0] === "cum")
+          return schema.required("height is required");
+        else
+          return schema;
+      }),
+      
+      
+        quantity: Yup.number().required(),
+        unit: Yup.string().oneOf(measurementUnitList),
+        rate: Yup.number().required(),
+        amount: Yup.number().required(),
+        remarks: Yup.string().required(),
+      });
+            
+
 
     return (
 
@@ -219,7 +314,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
             innerRef={formikRef}
             initialValues={currentValues}
             enableReinitialize
-            validationSchema={MeasurementRecordValidation.measurementRecordValidationSchema}
+            validationSchema={measurementRecordValidationSchema}
             onSubmit={() => { }}
 
         >
@@ -250,7 +345,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                                 type="text"
                                 readonly={sorListVisible}
 
-                            
+
                             />
 
                             {sorListVisible && (<ul className="p-2 shadow bg-base-100 rounded-box w-52 fixed">
@@ -275,7 +370,14 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                     <div className="table-cell text-color-primary">
 
                         <Input
-                            onChange={handleChange}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                // do custom things if required
+                                computeThings("nos");
+                                
+                                // call formik onchange handler
+                                handleChange(e);
+                            }}
+
                             value={values.nos}
                             error={errors.nos}
                             touched={touched.nos}
@@ -283,13 +385,20 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                             placeholder="Enter No"
                             required
                             type="number"
-                            readonly={false}
+                            readonly={!nosFieldEnabled}
                         />
                     </div>
 
                     <div className="table-cell text-color-secondary pt-2">
                         <Input
-                            onChange={handleChange}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                // do custom things if required
+                                computeThings("length");
+                                
+                                // call formik onchange handler
+                                handleChange(e);
+                            }}
+
                             value={values.length}
                             error={errors.length}
                             touched={touched.length}
@@ -297,13 +406,20 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                             placeholder="Enter Length"
                             required
                             type="number"
-                            readonly={false}
+                            readonly={!lengthFieldEnabled}
                         />
                     </div>
 
                     <div className="table-cell text-color-secondary pt-2">
                         <Input
-                            onChange={handleChange}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                // do custom things if required
+                                computeThings("breadth");
+                                
+                                // call formik onchange handler
+                                handleChange(e);
+                            }}
+
                             value={values.breadth}
                             error={errors.breadth}
                             touched={touched.breadth}
@@ -311,13 +427,20 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                             placeholder="Enter Breadth"
                             required
                             type="number"
-                            readonly={false}
+                            readonly={!breadthFieldEnabled}
                         />
                     </div>
 
                     <div className="table-cell text-color-secondary pt-2">
                         <Input
-                            onChange={handleChange}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                // do custom things if required
+                                computeThings("height");
+                                
+                                // call formik onchange handler
+                                handleChange(e);
+                            }}
+
                             value={values.height}
                             error={errors.height}
                             touched={touched.height}
@@ -325,13 +448,20 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                             placeholder="Enter Height"
                             required
                             type="number"
-                            readonly={false}
+                            readonly={!heightFieldEnabled}
                         />
                     </div>
 
                     <div className="table-cell text-color-secondary pt-2">
                         <Input
-                            onChange={handleChange}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                // do custom things if required
+                                computeThings("quantity");
+                                
+                                // call formik onchange handler
+                                handleChange(e);
+                            }}
+
                             value={values.quantity}
                             error={errors.quantity}
                             touched={touched.quantity}
@@ -339,7 +469,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                             placeholder="Enter Quantity"
                             required
                             type="number"
-                            readonly={false}
+                            readonly={!quantityFieldEnabled}
                         />
                     </div>
                     <div className="table-cell text-color-secondary pt-2">
@@ -359,7 +489,14 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
 
                     <div className="table-cell text-color-secondary pt-2">
                         <Input
-                            onChange={handleChange}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                // do custom things if required
+                                computeThings("rate");
+                                
+                                // call formik onchange handler
+                                handleChange(e);
+                            }}
+
                             value={values.rate}
                             error={errors.rate}
                             touched={touched.rate}
@@ -381,7 +518,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                             placeholder="Enter Cost"
                             required
                             type="number"
-                            readonly={false}
+                            readonly={true}
                         />
                     </div>
 
@@ -657,13 +794,15 @@ export const AddMeasurementComponent = ({ proposal_id, onUpdate, onBack }: AddMe
         const table = tableRefs[0];
         const data = await table.getData();
         console.log(data);
-        recordMeasurements(data);
+        if( data != null)
+            recordMeasurements(data);
     }
 
     return (
         <>
             {workingAnimation}
 
+            <Toaster />
             <div>
                 <MeasurementTable tableIndex={0} ref={(element: any) => { addTableRef(0, element) }} proposal_id={proposal_id} />
             </div>
