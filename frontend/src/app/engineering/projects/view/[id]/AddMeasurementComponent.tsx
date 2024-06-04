@@ -4,11 +4,12 @@ import { Formik, FormikProps } from "formik";
 
 import { MeasurementRecordValidation } from "pfmslib";
 import axios, { baseURL } from '@/lib/axiosConfig';
-import { useWorkingAnimation } from "@/app/v/atoms/useWorkingAnimation";
+// import { useWorkingAnimation } from "@/app/v/atoms/useWorkingAnimation";
 import { useSORList } from "@/hooks/data/ProjectProposalsHooks";
 
 import * as Yup from "yup";
 import toast, { Toaster } from "react-hot-toast";
+import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 
 interface InputProps {
     name?: string;
