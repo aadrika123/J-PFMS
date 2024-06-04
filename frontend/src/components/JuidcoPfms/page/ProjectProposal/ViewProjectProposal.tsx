@@ -204,7 +204,7 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
           <>
             <ProjectProposalApprovalStepper
               level={1}
-              subLevel={0}
+              subLevel={1}
               budget={400}
               items={items}
             />

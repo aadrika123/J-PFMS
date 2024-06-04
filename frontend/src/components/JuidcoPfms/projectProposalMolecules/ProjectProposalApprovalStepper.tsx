@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
+import { Icons } from "@/assets/svg/icons";
 
 type item = {
   label?: string;
@@ -19,9 +20,7 @@ type ProjectProposalApprovalStepperProps = {
   budget: number;
 };
 
-const ProjectProposalApprovalStepper: React.FC<
-  ProjectProposalApprovalStepperProps
-> = (props) => {
+const ProjectProposalApprovalStepper: React.FC<ProjectProposalApprovalStepperProps> = (props) => {
   const {
     items,
     activeBgColor = "primary_bg_indigo",
@@ -79,23 +78,39 @@ const ProjectProposalApprovalStepper: React.FC<
   };
 
   return (
-    <div className="flex ml-10">
+    <div className="flex ">
       {data.map((item: any, index) => (
-        <div key={index} className={`w-full`}>
-          <div className={`flex items-center`}>
+        <div key={index} className={`w-full `}>
+          <div
+            className={`flex items-center ${item.level === undefined && "border-t-2 border-b-2 border-dashed"}`}
+          >
+            <hr
+              className={`w-full border-2 ${index == 0 && "opacity-0"} ${newLevel + updatedSubLevel >= index && `border-${activeBgColor}`}`}
+            />
             <div
-              className={`h-8 w-10 rounded-full flex items-center justify-center p-1 text-white ${newLevel + updatedSubLevel >= index ? `bg-${activeBgColor}` : `bg-gray-500`}`}
+              className={`h-9 w-20 rounded-full flex items-center justify-center p-1 text-white 
+              ${item.level !== undefined && "mt-1"}
+              ${newLevel + updatedSubLevel === index && `animate-pulse`} 
+              ${item.others && item.others.length >0 && 'animate-pulse cursor-col-resize'}
+              ${newLevel + updatedSubLevel >= index ? `bg-${activeBgColor}` : `bg-gray-500`}`}
               onClick={() => handleExpand(item)}
             >
-              {newLevel + updatedSubLevel === index &&
-                (item?.label || <Image src={item?.img} alt="" />)}
+              {newLevel + updatedSubLevel === index
+                ? item?.label || (
+                    <Image
+                      className={` ${newLevel + updatedSubLevel === index && `animate-ping`}`}
+                      src={item?.img}
+                      alt=""
+                    />
+                  )
+                : newLevel + updatedSubLevel >= index && Icons.done}
             </div>
             <hr
-              className={`w-full border-2 ${data.length === index + 1 && "opacity-0"} ${newLevel + updatedSubLevel >= index && `border-${activeBgColor}`}`}
+              className={`w-full border-2 ${data.length === index + 1 && "opacity-0"} ${newLevel + updatedSubLevel > index && `border-${activeBgColor}`}`}
             />
           </div>
           <div
-            className={`mr-6 mt-3 -ml-10 ${data.length <= 5 ? "-ml-14 w-40" : "w-28"} text-xs text-center ${newLevel + updatedSubLevel >= index && "font-bold"}`}
+            className={`mt-3 text-xs text-center ${newLevel + updatedSubLevel >= index && "font-bold"}`}
           >
             {item?.info}
           </div>
@@ -106,29 +121,3 @@ const ProjectProposalApprovalStepper: React.FC<
 };
 
 export default ProjectProposalApprovalStepper;
-
-{
-  /* <div className="flex ml-10">
-{items.map((item, index) => (
-  <div key={index} className={`w-full`}>
-    <div className={`flex items-center`}>
-      <div
-        className={`h-8 w-10 rounded-full flex items-center justify-center p-1 text-white ${activeStepper >= index + 1 ? `bg-${activeBgColor}` : `bg-gray-500`}`}
-      >
-        {activeStepper === index + 1 &&
-          (item?.label || <Image src={item.img} alt="" />)}
-      </div>
-
-      <hr
-        className={`w-full border-2 ${items.length === index + 1 && "opacity-0"} ${activeStepper >= index + 1 && `border-${activeBgColor}`}`}
-      />
-    </div>
-    <div
-      className={`mr-6 mt-3 -ml-10 ${items.length <=5 ? '-ml-12 w-36' : 'w-28'} text-xs text-center ${activeStepper >= index + 1 && "font-bold"}`}
-    >
-      {item.info}
-    </div>
-  </div>
-))}
-</div> */
-}

@@ -486,7 +486,7 @@ class ProjectVerificationDao {
         data: data
       }).then((result) => {
         resolve(result);
-      }).catch((error) => {
+      }).catch((error:any) => {
         reject(error);
       });
     })
