@@ -55,18 +55,22 @@ const ScheduleOfRates = () => {
     const router = useRouter();
     const currentPath = usePathname();
 
-    const [primaryTabs, activePrimaryTabIndex, setActivePrimaryTabIndex] = usePrimaryTabs(0, false);
+    const [primaryTabs, activePrimaryTabIndex] = usePrimaryTabs(0, false);
 
 
 
     const [searchQuery, setSearchQuery] = useState<string>("");
+    console.log(searchQuery);
     const [limit, page, paginator, resetPaginator] = usePagination();
 
+    console.log(limit, page, paginator);
 
 
-    const [searchPanelItemValues, setSearchPanelItemValues] = useState<any>({});
 
-    const [workingAnimation, activateWorkingAnimation] = useWorkingAnimation();
+
+    const [searchPanelItemValues] = useState<any>({});
+
+    const [workingAnimation] = useWorkingAnimation();
 
 
     const [isFilterPanelOpen, setFilterPanelOpen] = useState(false);
@@ -100,10 +104,10 @@ const ScheduleOfRates = () => {
         resetPaginator();
     }
 
-    const onViewButtonClick = (id: number) => {
-        activateWorkingAnimation();
-        router.push(`${currentPath}/view/${id}?mode=view`);
-    };
+    // const onViewButtonClick = (id: number) => {
+    //     activateWorkingAnimation();
+    //     router.push(`${currentPath}/view/${id}?mode=view`);
+    // };
 
     return (
         <>

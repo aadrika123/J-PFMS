@@ -1,13 +1,13 @@
 "use client";
 import React, { ReactElement, ReactNode, useState } from "react";
 import TotalCountTable from "../molecules/TotalCountTable";
-import Button from "@/components/global/atoms/Button";
 import { useDispatch } from "react-redux";
 import { openPopup } from "@/redux/reducers/PopupReducers";
 import Table from "@/components/global/molecules/Table";
 import goBack from "@/utils/helper";
 import Popup from "@/components/global/molecules/Popup";
 import LosingDataConfirm from "@/components/global/molecules/LosingDataConfirm";
+import Button from "@/components/global/atoms/buttons/Button";
 
 export interface ColumnProps {
   name: string;

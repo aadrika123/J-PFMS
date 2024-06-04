@@ -13,8 +13,8 @@ interface ProjectManagementLayoutProps {
 
 export const ProjectManagementLayout = ({ children }: ProjectManagementLayoutProps) => {
   const pathName = usePathname();
-  const { isFetching, isLoading, data: outboxItemCount } = useProjectProposalOutboxItemCount();
-  const { isFetchingInboxItemCount, isLoadingInboxItemCount, data: inboxItemCount } = useProjectProposalInboxItemCount();
+  const { data: outboxItemCount } = useProjectProposalOutboxItemCount();
+  const { data: inboxItemCount } = useProjectProposalInboxItemCount();
 
   return (
     <>

@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Formik } from "formik";
 import { MeasurementRecordValidation } from "pfmslib";
 import { usePagination } from "@/hooks/Pagination";
@@ -25,6 +25,7 @@ interface InputProps {
     error?: string | undefined;
     touched?: boolean | undefined;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onFocus?: () => void;
     required?: boolean | false;
 }
 
@@ -45,6 +46,7 @@ const Input: React.FC<InputProps> = (props) => {
                             onChange={props.onChange}
                             type={props.type}
                             value={props?.value}
+                            onFocus={props?.onFocus}
                             className={`text-primary h-[40px] p-3 bg-transparent outline-none`}
                             name={props.name}
                             id={fieldId}
@@ -131,11 +133,10 @@ interface MeasurementRecordProps {
 const MeasurementRecord = (props: MeasurementRecordProps) => {
     const [measurement, setMeasurement] = useState<any>(props.measurement);
     const [searchText, setSearchText] = useState<string>("");
-    const { isFetching: isFetching, isLoading: isLoading, data: sorQueryResponseData, refetch: refetchSORList } = useSORList(searchText);
+    const { isFetching: isFetching, isLoading: isLoading, data: sorQueryResponseData  } = useSORList(searchText);
+    const [sorListVisible, setSorListVisible] = useState<boolean>(false);
 
     const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] = useWorkingAnimation();
-
-    const descriptionFieldRef = useRef<HTMLDivElement>(null);
 
     // const [machingSORs, ]
 
@@ -200,6 +201,8 @@ const MeasurementRecord = (props: MeasurementRecordProps) => {
 
     const selectItem = (index: number) => {
         console.log("selected item", sorQueryResponseData[index]);
+        setSorListVisible(false);
+
         setMeasurement({
             ...measurement,
             description: sorQueryResponseData[index].description,
@@ -212,22 +215,26 @@ const MeasurementRecord = (props: MeasurementRecordProps) => {
     return (
 
         <>
+        {workingAnimation}
             <Formik
                 initialValues={measurement}
                 enableReinitialize
                 validationSchema={MeasurementRecordValidation.measurementRecordValidationSchema}
                 onSubmit={save}
             >
-                {({ values, handleChange, errors, touched, handleSubmit}: any) => (
+                {({ values, handleChange, errors, touched, handleSubmit }: any) => (
                     <>
                         <div className="table-cell text-color-primary border p-2">
 
                             {editable ? (
 
-                                <div className="dropdown">
+                                <div>
 
                                     <Input
                                         onChange={handleChange}
+
+                                        onFocus={() => setSorListVisible(true)}
+
                                         value={values.description}
                                         error={errors.description}
                                         touched={touched.description}
@@ -235,8 +242,11 @@ const MeasurementRecord = (props: MeasurementRecordProps) => {
                                         placeholder="Enter Description"
                                         required
                                         type="text"
+                                        readonly={sorListVisible}
+
                                     />
-                                    <ul tabIndex={0} className="dropdown-content z-[10] menu p-2 shadow bg-base-100 rounded-box w-52">
+
+                                    {sorListVisible && (<ul onMouseLeave={() => setSorListVisible(false)} className="p-2 shadow bg-base-100 rounded-box w-52 fixed">
                                         <li><input type="text" placeholder="search" onChange={(event) => setSearchText(event.target.value)} /></li>
 
                                         {(isLoading || isFetching) ? (
@@ -251,7 +261,7 @@ const MeasurementRecord = (props: MeasurementRecordProps) => {
                                             })
 
                                         )}
-                                    </ul>
+                                    </ul>)}
                                 </div>
 
 
@@ -396,7 +406,7 @@ const MeasurementRecord = (props: MeasurementRecordProps) => {
                             <div
                                 className="mx-2 border p-1 bg-primary_green rounded text-white text-center"
                             >
-                                <button onClick={handleSubmit}>Save</button>
+                                <button onClick={handleSubmit} className="cursor-pointer" >Save</button>
                             </div>
 
                         )}
@@ -411,7 +421,7 @@ const MeasurementRecord = (props: MeasurementRecordProps) => {
 
                 <div
                     onClick={() => setEditable(!editable)}
-                    className="mx-2 border p-1 bg-primary_green rounded text-white text-center">
+                    className="mx-2 border p-1 bg-primary_green rounded text-white text-center cursor-pointer">
                     Edit
                 </div>
             )}
@@ -465,7 +475,7 @@ const MeasurementTable = ({ measurements }: MeasurementTableProps) => {
             {measurements?.map((row: any, index: number) => {
                 return (
                     <form className="table-row border" key={index}>
-                        <div className="table-cell text-color-secondary text-center">{index+1}</div>
+                        <div className="table-cell text-color-secondary text-center">{index + 1}</div>
                         <MeasurementRecord measurement={row} />
                     </form>
 

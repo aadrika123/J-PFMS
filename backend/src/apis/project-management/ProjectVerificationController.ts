@@ -276,6 +276,8 @@ class ProjectVerificationController {
       const { data, user } = req.body;
       if (user.isJuniorEngineer()) {
 
+        console.log("data", data);
+
         // validate measurement records
         Yup.array(MeasurementRecordValidation.measurementRecordValidationSchema).validate(data).then(() => {
 
@@ -283,10 +285,14 @@ class ProjectVerificationController {
             const result = { status: true, code: 200, message: "OK", data: daoResult };
             resolve(result);
           }).catch((error) => {
+            
             reject(error);
           })
 
         }).catch((error) => {
+          console.log("=====================================================================================");
+
+          console.log(error);
           reject(error);
         });
 

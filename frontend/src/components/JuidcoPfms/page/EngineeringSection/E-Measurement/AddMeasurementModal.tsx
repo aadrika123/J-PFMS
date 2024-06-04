@@ -68,6 +68,7 @@ const TableRow: React.FC<{ rowIndex: number }> = ({ rowIndex }) => {
   const [unit, setUnit] = useState<string>("");
   const [bidrate, setBidRate] = useState<string>("");
   const [isTyping, setisTyping] = useState<boolean>(false);
+  console.log(isTyping);
   const [selectoption, setSelectoption] = useState<string>("");
   console.log(searchQuery, "search");
   const fetchData = async () => {
@@ -140,11 +141,14 @@ const TableRow: React.FC<{ rowIndex: number }> = ({ rowIndex }) => {
       onChange={handleSearchChange}
     >
       <option value="">Select an option</option>
-      {selectoption?.data?.map((item: any) => (
+      
+      {/* {
+        
+      selectoption?.data?.map((item: any) => (
         <option key={item.description} value={item.description}>
           {item.description}
         </option>
-      ))}
+      ))} */}
     </Field>
   </div>
 </td>

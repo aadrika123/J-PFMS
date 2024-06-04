@@ -39,7 +39,7 @@ const TenderCriticalDatesForm: React.FC<TenderCriticalDatesFormProps> = (
   const formRef = useRef<HTMLFormElement>(null);
   const initialValues = {
     publishing_date: "",
-    bid_opeining_date: "",
+    bid_opening_date: "",
     document_sale_start_date: "",
     document_sale_end_date: "",
     seek_clarification_start_date: "",
@@ -240,10 +240,10 @@ const TenderCriticalDatesForm: React.FC<TenderCriticalDatesFormProps> = (
               <DateTimePickerComponent
                 label="Bid Opening Date"
                 onBlur={handleBlur}
-                value={values.bid_opeining_date}
-                touched={touched.bid_opeining_date}
-                error={errors.bid_opeining_date}
-                name="bid_opeining_date"
+                value={values.bid_opening_date}
+                touched={touched.bid_opening_date}
+                error={errors.bid_opening_date}
+                name="bid_opening_date"
                 readonly={readonly}
                 required
               />

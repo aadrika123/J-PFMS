@@ -7,7 +7,7 @@ import { acknowledgeProposal, useProjectProposalDetails } from "@/hooks/data/Pro
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 import Image from "next/image";
 import home from "@/assets/svg/list.svg";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 import list from "@/assets/svg/list.svg";
 import details from "@/assets/svg/details.svg";
@@ -340,7 +340,6 @@ export const Paragraph = ({ desc }: { desc: string }) => {
 const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number }) => {
   const pathName = usePathname();
 
-  const router = useRouter();
 
   const [state, setState] = useState<any>({
     activeStep: 0,
@@ -349,7 +348,7 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
     docData: null,
   });
 
-  const { activeStep, showPopup, docData } = state;
+  const { showPopup } = state;
 
 
 

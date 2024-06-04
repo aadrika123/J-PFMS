@@ -12,7 +12,7 @@ interface ProposalDetail {
 
 
 const DetailsCards: React.FC = () => {
-    const [proposalDetails, setProposalDetails] = useState<ProposalDetail[]>([
+    const [proposalDetails] = useState<ProposalDetail[]>([
       {
         id: 1,
         documents: "Document 1",

@@ -7,7 +7,6 @@ import axios, { baseURL } from '@/lib/axiosConfig';
 // import { useWorkingAnimation } from "@/app/v/atoms/useWorkingAnimation";
 import { useSORList } from "@/hooks/data/ProjectProposalsHooks";
 
-import * as Yup from "yup";
 import toast, { Toaster } from "react-hot-toast";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 
@@ -33,8 +32,8 @@ const Input: React.FC<InputProps> = (props) => {
             <div className="flex justify-center">
                 <div className="flex flex-col gap-1 w-[80%]">
                     <div
-                        className={props.readonly ? 
-                            `flex items-center justify-between rounded border shadow-lg bg-gray-200 border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none`: 
+                        className={props.readonly ?
+                            `flex items-center justify-between rounded border shadow-lg bg-gray-200 border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none` :
                             `flex items-center justify-between rounded border shadow-lg bg-transparent border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none`}
                     >
                         <input
@@ -44,25 +43,26 @@ const Input: React.FC<InputProps> = (props) => {
                             onChange={props.onChange}
                             type={props.type}
                             value={props?.value}
-                            className={"text-primary h-[40px] p-3 bg-transparent outline-none"}
+                            className={"text-primary h-[40px] p-3 bg-transparent outline-none overflow-hidden"}
                             name={props.name}
                             id={fieldId}
                             onFocus={props?.onFocus}
                             onBlur={props?.onBlur}
                             autoComplete="off"
                             title={`${props?.value}`}
+
                         />
-                    
-                </div>
 
-                <div>
-                    {props.touched && props.error && (
-                        <div className="text-red-500">{props.error}</div>
-                    )}
-                </div>
+                    </div>
 
-            </div>
-        </div >
+                    <div>
+                        {props.touched && props.error && (
+                            <div className="text-red-500">{props.error}</div>
+                        )}
+                    </div>
+
+                </div>
+            </div >
         </>
     );
 };
@@ -140,7 +140,6 @@ interface MeasurementRecordProps {
 
 const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((props: MeasurementRecordProps, ref) => {
     // const initialValues = {
-    //     proposal_id: props.proposal_id,
     //     description: "Aluminium Sheets",
     //     nos: 10,
     //     length: 10,
@@ -156,7 +155,6 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
 
 
     const initialValues = {
-        proposal_id: props.proposal_id,
         description: "",
         nos: "",
         length: "",
@@ -174,7 +172,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
     const [currentValues, setCurrentValues] = useState<any>(initialValues);
 
     const [searchText, setSearchText] = useState<string>("");
-    const { isFetching: isFetching, isLoading: isLoading, data: sorQueryResponseData, refetch: refetchSORList } = useSORList(searchText);
+    const { isFetching: isFetching, isLoading: isLoading, data: sorQueryResponseData } = useSORList(searchText);
     const [sorListVisible, setSorListVisible] = useState<boolean>(false);
 
     const [nosFieldEnabled, setNosFieldEnabled] = useState<boolean>(false);
@@ -184,13 +182,13 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
     const [quantityFieldEnabled, setQuantityFieldEnabled] = useState<boolean>(false);
 
 
-    
+
     const [unit, setUnit] = useState<string>("");
     const [length, setLength] = useState<number>(0);
     const [breadth, setBreadth] = useState<number>(0);
     const [height, setHeight] = useState<number>(0);
     const [quantity, setQuantity] = useState<number>(0);
-    
+
 
     const [rate, setRate] = useState<number>(0);
     const [nos, setNos] = useState<number>(0);
@@ -201,8 +199,11 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
         async getData() {
             formikRef?.current?.handleSubmit();
             const data: any = await formikRef?.current?.validateForm();
+            console.log(formikRef.current?.values);
+
             if (Object.keys(data).length == 0) {
-                const d = formikRef.current?.values;
+                const d = { ...formikRef.current?.values, proposal_id: props.proposal_id };
+                console.log("final values: ", d);
                 return d;
             } else {
                 toast.error(data[Object.keys(data)[0]]);
@@ -219,7 +220,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
 
 
     const enableDisableFieldsBasedOnUnitValue = (unit: string) => {
-    
+
         if (unit === "metre") {
             setNosFieldEnabled(true);
             setLengthFieldEnabled(true);
@@ -228,9 +229,9 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
             setQuantityFieldEnabled(false);
 
             return { ...currentValues, breadth: "", height: "" };
-            
+
         } else if (unit === "sqm") {
-            
+
             setNosFieldEnabled(true);
             setLengthFieldEnabled(true);
             setBreadthFieldEnabled(true);
@@ -247,7 +248,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
             setQuantityFieldEnabled(false);
         } else {
 
-            
+
             setNosFieldEnabled(false);
             setQuantityFieldEnabled(true);
             setLengthFieldEnabled(false);
@@ -261,43 +262,46 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
 
 
     useEffect(() => {
-        setCurrentValues({... currentValues, quantity: quantity, amount: quantity*rate});
+        setCurrentValues({ ...currentValues, quantity: quantity, amount: quantity * rate });
     }, [quantity]);
 
 
 
     useEffect(() => {
         console.log("unit", unit);
-        if(unit == "cum"){
-            const newQty = nos*length*breadth*height; 
-            setCurrentValues({... currentValues, 
+        if (unit == "cum") {
+            const newQty = nos * length * breadth * height;
+            setCurrentValues({
+                ...currentValues,
                 nos: nos,
                 length: length,
                 breadth: breadth,
                 height: height,
                 quantity: newQty,
-                amount: rate*newQty,
+                amount: rate * newQty,
             });
-        }else if(unit == "sqm"){
-            const newQty = nos*length*breadth; 
-            setCurrentValues({... currentValues, 
+        } else if (unit == "sqm") {
+            const newQty = nos * length * breadth;
+            setCurrentValues({
+                ...currentValues,
                 nos: nos,
                 length: length,
                 breadth: breadth,
                 quantity: newQty,
-                amount: rate*newQty,
+                amount: rate * newQty,
             });
-        }else if(unit == "metre"){
-            const newQty = nos*length; 
-            setCurrentValues({... currentValues, 
+        } else if (unit == "metre") {
+            const newQty = nos * length;
+            setCurrentValues({
+                ...currentValues,
                 nos: nos,
                 length: length,
                 quantity: newQty,
-                amount: rate*newQty,
+                amount: rate * newQty,
             });
         }
 
-        
+
     }, [nos, length, breadth, height]);
 
     const selectItem = (index: number) => {
@@ -323,19 +327,14 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
             innerRef={formikRef}
             initialValues={currentValues}
             enableReinitialize
-            validationSchema={MeasurementRecordValidation.measurementRecordValidationSchema}
+            validationSchema={MeasurementRecordValidation.measurementRecordValidationSchemaFrontend}
             onSubmit={() => { }}
 
         >
             {({ values, handleChange, errors, touched }: any) => (
 
                 <>
-
-
                     <div className="table-cell text-color-primary">
-
-                        <input type="hidden" name="proposal_id" value={values.proposal_id} />
-
                         <div>
                             <Input
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -344,7 +343,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                                 }}
 
                                 onFocus={() => setSorListVisible(true)}
-
+                                
                                 value={values.description}
                                 error={errors.description}
                                 touched={touched.description}
@@ -357,15 +356,15 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
 
                             />
 
-                            {sorListVisible && (<ul className="p-2 shadow bg-base-100 rounded-box w-52 fixed">
-                                <li><input type="text" placeholder="search" onChange={(event) => setSearchText(event.target.value)} /></li>
+                            {sorListVisible && (<ul onMouseLeave={() => setSorListVisible(false)} className="p-2 shadow bg-base-100 w-52 fixed">
+                                <li><input type="text" placeholder="search" onChange={(event) => setSearchText(event.target.value)} className="my-2 border border-1 w-full text-xl px-2"/></li>
 
                                 {(isLoading || isFetching) ? (
                                     <span>Loading ...</span>
                                 ) : (
                                     sorQueryResponseData?.map((item: any, index: number) => {
                                         return (
-                                            <li key={index} className="border border-1" onClick={() => selectItem(index)}>
+                                            <li key={index} className="border border-1 p-1 hover:bg-primary_bg_indigo hover:text-white cursor-pointer" onClick={() => selectItem(index)}>
                                                 {item?.sno} {item?.description}
                                             </li>
                                         );
@@ -381,7 +380,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                         <Input
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                 // do custom things if required
-                                setNos (Number(e.target.value));
+                                setNos(Number(e.target.value));
                                 // call formik onchange handler
                                 handleChange(e);
                             }}
@@ -462,7 +461,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                 // do custom things if required
                                 setQuantity(Number(e.target.value));
-                                
+
                                 // call formik onchange handler
                                 handleChange(e);
                             }}
@@ -470,7 +469,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                             value={values.quantity}
                             error={errors.quantity}
                             touched={touched.quantity}
-                            
+
                             name="quantity"
                             placeholder="Enter Quantity"
                             required
@@ -661,7 +660,7 @@ const MeasurementTable = forwardRef<CanProvideData, SORTableProps>((props: SORTa
                             <div className="flex justify-between bg-primary_bg_indigo p-2">
                                 <div></div>
                                 <div className="flex justify-center text-2xl">
-                                    Add Measurement (s)
+                                    Add Measurements/Labours/Materials
                                 </div>
 
                                 <div>
@@ -736,9 +735,9 @@ const MeasurementTable = forwardRef<CanProvideData, SORTableProps>((props: SORTa
 MeasurementTable.displayName = "SORTable";
 
 
-interface DocumentsState {
-    items: []
-}
+// interface DocumentsState {
+//     items: []
+// }
 
 // class Documents extends React.Component {
 //     state: DocumentSte1
@@ -770,7 +769,7 @@ export const AddMeasurementComponent = ({ proposal_id, onUpdate, onBack }: AddMe
 
     // const documents = new Documents(10);
 
-    const [tableRefs, setTableRefs] = useState<any | null>({});
+    const [tableRefs] = useState<any | null>({});
     const addTableRef = ((index: number, element: any) => {
         if (element != null) {
             tableRefs[index] = element;
@@ -806,7 +805,7 @@ export const AddMeasurementComponent = ({ proposal_id, onUpdate, onBack }: AddMe
         const table = tableRefs[0];
         const data = await table.getData();
         console.log(data);
-        if( data != null)
+        if (data != null)
             recordMeasurements(data);
     }
 

@@ -378,7 +378,7 @@ const TenderFeeDetailsForm: React.FC<TenderFeeDetailsFormProps> = (
                 </Button>
               )}
 
-              {!readonly && (
+              {!readonly && dirty && (
                 <>
                   <Button
                     onClick={() => handleBackAndReset(handleReset)}

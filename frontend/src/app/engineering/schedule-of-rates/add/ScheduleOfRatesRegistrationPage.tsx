@@ -8,9 +8,6 @@ import { Formik, FormikProps } from "formik";
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import * as Yup from "yup";
 
-import { useInformationDialog } from "./Dialogs";
-
-
 const units = ["Sqm", "Day"];
 
 interface InputProps {
@@ -503,7 +500,7 @@ SORTable.displayName = "SORTable";
 
 
 const ScheduleOfRatesRegistrationPage = () => {
-  const [successDialog, showSuccessDialog] = useInformationDialog("Success", "The data has been submitted successfully!");
+  // const [successDialog, showSuccessDialog] = useInformationDialog("Success", "The data has been submitted successfully!");
 
   const [tables, setTables] = useState<any>({}); 
   const [nextTableId, setNextTableId] = useState<number>(0);
@@ -578,7 +575,7 @@ const ScheduleOfRatesRegistrationPage = () => {
 
     else{
       console.log(allData);
-      showSuccessDialog();
+      // showSuccessDialog();
     }
   }
 
@@ -607,7 +604,7 @@ const ScheduleOfRatesRegistrationPage = () => {
   return (
 
     <>
-    {successDialog}
+    {/* {successDialog} */}
       <div className="flex items-center justify-between pb-4 mb-4 bg-gray-300 p-2 shadow-xl">
         <Button
           variant="cancel"

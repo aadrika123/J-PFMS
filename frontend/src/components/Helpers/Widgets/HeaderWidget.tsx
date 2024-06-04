@@ -17,6 +17,7 @@ interface HeaderWidgetProps {
   editVisible?: boolean | false;
   handleEditMode?: () => void;
   handlePrint?: () => void;
+  handleAdd?: () => void;
 }
 
 export function HeaderWidget(props: HeaderWidgetProps) {

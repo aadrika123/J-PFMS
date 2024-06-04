@@ -7,9 +7,9 @@ import React from "react";
 import { SubHeading } from "@/components/Helpers/Heading";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import Button from "@/components/global/atoms/Button";
 import { LinkWithLoader } from "@/components/global/atoms/LinkWithLoader";
 import goBack from "@/utils/helper";
+import Button from "@/components/global/atoms/buttons/Button";
 
 type HeaderFactory = "edit" | "add" | "view" | "";
 interface HeaderWidgetProps {

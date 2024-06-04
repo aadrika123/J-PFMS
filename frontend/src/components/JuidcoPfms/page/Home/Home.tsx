@@ -1,18 +1,18 @@
 "use client";
-import Button from "@/components/global/atoms/buttons/Button";
-import Table from "@/components/global/molecules/Table";
+// import Button from "@/components/global/atoms/buttons/Button";
+// import Table from "@/components/global/molecules/Table";
 // const Table = lazy(()=> import("@/components/global/molecules/Table"));
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import React, { useState } from "react";
-import HomeHeader from "./Header";
-import HomeCard, { RactangleCard } from "./Card";
-import AllHomeButtons from "./AllButtons";
+// import HomeHeader from "./Header";
+// import HomeCard, { RactangleCard } from "./Card";
+// import AllHomeButtons from "./AllButtons";
 import { useQuery } from "react-query";
 import { PFMS_URL } from "@/utils/api/urls";
 import axios from "@/lib/axiosConfig";
-import LoaderSkeleton from "@/components/global/atoms/LoaderSkeleton";
+// import LoaderSkeleton from "@/components/global/atoms/LoaderSkeleton";
 import { useSelector } from "react-redux";
-import { initialApiCall } from "@/utils/initialApiCall";
+// import { initialApiCall } from "@/utils/initialApiCall";
 
 type stateProps = {
   moduleId: number | null;
@@ -21,8 +21,7 @@ type stateProps = {
 };
 
 const Home = () => {
-  const router = useRouter();
-  const [state, setState] = useState<stateProps>({
+  const [state] = useState<stateProps>({
     moduleId: null,
     page: 1,
     limit: 10,
@@ -33,7 +32,7 @@ const Home = () => {
   const fetchData = async () => {
     try {
       const res = await axios({
-        url: `${PFMS_URL.RECEIPT_REGISTER.get}?limit=${limit}&page=${page}&order=-1&date=${new Date().toISOString().split("T")[0]}&module=${moduleId}&ulb=${user?.user_type === "Admin" ? undefined : user?.ulb_id}`,
+        url: `${PFMS_URL.DASHBOARD.get}?limit=${limit}&page=${page}&order=-1&date=${new Date().toISOString().split("T")[0]}&module=${moduleId}&ulb=${user?.user_type === "Admin" ? undefined : user?.ulb_id}`,
         method: "GET",
       });
 
@@ -54,8 +53,6 @@ const Home = () => {
 
   const {
     isError: fetchingError,
-    isFetching: isFetching,
-    data: data,
   }: any = useQuery(["receipts", moduleId, page, limit], fetchData);
 
   if (fetchingError) {
@@ -63,62 +60,62 @@ const Home = () => {
   }
 
   //////// Table View Button Feature //////////
-  const onViewButtonClick1 = (id: string) => {
-    router.push(`/revenue-collection/receipt-register/view/${id}?mode=view`);
-  };
+  // const onViewButtonClick1 = (id: string) => {
+  //   router.push(`/revenue-collection/receipt-register/view/${id}?mode=view`);
+  // };
 
   /////// Handling Module Click
-  const handleClick = (id: number) => {
-    if (moduleId === id) {
-      setState({ ...state, moduleId: null });
-    } else {
-      setState({ ...state, moduleId: id });
-    }
-  };
+  // const handleClick = (id: number) => {
+  //   if (moduleId === id) {
+  //     setState({ ...state, moduleId: null });
+  //   } else {
+  //     setState({ ...state, moduleId: id });
+  //   }
+  // };
   
-  const tButton = (id: string) => {
-    return (
-      <>
-        <Button
-          variant="primary"
-          className="py-2 px-4"
-          onClick={() => onViewButtonClick1(id)}
-        >
-          View
-        </Button>
-      </>
-    );
-  };
+  // const tButton = (id: string) => {
+  //   return (
+  //     <>
+  //       <Button
+  //         variant="primary"
+  //         className="py-2 px-4"
+  //         onClick={() => onViewButtonClick1(id)}
+  //       >
+  //         View
+  //       </Button>
+  //     </>
+  //   );
+  // };
 
-  const columns = [
-    { name: "id", caption: "Sr. No.", width: "w-[10%]" },
-    {
-      name: "receipt_no",
-      caption: "Receipt Number",
-      width: "w-[25%]",
-    },
-    {
-      name: "paid_by",
-      caption: "Paid By",
-      width: "w-[25%]",
-    },
-    {
-      name: "revenue_module",
-      caption: "Revenue Module",
-      width: "w-[25%]",
-    },
-    {
-      name: "receipt_date",
-      caption: "Receipt Date",
-      width: "w-[25%]",
-    },
-    {
-      name: "view",
-      caption: "View",
-      width: "w-[10%]",
-      value: tButton,
-    },
-  ];
+  // const columns = [
+  //   { name: "id", caption: "Sr. No.", width: "w-[10%]" },
+  //   {
+  //     name: "receipt_no",
+  //     caption: "Receipt Number",
+  //     width: "w-[25%]",
+  //   },
+  //   {
+  //     name: "paid_by",
+  //     caption: "Paid By",
+  //     width: "w-[25%]",
+  //   },
+  //   {
+  //     name: "revenue_module",
+  //     caption: "Revenue Module",
+  //     width: "w-[25%]",
+  //   },
+  //   {
+  //     name: "receipt_date",
+  //     caption: "Receipt Date",
+  //     width: "w-[25%]",
+  //   },
+  //   {
+  //     name: "view",
+  //     caption: "View",
+  //     width: "w-[10%]",
+  //     value: tButton,
+  //   },
+  // ];
 
   return (
     <div className="flex justify-center">

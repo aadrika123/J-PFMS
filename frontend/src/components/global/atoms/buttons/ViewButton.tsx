@@ -1,7 +1,7 @@
-import Button from "@/components/global/atoms/Button";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
+import Button from "./Button";
 
 const ViewButton = (id: string) => {
   const pathName = usePathname();

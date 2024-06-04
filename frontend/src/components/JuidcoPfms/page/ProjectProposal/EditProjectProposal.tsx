@@ -13,7 +13,6 @@ import axios from "@/lib/axiosConfig";
 import { PFMS_URL } from "@/utils/api/urls";
 import goBack, { DateFormatter } from "@/utils/helper";
 import { useSearchParams } from "next/navigation";
-import { FormValues } from "@/utils/types/formikTypes";
 import { HeaderWidget } from "@/components/Helpers/Widgets/HeaderWidget";
 import SuccesfullConfirmPopup from "@/components/global/molecules/general/SuccesfullConfirmPopup";
 import toast, { Toaster } from "react-hot-toast";
@@ -50,7 +49,7 @@ const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
   const { data: data }: any = useQuery(["pro-proposal", ProProposalId], fetch);
 
   ///////// Handle Submit
-  const handleSubmit = async (values: FormValues) => {
+  const handleSubmit = async (values: any) => {
     activateWorkingAnimation();
     const files = values.files.filter(
       (item: any) => item.file_token !== "null"

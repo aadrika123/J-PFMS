@@ -6,10 +6,10 @@ model measurements {
   proposal      project_proposals  @relation(fields: [proposal_id], references: [id])
 
   description   String
-  nos           Int
-  length        Float
-  breadth       Float
-  height        Float
+  nos           Int?
+  length        Float?
+  breadth       Float?
+  height        Float?
   quantity      Float
   unit          String
   rate          Float
