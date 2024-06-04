@@ -48,11 +48,13 @@ import FolderIcon from "@/assets/svg/Folder.svg";
 import SelectForNoApi from "@/components/global/atoms/SelectForNoApi";
 
 type TenderBasicDetailsFormProps = {
-  handleTabChange : (type: string) => void;
-}
+  handleTabChange: (type: string) => void;
+};
 
-const TenderBasicDetailsForm:React.FC<TenderBasicDetailsFormProps> = (props) => {
-  const {handleTabChange} = props;
+const TenderBasicDetailsForm: React.FC<TenderBasicDetailsFormProps> = (
+  props
+) => {
+  const { handleTabChange } = props;
   const formRef = useRef<HTMLFormElement>(null);
   const initialValues = {
     reference_no: "",
@@ -62,7 +64,7 @@ const TenderBasicDetailsForm:React.FC<TenderBasicDetailsFormProps> = (props) => 
     allow_resubmission: undefined,
     allow_withdrawal: undefined,
     allow_offline_submission: undefined,
-    payment_mode: "online" || "offline",
+    payment_mode: "online",
     bank: "",
     instrument: "",
     file: {
@@ -71,6 +73,7 @@ const TenderBasicDetailsForm:React.FC<TenderBasicDetailsFormProps> = (props) => 
       file_token: "",
     },
   };
+
   const readonly = false;
   const [state, setState] = useState<any>({
     file: "",
@@ -97,7 +100,7 @@ const TenderBasicDetailsForm:React.FC<TenderBasicDetailsFormProps> = (props) => 
   /////// Handle Submit //////
   const onSubmit = (values: FormikValues) => {
     console.log("Basic Details", values);
-    handleTabChange("next")
+    handleTabChange("next");
   };
 
   ///////////// Checking File Type
@@ -512,7 +515,11 @@ const TenderBasicDetailsForm:React.FC<TenderBasicDetailsFormProps> = (props) => 
                   Cancel
                 </Button>
               ) : (
-                <Button onClick={()=> handleTabChange("prev")} buttontype="button" variant="cancel">
+                <Button
+                  onClick={() => handleTabChange("prev")}
+                  buttontype="button"
+                  variant="cancel"
+                >
                   Back
                 </Button>
               )}

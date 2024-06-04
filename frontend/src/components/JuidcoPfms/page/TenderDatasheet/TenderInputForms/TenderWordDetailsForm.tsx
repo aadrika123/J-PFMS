@@ -43,10 +43,8 @@ type TenderWorkDetailsFormProps = {
   handleTabChange: (type: string) => void;
 };
 
-const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (
-  props
-) => {
-  const { handleTabChange } = props
+const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (props) => {
+  const { handleTabChange } = props;
   const formRef = useRef<HTMLFormElement>(null);
   const initialValues = {
     work_title: "",
@@ -338,10 +336,10 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (
                     touched={touched.bid_opening_place}
                     label="Bid Opening Place"
                     name="bid_opening_place"
-                    required
                     placeholder="Enter Bid Opening Place"
                     maxlength={50}
-                    readonly={readonly}
+                    required={values.pre_bid_meeting}
+                    readonly={!values.pre_bid_meeting || readonly}
                     labelColor="black font-medium"
                   />
                   <Input
@@ -352,10 +350,10 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (
                     touched={touched.pre_bid_meeting_place}
                     label="Pre Bid Meeting Place"
                     name="pre_bid_meeting_place"
-                    required
                     placeholder="Enter Pre Bid Meeting Place"
                     maxlength={50}
-                    readonly={readonly}
+                    required={values.pre_bid_meeting}
+                    readonly={!values.pre_bid_meeting || readonly}
                     labelColor="black font-medium"
                   />
                 </div>
@@ -369,9 +367,9 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (
                   name="pre_bid_meeting_address"
                   placeholder="Enter Pre Bid Meeting Address"
                   maxlength={150}
-                  required
                   className="min-h-[80px] max-h-[80px]"
-                  readonly={readonly}
+                  required={values.pre_bid_meeting}
+                  readonly={!values.pre_bid_meeting || readonly}
                   labelColor="black font-medium"
                 />
               </div>
@@ -455,7 +453,11 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (
                   Cancel
                 </Button>
               ) : (
-                <Button onClick={() => handleTabChange("prev")} buttontype="button" variant="cancel">
+                <Button
+                  onClick={() => handleTabChange("prev")}
+                  buttontype="button"
+                  variant="cancel"
+                >
                   Back
                 </Button>
               )}
