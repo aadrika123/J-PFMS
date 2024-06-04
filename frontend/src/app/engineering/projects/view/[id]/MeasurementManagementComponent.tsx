@@ -8,8 +8,9 @@ import LoaderSkeleton from "@/components/global/atoms/LoaderSkeleton";
 import PopupEx from "@/components/global/molecules/general/PopupEx";
 import Button from "@/components/global/atoms/buttons/Button";
 import { AddMeasurementComponent } from "./AddMeasurementComponent";
-import { useWorkingAnimation } from "@/app/v/atoms/useWorkingAnimation";
+// import { useWorkingAnimation } from "@/app/v/atoms/useWorkingAnimation";
 import axios, { baseURL } from '@/lib/axiosConfig';
+import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 
 
 
