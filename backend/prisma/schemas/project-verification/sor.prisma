@@ -1,8 +1,18 @@
 //// OTPs
 model schedule_of_rates {
   id            Int         @id   @default(autoincrement())
-  title         String
-  data          Json
+  
+  sno           String      @unique
+  description   String
+  activity      String?
+  output_of_machine   String?
+  output              String?
+  basic_rate          Int?
+  da                  Int?
+  unit                String
+  rate                Float
+  description_type    String
+  
   created_at    DateTime @default(now()) @map("created_at")
   updated_at    DateTime @default(now()) @updatedAt @map("updated_at")
 }

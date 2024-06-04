@@ -29,7 +29,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
             <Header onClick={handleToggle} />
             <div className="flex">
               <Sidebar
-                className={`hide-scrollbar shadow-lg border-r w-[25%] overflow-y-auto overflow-x-hidden z-10 transition-all duration-200 ${!isExpanded ? "w-0" : "max-tmp:absolute max-tmp:bg-white max-tmp:w-[40%] max-md:w-[50%] max-sm:w-[66%] max-xs:w-full"}`}
+                className={`hide-scrollbar shadow-lg border-r w-[25%] overflow-y-auto overflow-x-hidden z-1 transition-all duration-200 ${!isExpanded ? "w-0" : "max-tmp:absolute max-tmp:bg-white max-tmp:w-[40%] max-md:w-[50%] max-sm:w-[66%] max-xs:w-full"}`}
               />
               <section
                 style={{ height: "calc(100vh - 3.5rem)" }}

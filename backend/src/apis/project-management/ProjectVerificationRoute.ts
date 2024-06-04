@@ -23,7 +23,11 @@ class ProjectVerificationRoute extends APIv1_New{
     // mutable routes: use post
     this.addPostRoute(`acknowledge/:proposalId`, this.controller.acknowledge);
     this.addPostRoute(`approve`, this.controller.approveProposal);
-    this.addPostRoute('record-measurements/:proposalId', this.controller.recordMeasurements);
+    this.addPostRoute('measurements/create', this.controller.recordMeasurements);
+    this.addGetRoute('measurements/get', this.controller.getMeasurements);
+    this.addPostRoute('measurements/update', this.controller.updateMeasurement);
+
+    this.addGetRoute('schedule-of-rates/get', this.controller.getScheduleOfRates);
 
     // this.addPostRoute(`send-back`, this.controller.sendBackProposal);
 

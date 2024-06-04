@@ -1,11 +1,15 @@
 import Button from "@/components/global/atoms/buttons/Button";
-import React, { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Formik, FormikProps } from "formik";
 
+import { MeasurementRecordValidation } from "pfmslib";
+import axios, { baseURL } from '@/lib/axiosConfig';
+// import { useWorkingAnimation } from "@/app/v/atoms/useWorkingAnimation";
+import { useSORList } from "@/hooks/data/ProjectProposalsHooks";
+
 import * as Yup from "yup";
-
-
-const units = ["Sqm", "Day"];
+import toast, { Toaster } from "react-hot-toast";
+import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 
 interface InputProps {
     name?: string;
@@ -17,6 +21,8 @@ interface InputProps {
     touched?: boolean | undefined;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     required?: boolean | false;
+    onFocus?: () => void;
+    onBlur?: () => void;
 }
 
 const Input: React.FC<InputProps> = (props) => {
@@ -27,7 +33,9 @@ const Input: React.FC<InputProps> = (props) => {
             <div className="flex justify-center">
                 <div className="flex flex-col gap-1 w-[80%]">
                     <div
-                        className={`flex items-center justify-between rounded border shadow-lg bg-transparent border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none`}
+                        className={props.readonly ? 
+                            `flex items-center justify-between rounded border shadow-lg bg-gray-200 border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none`: 
+                            `flex items-center justify-between rounded border shadow-lg bg-transparent border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none`}
                     >
                         <input
                             disabled={props.readonly}
@@ -36,20 +44,25 @@ const Input: React.FC<InputProps> = (props) => {
                             onChange={props.onChange}
                             type={props.type}
                             value={props?.value}
-                            className={`text-primary h-[40px] p-3 bg-transparent outline-none`}
+                            className={"text-primary h-[40px] p-3 bg-transparent outline-none"}
                             name={props.name}
                             id={fieldId}
+                            onFocus={props?.onFocus}
+                            onBlur={props?.onBlur}
+                            autoComplete="off"
+                            title={`${props?.value}`}
                         />
-                    </div>
-
-                    <div>
-                        {props.touched && props.error && (
-                            <div className="text-red-500">{props.error}</div>
-                        )}
-                    </div>
-
+                    
                 </div>
+
+                <div>
+                    {props.touched && props.error && (
+                        <div className="text-red-500">{props.error}</div>
+                    )}
+                </div>
+
             </div>
+        </div >
         </>
     );
 };
@@ -83,22 +96,24 @@ const DDL: React.FC<DDLProps> = (props) => {
                     <div
                         className={`flex items-center justify-between rounded border shadow-lg bg-transparent border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none`}
                     >
-                        <select
-                            disabled={props.readonly}
-                            required={props.required}
-                            onChange={props.onChange}
-                            value={props?.value}
-                            className={`text-primary h-[40px] p-3 bg-transparent outline-none`}
-                            name={props.name}
-                            id={fieldId}
-                        >
+                        <div className={props.readonly ? "bg-gray-200 border border-1 border-gray-200" : ""}>
+                            <select
+                                disabled={props.readonly}
+                                required={props.required}
+                                onChange={props.onChange}
+                                value={props?.value}
+                                className={`text-primary h-[40px] p-3 bg-transparent outline-none`}
+                                name={props.name}
+                                id={fieldId}
+                            >
+                                {props.options.map((item, index) => {
+                                    return (
+                                        <option key={`${item.name}-option-${index}`} value={item.name}>{item.caption}</option>
+                                    );
+                                })}
+                            </select>
+                        </div>
 
-                            {props.options.map((item, index) => {
-                                return (
-                                    <option key={`${item.name}-option-${index}`} value={item.name}>{item.caption}</option>
-                                );
-                            })}
-                        </select>
                     </div>
 
                     <div>
@@ -119,7 +134,66 @@ interface CanProvideData {
     getData(): Promise<any>;
 }
 
-const MeasurementRecord = forwardRef<CanProvideData>((props, ref) => {
+interface MeasurementRecordProps {
+    proposal_id: number;
+}
+
+const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((props: MeasurementRecordProps, ref) => {
+    // const initialValues = {
+    //     proposal_id: props.proposal_id,
+    //     description: "Aluminium Sheets",
+    //     nos: 10,
+    //     length: 10,
+    //     breadth: 10,
+    //     height: 2,
+    //     quantity: 10,
+    //     unit: "cum",
+    //     rate: 10,
+    //     amount: 300,
+    //     remarks: "to be used on doors, windows etc."
+    // };
+
+
+
+    const initialValues = {
+        proposal_id: props.proposal_id,
+        description: "",
+        nos: "",
+        length: "",
+        breadth: "",
+        height: "",
+        quantity: "",
+        unit: "",
+        rate: "",
+        amount: "",
+        remarks: ""
+    };
+
+
+
+    const [currentValues, setCurrentValues] = useState<any>(initialValues);
+
+    const [searchText, setSearchText] = useState<string>("");
+    const { isFetching: isFetching, isLoading: isLoading, data: sorQueryResponseData, refetch: refetchSORList } = useSORList(searchText);
+    const [sorListVisible, setSorListVisible] = useState<boolean>(false);
+
+    const [nosFieldEnabled, setNosFieldEnabled] = useState<boolean>(false);
+    const [lengthFieldEnabled, setLengthFieldEnabled] = useState<boolean>(false);
+    const [breadthFieldEnabled, setBreadthFieldEnabled] = useState<boolean>(false);
+    const [heightFieldEnabled, setHeightFieldEnalbed] = useState<boolean>(false);
+    const [quantityFieldEnabled, setQuantityFieldEnabled] = useState<boolean>(false);
+
+
+    
+    const [unit, setUnit] = useState<string>("");
+    const [length, setLength] = useState<number>(0);
+    const [breadth, setBreadth] = useState<number>(0);
+    const [height, setHeight] = useState<number>(0);
+    const [quantity, setQuantity] = useState<number>(0);
+    
+
+    const [rate, setRate] = useState<number>(0);
+    const [nos, setNos] = useState<number>(0);
 
     const formikRef = useRef<FormikProps<any>>(null);
 
@@ -131,143 +205,336 @@ const MeasurementRecord = forwardRef<CanProvideData>((props, ref) => {
                 const d = formikRef.current?.values;
                 return d;
             } else {
+                toast.error(data[Object.keys(data)[0]]);
                 return null;
             }
         },
 
     }));
 
-    const initialValues = {
-      description: "",
-      unit: "Sqm",
-      quantity: "0",
-      rate: "0.0",
-      cost: 0,
-      year: "",
-      remarks: ""
-    };
 
-    // const initialValues = {
-    //     description: "fdsf",
-    //     unit: "Sqm",
-    //     quantity: "5",
-    //     rate: "5",
-    //     cost: 10,
-    //     year: "2024",
-    //     remarks: "fsdf fdsf"
-    // };
-
-
-    const validationSchema = Yup.object({
-        description: Yup.string().required(),
-        unit: Yup.string().oneOf(units),
-        quantity: Yup.number().required().moreThan(0),
-        rate: Yup.number().required().moreThan(0),
-        cost: Yup.number().required().moreThan(0),
-        year: Yup.number().required().moreThan(2023).lessThan(2025),
-        remarks: Yup.string().required(),
+    const unitOptions = MeasurementRecordValidation.measurementUnitList.map((unit) => {
+        return { name: unit, caption: unit };
     });
+
+
+    const enableDisableFieldsBasedOnUnitValue = (unit: string) => {
+    
+        if (unit === "metre") {
+            setNosFieldEnabled(true);
+            setLengthFieldEnabled(true);
+            setBreadthFieldEnabled(false);
+            setHeightFieldEnalbed(false);
+            setQuantityFieldEnabled(false);
+
+            return { ...currentValues, breadth: "", height: "" };
+            
+        } else if (unit === "sqm") {
+            
+            setNosFieldEnabled(true);
+            setLengthFieldEnabled(true);
+            setBreadthFieldEnabled(true);
+            setHeightFieldEnalbed(false);
+            setQuantityFieldEnabled(false);
+
+            return { ...currentValues, height: "" };
+
+        } else if (unit === "cum") {
+            setNosFieldEnabled(true);
+            setLengthFieldEnabled(true);
+            setBreadthFieldEnabled(true);
+            setHeightFieldEnalbed(true);
+            setQuantityFieldEnabled(false);
+        } else {
+
+            
+            setNosFieldEnabled(false);
+            setQuantityFieldEnabled(true);
+            setLengthFieldEnabled(false);
+            setBreadthFieldEnabled(false);
+            setHeightFieldEnalbed(false);
+
+            return { ...currentValues, nos: "", length: "", breadth: "", height: "" };
+        }
+
+    }
+
+
+    useEffect(() => {
+        setCurrentValues({... currentValues, quantity: quantity, amount: quantity*rate});
+    }, [quantity]);
+
+
+
+    useEffect(() => {
+        console.log("unit", unit);
+        if(unit == "cum"){
+            const newQty = nos*length*breadth*height; 
+            setCurrentValues({... currentValues, 
+                nos: nos,
+                length: length,
+                breadth: breadth,
+                height: height,
+                quantity: newQty,
+                amount: rate*newQty,
+            });
+        }else if(unit == "sqm"){
+            const newQty = nos*length*breadth; 
+            setCurrentValues({... currentValues, 
+                nos: nos,
+                length: length,
+                breadth: breadth,
+                quantity: newQty,
+                amount: rate*newQty,
+            });
+        }else if(unit == "metre"){
+            const newQty = nos*length; 
+            setCurrentValues({... currentValues, 
+                nos: nos,
+                length: length,
+                quantity: newQty,
+                amount: rate*newQty,
+            });
+        }
+
+        
+    }, [nos, length, breadth, height]);
+
+    const selectItem = (index: number) => {
+        console.log("selected item", sorQueryResponseData[index]);
+        setSorListVisible(false);
+        const modifiedValues = enableDisableFieldsBasedOnUnitValue(sorQueryResponseData[index].unit);
+
+        setRate(sorQueryResponseData[index].rate);
+        setUnit(sorQueryResponseData[index].unit)
+
+        setCurrentValues({
+            ...modifiedValues,
+            description: sorQueryResponseData[index].description,
+            unit: sorQueryResponseData[index].unit,
+            rate: sorQueryResponseData[index].rate
+        });
+    }
+
 
     return (
 
         <Formik
             innerRef={formikRef}
-            initialValues={initialValues}
-            validationSchema={validationSchema}
+            initialValues={currentValues}
+            enableReinitialize
+            validationSchema={MeasurementRecordValidation.measurementRecordValidationSchema}
             onSubmit={() => { }}
 
         >
             {({ values, handleChange, errors, touched }: any) => (
 
                 <>
+
+
+                    <div className="table-cell text-color-primary">
+
+                        <input type="hidden" name="proposal_id" value={values.proposal_id} />
+
+                        <div>
+                            <Input
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                    // do custom things if required
+                                    handleChange(e);
+                                }}
+
+                                onFocus={() => setSorListVisible(true)}
+
+                                value={values.description}
+                                error={errors.description}
+                                touched={touched.description}
+                                name="description"
+                                placeholder="Enter Description"
+                                required
+                                type="text"
+                                readonly={sorListVisible}
+
+
+                            />
+
+                            {sorListVisible && (<ul className="p-2 shadow bg-base-100 rounded-box w-52 fixed">
+                                <li><input type="text" placeholder="search" onChange={(event) => setSearchText(event.target.value)} /></li>
+
+                                {(isLoading || isFetching) ? (
+                                    <span>Loading ...</span>
+                                ) : (
+                                    sorQueryResponseData?.map((item: any, index: number) => {
+                                        return (
+                                            <li key={index} className="border border-1" onClick={() => selectItem(index)}>
+                                                {item?.sno} {item?.description}
+                                            </li>
+                                        );
+                                    })
+
+                                )}
+                            </ul>)}
+                        </div>
+                    </div>
+
                     <div className="table-cell text-color-primary">
 
                         <Input
-                            onChange={handleChange}
-                            value={values.description}
-                            error={errors.description}
-                            touched={touched.description}
-                            name="description"
-                            placeholder="Enter Description"
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                // do custom things if required
+                                setNos (Number(e.target.value));
+                                // call formik onchange handler
+                                handleChange(e);
+                            }}
+
+                            value={values.nos}
+                            error={errors.nos}
+                            touched={touched.nos}
+                            name="nos"
+                            placeholder="Enter No"
                             required
-                            type="text"
-                            readonly={false}
+                            type="number"
+                            readonly={!nosFieldEnabled}
+                        />
+                    </div>
+
+                    <div className="table-cell text-color-secondary pt-2">
+                        <Input
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                // do custom things if required
+                                setLength(Number(e.target.value));
+                                // call formik onchange handler
+                                handleChange(e);
+                            }}
+
+                            value={values.length}
+                            error={errors.length}
+                            touched={touched.length}
+                            name="length"
+                            placeholder="Enter Length"
+                            required
+                            type="number"
+                            readonly={!lengthFieldEnabled}
+                        />
+                    </div>
+
+                    <div className="table-cell text-color-secondary pt-2">
+                        <Input
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                // do custom things if required
+                                setBreadth(Number(e.target.value));
+                                // call formik onchange handler
+                                handleChange(e);
+                            }}
+
+                            value={values.breadth}
+                            error={errors.breadth}
+                            touched={touched.breadth}
+                            name="breadth"
+                            placeholder="Enter Breadth"
+                            required
+                            type="number"
+                            readonly={!breadthFieldEnabled}
+                        />
+                    </div>
+
+                    <div className="table-cell text-color-secondary pt-2">
+                        <Input
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                // do custom things if required
+                                setHeight(Number(e.target.value));
+                                // call formik onchange handler
+                                handleChange(e);
+                            }}
+
+                            value={values.height}
+                            error={errors.height}
+                            touched={touched.height}
+                            name="height"
+                            placeholder="Enter Height"
+                            required
+                            type="number"
+                            readonly={!heightFieldEnabled}
+                        />
+                    </div>
+
+                    <div className="table-cell text-color-secondary pt-2">
+                        <Input
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                // do custom things if required
+                                setQuantity(Number(e.target.value));
+                                
+                                // call formik onchange handler
+                                handleChange(e);
+                            }}
+
+                            value={values.quantity}
+                            error={errors.quantity}
+                            touched={touched.quantity}
+                            
+                            name="quantity"
+                            placeholder="Enter Quantity"
+                            required
+                            type="number"
+                            readonly={!quantityFieldEnabled}
                         />
                     </div>
                     <div className="table-cell text-color-secondary pt-2">
                         <DDL
-                            onChange={handleChange}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                // do custom things if required
+                                setUnit(e.target.value);
+
+                                // call formik onchange handler
+                                handleChange(e);
+                            }}
                             value={values.unit}
                             error={errors.unit}
                             touched={touched.unit}
                             name="unit"
                             required
-                            type="text"
-                            readonly={false}
-                            options={
-                                [
-                                    { name: "Sqm", caption: "Sqm" },
-                                    { name: "Day", caption: "Day" },
-
-                                ]}
+                            readonly={true}
+                            options={unitOptions}
                         />
 
 
                     </div>
+
                     <div className="table-cell text-color-secondary pt-2">
                         <Input
-                            onChange={handleChange}
-                            value={values.quantity}
-                            error={errors.quantity}
-                            touched={touched.quantity}
-                            name="quantity"
-                            placeholder="Enter quantity"
-                            required
-                            type="text"
-                            readonly={false}
-                        />
-                    </div>
-                    <div className="table-cell text-color-secondary pt-2">
-                        <Input
-                            onChange={handleChange}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                // do custom things if required
+                                setRate(Number(e.target.value));
+
+                                // call formik onchange handler
+                                handleChange(e);
+                            }}
+
                             value={values.rate}
                             error={errors.rate}
                             touched={touched.rate}
                             name="rate"
                             placeholder="Enter rate"
                             required
-                            type="text"
-                            readonly={false}
+                            type="number"
+                            readonly={true}
                         />
                     </div>
 
                     <div className="table-cell text-color-secondary pt-2">
                         <Input
                             onChange={handleChange}
-                            value={values.cost}
-                            error={errors.cost}
-                            touched={touched.cost}
-                            name="cost"
+                            value={values.amount}
+                            error={errors.amount}
+                            touched={touched.amount}
+                            name="amount"
                             placeholder="Enter Cost"
                             required
-                            type="text"
-                            readonly={false}
+                            type="number"
+                            readonly={true}
                         />
                     </div>
 
-                    <div className="table-cell text-color-secondary pt-2">
-                        <Input
-                            onChange={handleChange}
-                            value={values.year}
-                            error={errors.year}
-                            touched={touched.year}
-                            name="year"
-                            placeholder="Enter Year"
-                            required
-                            type="text"
-                            readonly={false}
-                        />
-                    </div>
+
 
                     <div className="table-cell text-color-secondary pt-2">
                         <Input
@@ -283,47 +550,8 @@ const MeasurementRecord = forwardRef<CanProvideData>((props, ref) => {
                         />
                     </div>
 
-                    <div className="table-cell text-color-secondary pt-2">
-                        <Input
-                            onChange={handleChange}
-                            value={values.remarks}
-                            error={errors.remarks}
-                            touched={touched.remarks}
-                            name="remarks"
-                            placeholder="Enter Remarks"
-                            required
-                            type="text"
-                            readonly={false}
-                        />
-                    </div>
 
-                    <div className="table-cell text-color-secondary pt-2">
-                        <Input
-                            onChange={handleChange}
-                            value={values.remarks}
-                            error={errors.remarks}
-                            touched={touched.remarks}
-                            name="remarks"
-                            placeholder="Enter Remarks"
-                            required
-                            type="text"
-                            readonly={false}
-                        />
-                    </div>
 
-                    <div className="table-cell text-color-secondary pt-2">
-                        <Input
-                            onChange={handleChange}
-                            value={values.remarks}
-                            error={errors.remarks}
-                            touched={touched.remarks}
-                            name="remarks"
-                            placeholder="Enter Remarks"
-                            required
-                            type="text"
-                            readonly={false}
-                        />
-                    </div>
                 </>
 
 
@@ -339,13 +567,14 @@ MeasurementRecord.displayName = "SORRecordRow";
 
 interface SORTableProps {
     tableIndex: number,
+    proposal_id: number,
 }
 
 const MeasurementTable = forwardRef<CanProvideData, SORTableProps>((props: SORTableProps, ref) => {
     const [rowCountInputValue, setRowCountInputValue] = useState<number>(1);
 
     const [rows, setRows] = useState<any[]>([
-        <MeasurementRecord key="row-0" ref={(element: any) => { addRowRef(0, element) }} />
+        <MeasurementRecord key="row-0" ref={(element: any) => { addRowRef(0, element) }} proposal_id={props.proposal_id} />
     ]);
 
     const [rowRefs, setRowRefs] = useState<any | null>({});
@@ -360,7 +589,7 @@ const MeasurementTable = forwardRef<CanProvideData, SORTableProps>((props: SORTa
     const addRow = () => {
         const index = rows.length;
         const newRows = [...rows,
-        <MeasurementRecord key={`row-${index}`} ref={(element: any) => { addRowRef(index, element) }} />
+        <MeasurementRecord key={`row-${index}`} ref={(element: any) => { addRowRef(index, element) }} proposal_id={props.proposal_id} />
         ];
         setRows(newRows);
     }
@@ -380,7 +609,7 @@ const MeasurementTable = forwardRef<CanProvideData, SORTableProps>((props: SORTa
             setRowRefs(newRefs);
 
         } else {
-            alert("Kindly use the remove table option instead!");
+            alert("At least one row is required!");
         }
     }
 
@@ -389,7 +618,7 @@ const MeasurementTable = forwardRef<CanProvideData, SORTableProps>((props: SORTa
         const newRows = [...rows];
         for (let index = existingRowCount; index < existingRowCount + n; index++) {
             newRows.push(
-                <MeasurementRecord key={`row-${index}`} ref={(element: any) => { addRowRef(index, element) }} />
+                <MeasurementRecord key={`row-${index}`} ref={(element: any) => { addRowRef(index, element) }} proposal_id={props.proposal_id} />
             );
         }
         setRows(newRows);
@@ -530,11 +759,17 @@ interface DocumentsState {
 
 
 interface AddMeasurementComponentProps {
+    proposal_id: number,
     onBack: () => void,
+    onUpdate: () => void;
 }
 
-export const AddMeasurementComponent = ({ onBack }: AddMeasurementComponentProps) => {
+export const AddMeasurementComponent = ({ proposal_id, onUpdate, onBack }: AddMeasurementComponentProps) => {
+    const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] = useWorkingAnimation();
+
+
     // const documents = new Documents(10);
+
     const [tableRefs, setTableRefs] = useState<any | null>({});
     const addTableRef = ((index: number, element: any) => {
         if (element != null) {
@@ -543,23 +778,52 @@ export const AddMeasurementComponent = ({ onBack }: AddMeasurementComponentProps
     })
 
 
+    const recordMeasurements = async (data: any) => {
+        activateWorkingAnimation();
+        try {
+            axios({
+                url: `${baseURL}/project-verification/measurements/create`,
+                method: "POST",
+                data: {
+                    data: data.records,
+                },
+            }).then((res) => {
+                console.log(res);
+                hideWorkingAnimation();
+                onUpdate();
+            }).catch((error) => {
+                hideWorkingAnimation();
+                console.log(error);
+            });
+        } catch (error) {
+            hideWorkingAnimation();
+            console.log(error);
+        }
+    };
+
+
     const onSubmit = async () => {
         const table = tableRefs[0];
         const data = await table.getData();
         console.log(data);
+        if( data != null)
+            recordMeasurements(data);
     }
 
     return (
         <>
+            {workingAnimation}
+
+            <Toaster />
             <div>
-                <MeasurementTable tableIndex={0} ref={(element: any) => {addTableRef(0,element) }} />
+                <MeasurementTable tableIndex={0} ref={(element: any) => { addTableRef(0, element) }} proposal_id={proposal_id} />
             </div>
 
             {/* {documents.render()} */}
 
             <div className="flex gap-2 justify-end">
                 <div>
-                    <Button variant="primary" onClick={onSubmit}>Save and Acknowledge</Button>
+                    <Button variant="primary" onClick={onSubmit}>Save</Button>
                 </div>
                 <div>
                     <Button variant="primary" onClick={onBack}>Back</Button>

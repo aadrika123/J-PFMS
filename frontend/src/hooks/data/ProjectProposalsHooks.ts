@@ -14,7 +14,8 @@ const projectProposalsArchiveApi = `${baseURL}/project-verification/archive`;
 const projectProposalAcknowledgementApi = `${baseURL}/project-verification/acknowledge`;
 const projectProposalOutboxItemCountApi = `${baseURL}/project-verification/get-outbox-item-count`;
 const projectProposalInboxItemCountApi = `${baseURL}/project-verification/get-inbox-item-count`;
-
+const measurementListAPI = `${baseURL}/project-verification/measurements/get`;
+const sorListAPI = `${baseURL}/project-verification/schedule-of-rates/get`;
 
 export const useProjectProposalList = (searchQuery: string, limit: number, page: number) => {
   const pathName = usePathname();
@@ -157,6 +158,43 @@ export const useProjectProposalInboxItemCount = () => {
 }
 
 
+export const useMeasurementList = (proposalId: number, searchQuery: string, limit: number, page: number) => {
+  return useQuery(["measurements", proposalId, searchQuery, limit, page], (): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      axios.get(`${measurementListAPI}?proposal_id=${proposalId}&limit=${limit}&page=${page}&order=-1&${searchQuery && searchQuery.length > 0 ? `&${searchQuery}` : ''}`).then(resp => {
+        console.log(resp.data);
+        console.log(resp.data.message);
+        if (!resp.data.status) {
+          reject(resp.data.message);
+        } else {
+          resolve(resp.data.data);
+        }
+      }).catch((reason) => {
+        reject(reason);
+      });
+    });
+  });
+}
+
+export const useSORList = (search: string) => {
+  return useQuery(["sor-list", search], (): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      axios.get(`${sorListAPI}${search && search.length > 0 ? `?search=${search}` : ''}`).then(resp => {
+        console.log(resp.data);
+        console.log(resp.data.message);
+        if (!resp.data.status) {
+          reject(resp.data.message);
+        } else {
+          resolve(resp.data.data);
+        }
+      }).catch((reason) => {
+        reject(reason);
+      });
+    });
+  });
+}
+
+
 export const acknowledgeProposal = (proposalId: number) => {
   return new Promise((resolve, reject) => {
     axios.post(`${projectProposalAcknowledgementApi}/${proposalId}`).then(resp => {
@@ -171,6 +209,8 @@ export const acknowledgeProposal = (proposalId: number) => {
     });
   });
 }
+
+
 
 
 

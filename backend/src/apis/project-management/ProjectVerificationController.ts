@@ -2,7 +2,7 @@ import { APIv1Response } from "../APIv1";
 import { Request } from "express";
 import ProjectVerificationDao from "./ProjectVerificationDao";
 import * as Yup from "yup";
-import { ProjectProposalStages } from "pfmslib";
+import { MeasurementRecordValidation, ProjectProposalStages, } from "pfmslib";
 
 
 /*
@@ -61,10 +61,10 @@ class ProjectVerificationController {
         const limit: number = Number(req.query.limit);
         const order: number = Number(req.query.order);
 
-        console.log(req.query);
+        const filters = req.query;
 
         // call dao
-        this.dao.getAll(req.query, page, limit, order).then((data: any) => {
+        this.dao.getAll(filters, page, limit, order).then((data: any) => {
           if (!data) {
             const result = { status: true, code: 200, message: "Not Found", data: data };
             resolve(result);
@@ -275,16 +275,24 @@ class ProjectVerificationController {
 
       const { data, user } = req.body;
       if (user.isJuniorEngineer()) {
-        //validate
-        Yup.object({
-          proposalId: Yup.number().required("proposal id is required")
-        }).validate(req.params).then(() => {
-          const result = { status: true, code: 200, message: "Failure", data: data};
-          resolve(result);
+
+        // validate measurement records
+        Yup.array(MeasurementRecordValidation.measurementRecordValidationSchema).validate(data).then(() => {
+
+          this.dao.recordMeasurements(data).then((daoResult) => {
+            const result = { status: true, code: 200, message: "OK", data: daoResult };
+            resolve(result);
+          }).catch((error) => {
+            reject(error);
+          })
+
         }).catch((error) => {
           reject(error);
         });
-      }else{
+
+
+
+      } else {
         reject(new Error("Measurements can be added by Junior Engineer only."));
       }
     });
@@ -348,8 +356,104 @@ class ProjectVerificationController {
   };
 
 
+  getMeasurements = async (req: Request): Promise<APIv1Response> => {
+    return new Promise((resolve, reject) => {
+
+      // validate the data
+      Yup.object({
+        proposal_id: Yup.number().required("proposal_id is required"),
+        page: Yup.number().required("page is required."),
+        limit: Yup.number().required("limit is required."),
+        order: Yup.number().required("order is required.").oneOf([1, -1])
+      }).validate(req.query).then(() => {
+
+        //collect data
+        const proposal_id: number = Number(req.query.proposal_id);
+        const page: number = Number(req.query.page);
+        const limit: number = Number(req.query.limit);
+        const order: number = Number(req.query.order);
+
+        const filters = req.query;
+        this.dao.getMeasurements(proposal_id, filters, page, limit, order).then((data: any) => {
+          if (!data) {
+            const result = { status: true, code: 200, message: "Not Found", data: data };
+            resolve(result);
+          } else {
+            const result = { status: true, code: 200, message: "Found", data: data };
+            resolve(result);
+          }
+        }).catch((error) => {
+          reject(error);
+        });
+
+      }).catch((error) => {
+        reject(error);
+      });
+
+    });
+  }
 
 
+  getScheduleOfRates = async (req: Request): Promise<APIv1Response> => {
+    return new Promise((resolve, reject) => {
+
+      //validate query params
+      Yup.object({
+        search: Yup.string()
+      }).validate(req.query).then(() => {
+        const search = req.query.search as string;
+
+        console.log(search);
+
+        this.dao.getScheduleOfRates(search).then((data) => {
+
+          const result = { status: true, code: 200, message: "Found", data: data };
+          resolve(result);
+
+        }).catch((error) => {
+          reject(error);
+        });
+
+
+      }).catch((error) => {
+        reject(error);
+      });
+
+    });
+  }
+
+
+  updateMeasurement = async (req: Request): Promise<APIv1Response> => {
+    return new Promise((resolve, reject) => {
+      const { data, user } = req.body;
+
+      console.log(data);
+
+      if (user.isJuniorEngineer()) {
+
+        // validate measurement records
+        MeasurementRecordValidation.measurementRecordUpdateValidationSchema.validate(data).then(() => {
+
+          this.dao.updateMeasurement(data).then((daoResult) => {
+            const result = { status: true, code: 200, message: "OK", data: daoResult };
+            resolve(result);
+          }).catch((error) => {
+            reject(error);
+          })
+
+        }).catch((error:any) => {
+          reject(error);
+        });
+
+
+
+      } else {
+        reject(new Error("Measurements can be added by Junior Engineer only."));
+      }
+
+
+    });
+  }
 
 }
 

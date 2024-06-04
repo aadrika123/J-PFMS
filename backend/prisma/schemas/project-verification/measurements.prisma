@@ -2,8 +2,19 @@
 model measurements {
   id            Int         @id   @default(autoincrement())
   
+  proposal_id   Int
+  proposal      project_proposals  @relation(fields: [proposal_id], references: [id])
+
   description   String
   nos           Int
+  length        Float
+  breadth       Float
+  height        Float
+  quantity      Float
+  unit          String
+  rate          Float
+  amount        Float
+  remarks       String
 
   created_at    DateTime @default(now()) @map("created_at")
   updated_at    DateTime @default(now()) @updatedAt @map("updated_at")
