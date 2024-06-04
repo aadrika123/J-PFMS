@@ -7,14 +7,14 @@ export const tenderCriticalDateSchema = Yup.object({
       const { createError } = validationContex;
       if (new Date(value) < new Date()) {
         return createError({
-          message: "Invalid Date",
+          message: "should be greater then current date",
         });
       }
       return true;
     }),
-  bid_opeining_date: Yup.string()
+  bid_opening_date: Yup.string()
     .required("bid opening date is required")
-    .test("bid_opeining_date", (value, validationContex) => {
+    .test("bid_opening_date", (value, validationContex) => {
       const {
         createError,
         parent: {
@@ -26,20 +26,22 @@ export const tenderCriticalDateSchema = Yup.object({
       } = validationContex;
       const bsed = new Date(bid_submission_end_date);
       bsed.setDate(bsed.getDate() + 15);
-      if (new Date(value) < new Date(publishing_date)) {
+      const bid_o_date = new Date(value);
+      if (bid_o_date < new Date(publishing_date)) {
         return createError({
-          message: "Invalid Date",
+          message: "should be greater then publishing date",
         });
-      } else if (new Date(value) < bsed) {
+      } else if (bid_o_date < bsed) {
         return createError({
-          message: "Invalid Date",
+          message: "should be greater then bid submission end date",
         });
-      } else if (
-        new Date(value) < new Date(document_sale_end_date) ||
-        new Date(value) < new Date(seek_clarification_end_date)
-      ) {
+      } else if (bid_o_date < new Date(document_sale_end_date)) {
         return createError({
-          message: "Invalid Date",
+          message: "should be greater then document sale end date",
+        });
+      } else if (bid_o_date < new Date(seek_clarification_end_date)) {
+        return createError({
+          message: "should be greater then seek clarification end date",
         });
       }
       return true;
@@ -53,21 +55,21 @@ export const tenderCriticalDateSchema = Yup.object({
       } = validationContex;
       if (new Date(value) < new Date(publishing_date)) {
         return createError({
-          message: "Invalid Date",
+          message: "should be greater then publishing date",
         });
       }
       return true;
     }),
   document_sale_end_date: Yup.string()
     .required("document sale end is required")
-    .test("bid_opeining_date", (value, validationContex) => {
+    .test("bid_opening_date", (value, validationContex) => {
       const {
         createError,
         parent: { document_sale_start_date },
       } = validationContex;
       if (new Date(value) < new Date(document_sale_start_date)) {
         return createError({
-          message: "Invalid Date",
+          message: "should be greater then document sale start date",
         });
       }
       return true;
@@ -81,7 +83,7 @@ export const tenderCriticalDateSchema = Yup.object({
       } = validationContex;
       if (new Date(value) < new Date(publishing_date)) {
         return createError({
-          message: "Invalid Date",
+          message: "should be greater then seek clarification start date",
         });
       }
       return true;
@@ -95,7 +97,7 @@ export const tenderCriticalDateSchema = Yup.object({
       } = validationContex;
       if (new Date(value) < new Date(seek_clarification_start_date)) {
         return createError({
-          message: "Invalid Date",
+          message: "should be greater then seek clarification start date",
         });
       }
       return true;
@@ -109,7 +111,7 @@ export const tenderCriticalDateSchema = Yup.object({
       } = validationContex;
       if (new Date(value) < new Date(publishing_date)) {
         return createError({
-          message: "Invalid Date",
+          message: "should be greater then publishing date",
         });
       }
       return true;
@@ -125,11 +127,11 @@ export const tenderCriticalDateSchema = Yup.object({
       pd.setDate(pd.getDate() + 15);
       if (new Date(value) < new Date(bid_submission_start_date)) {
         return createError({
-          message: "Invalid Date",
+          message: "should be greater then bid submission start date",
         });
       } else if (new Date(value) < pd) {
         return createError({
-          message: "Invalid Date",
+          message: "should be greater then publishing date",
         });
       }
       return true;
@@ -139,15 +141,15 @@ export const tenderCriticalDateSchema = Yup.object({
     .test("pre_bid_meeting_date", (value, validationContex) => {
       const {
         createError,
-        parent: { publishing_date, bid_opeining_date },
+        parent: { publishing_date, bid_opening_date },
       } = validationContex;
       if (new Date(value) < new Date(publishing_date)) {
         return createError({
-          message: "Invalid Date",
+          message: "should be greater then publishing date",
         });
-      } else if (new Date(value) > new Date(bid_opeining_date)) {
+      } else if (new Date(value) > new Date(bid_opening_date)) {
         return createError({
-          message: "Invalid Date",
+          message: "should be greater then bid opeining date",
         });
       }
       return true;

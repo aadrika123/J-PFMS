@@ -375,7 +375,7 @@ const TenderBidOpenerForm: React.FC<TenderBidOpenerFormProps> = (props) => {
                     variant="primary"
                     className="animate-pulse"
                   >
-                    Save & Next
+                    Save & Preview
                   </Button>
                 </>
               )}
