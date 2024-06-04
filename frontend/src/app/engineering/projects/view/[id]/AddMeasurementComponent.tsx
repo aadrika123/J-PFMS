@@ -1,5 +1,5 @@
 import Button from "@/components/global/atoms/buttons/Button";
-import React, { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Formik, FormikProps } from "formik";
 
 import { MeasurementRecordValidation } from "pfmslib";
@@ -155,6 +155,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
 
 
     const initialValues = {
+        proposal_id: props.proposal_id,
         description: "",
         nos: "",
         length: "",
@@ -181,6 +182,17 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
     const [heightFieldEnabled, setHeightFieldEnalbed] = useState<boolean>(false);
     const [quantityFieldEnabled, setQuantityFieldEnabled] = useState<boolean>(false);
 
+
+    
+    const [unit, setUnit] = useState<string>("");
+    const [length, setLength] = useState<number>(0);
+    const [breadth, setBreadth] = useState<number>(0);
+    const [height, setHeight] = useState<number>(0);
+    const [quantity, setQuantity] = useState<number>(0);
+    
+
+    const [rate, setRate] = useState<number>(0);
+    const [nos, setNos] = useState<number>(0);
 
     const formikRef = useRef<FormikProps<any>>(null);
 
@@ -246,14 +258,54 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
 
     }
 
-    const computeThings = (fieldName: string) => {
+
+    useEffect(() => {
+        setCurrentValues({... currentValues, quantity: quantity, amount: quantity*rate});
+    }, [quantity]);
+
+
+
+    useEffect(() => {
+        console.log("unit", unit);
+        if(unit == "cum"){
+            const newQty = nos*length*breadth*height; 
+            setCurrentValues({... currentValues, 
+                nos: nos,
+                length: length,
+                breadth: breadth,
+                height: height,
+                quantity: newQty,
+                amount: rate*newQty,
+            });
+        }else if(unit == "sqm"){
+            const newQty = nos*length*breadth; 
+            setCurrentValues({... currentValues, 
+                nos: nos,
+                length: length,
+                breadth: breadth,
+                quantity: newQty,
+                amount: rate*newQty,
+            });
+        }else if(unit == "metre"){
+            const newQty = nos*length; 
+            setCurrentValues({... currentValues, 
+                nos: nos,
+                length: length,
+                quantity: newQty,
+                amount: rate*newQty,
+            });
+        }
+
         
-    }
+    }, [nos, length, breadth, height]);
 
     const selectItem = (index: number) => {
         console.log("selected item", sorQueryResponseData[index]);
         setSorListVisible(false);
         const modifiedValues = enableDisableFieldsBasedOnUnitValue(sorQueryResponseData[index].unit);
+
+        setRate(sorQueryResponseData[index].rate);
+        setUnit(sorQueryResponseData[index].unit)
 
         setCurrentValues({
             ...modifiedValues,
@@ -264,57 +316,13 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
     }
 
 
-    const measurementUnitList = ["sqm", "nos", "metre", "litre", "hour", "tonne.km", "kg", "Day", "tonne", "cum"];
-
-
-    const measurementRecordValidationSchema = Yup.object({
-        description: Yup.string().required(),
-        nos: Yup.number().optional().when('unit', (unit, schema) => {
-          if (unit[0] === "cum" || unit[0] === "sqm" || unit[0] === "metre")
-            return schema.required()
-          else
-            return schema;
-        }),
-      
-        length: Yup.number().optional().when('unit', (unit, schema) => {
-          console.log("Select unit: ", unit);
-          if (unit[0] === "cum" || unit[0] === "sqm" || unit[0] === "metre")
-            return schema.required("length is required");
-          else
-            return schema;
-        }),
-      
-        breadth: Yup.number().optional().when('unit', (unit, schema) => {
-          if (unit[0] === "cum" || unit[0] === "sqm")
-            return schema.required("breadth is required");
-          else
-            return schema;
-        }),
-      
-        height: Yup.number().optional().when('unit', (unit, schema) => {
-        if (unit[0] === "cum")
-          return schema.required("height is required");
-        else
-          return schema;
-      }),
-      
-      
-        quantity: Yup.number().required(),
-        unit: Yup.string().oneOf(measurementUnitList),
-        rate: Yup.number().required(),
-        amount: Yup.number().required(),
-        remarks: Yup.string().required(),
-      });
-            
-
-
     return (
 
         <Formik
             innerRef={formikRef}
             initialValues={currentValues}
             enableReinitialize
-            validationSchema={measurementRecordValidationSchema}
+            validationSchema={MeasurementRecordValidation.measurementRecordValidationSchema}
             onSubmit={() => { }}
 
         >
@@ -325,7 +333,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
 
                     <div className="table-cell text-color-primary">
 
-                        <input type="hidden" name="proposal_id" value={props.proposal_id} />
+                        <input type="hidden" name="proposal_id" value={values.proposal_id} />
 
                         <div>
                             <Input
@@ -372,8 +380,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                         <Input
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                 // do custom things if required
-                                computeThings("nos");
-                                
+                                setNos (Number(e.target.value));
                                 // call formik onchange handler
                                 handleChange(e);
                             }}
@@ -393,8 +400,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                         <Input
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                 // do custom things if required
-                                computeThings("length");
-                                
+                                setLength(Number(e.target.value));
                                 // call formik onchange handler
                                 handleChange(e);
                             }}
@@ -414,8 +420,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                         <Input
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                 // do custom things if required
-                                computeThings("breadth");
-                                
+                                setBreadth(Number(e.target.value));
                                 // call formik onchange handler
                                 handleChange(e);
                             }}
@@ -435,8 +440,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                         <Input
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                 // do custom things if required
-                                computeThings("height");
-                                
+                                setHeight(Number(e.target.value));
                                 // call formik onchange handler
                                 handleChange(e);
                             }}
@@ -456,7 +460,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                         <Input
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                 // do custom things if required
-                                computeThings("quantity");
+                                setQuantity(Number(e.target.value));
                                 
                                 // call formik onchange handler
                                 handleChange(e);
@@ -465,6 +469,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                             value={values.quantity}
                             error={errors.quantity}
                             touched={touched.quantity}
+                            
                             name="quantity"
                             placeholder="Enter Quantity"
                             required
@@ -474,7 +479,13 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                     </div>
                     <div className="table-cell text-color-secondary pt-2">
                         <DDL
-                            onChange={handleChange}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                // do custom things if required
+                                setUnit(e.target.value);
+
+                                // call formik onchange handler
+                                handleChange(e);
+                            }}
                             value={values.unit}
                             error={errors.unit}
                             touched={touched.unit}
@@ -491,8 +502,8 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                         <Input
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                 // do custom things if required
-                                computeThings("rate");
-                                
+                                setRate(Number(e.target.value));
+
                                 // call formik onchange handler
                                 handleChange(e);
                             }}
