@@ -30,7 +30,14 @@ import CoverIcon from "@/assets/svg/Parchment.svg";
 import ImageUploadUi from "./ImageUploadUi";
 import Input from "@/components/global/atoms/Input";
 
-const TenderCoverDetailsForm = () => {
+type TenderCoverDetailsFormProps = {
+  handleTabChange: (type: string) => void;
+};
+
+const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
+  props
+) => {
+  const { handleTabChange } = props;
   const formRef = useRef<HTMLFormElement>(null);
   const initialValues = {
     cover_no: "1",
@@ -52,13 +59,14 @@ const TenderCoverDetailsForm = () => {
     state;
 
   ////////////// Handle Cover No Change ////////////
-  const handleTabChange = (tabNo: number) => {
+  const handleFileTabChange = (tabNo: number) => {
     setState({ ...state, tabNo });
   };
 
   /////// Handle Submit //////
   const onSubmit = (values: FormikValues) => {
     console.log("Basic Details", values);
+    handleTabChange("next");
   };
 
   ///// handlBackAndReset
@@ -260,7 +268,7 @@ const TenderCoverDetailsForm = () => {
                   ?.list.map((item, index) => (
                     <div
                       key={index}
-                      onClick={() => handleTabChange(index + 1)}
+                      onClick={() => handleFileTabChange(index + 1)}
                       className={`px-3 py-1 rounded cursor-pointer ${index + 1 === tabNo ? `${handleIsMissning(errors.files, item) ? "text-red-600 border border-red-600" : " text-white"} bg-primary_bg_indigo` : handleIsMissning(errors.files, item) ? "text-red-600 border border-red-600 bg-gray-200" : "bg-gray-200 text-secondary"}`}
                     >
                       {item}
@@ -309,7 +317,11 @@ const TenderCoverDetailsForm = () => {
                   Cancel
                 </Button>
               ) : (
-                <Button onClick={goBack} buttontype="button" variant="cancel">
+                <Button
+                  onClick={() => handleTabChange("prev")}
+                  buttontype="button"
+                  variant="cancel"
+                >
                   Back
                 </Button>
               )}

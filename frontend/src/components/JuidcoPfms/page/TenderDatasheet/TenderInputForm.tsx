@@ -17,11 +17,8 @@ import TenderFeeDetailsForm from "./TenderInputForms/TenderFeeDetailsForm";
 import TenderCriticalDatesForm from "./TenderInputForms/TenderCriticalDatesForm";
 import TenderBidOpenerForm from "./TenderInputForms/TenderBidOpenersForm";
 import ViewTenderFormDetails from "./TenderInputForms/ViewTenderFormDetails";
-import { usePathname, useRouter } from "next/navigation";
 
 const TenderInputForm = ({ PageNo }: { PageNo: number }) => {
-  const router = useRouter();
-  const pathname = usePathname();
   const [state, setState] = useState({
     tabNo: 1,
     showPreview: false,
@@ -29,10 +26,18 @@ const TenderInputForm = ({ PageNo }: { PageNo: number }) => {
 
   const { tabNo, showPreview } = state;
 
+  //////////// Handle Tab Jump //////////
+  const handleTabJump = (tabNo: number) => {
+    setState({ ...state, tabNo });
+  };
+
   //////////// Handle Tab Change //////////
-  const handleTabChange = (tabNo: number) => {
-    // setState({ ...state, tabNo });
-    router.push(`${pathname.split("add/")[0]}/add/${tabNo}`);
+  const handleTabChange = (changeType: string) => {
+    if (changeType === "prev") {
+      setState({ ...state, tabNo: tabNo - 1 });
+    } else if (changeType === "next") {
+      setState({ ...state, tabNo: tabNo + 1 });
+    }
   };
 
   console.log("page No", PageNo);
@@ -67,8 +72,8 @@ const TenderInputForm = ({ PageNo }: { PageNo: number }) => {
             {tabList.map((tab, index) => (
               <div
                 key={index}
-                className={`px-3 py-2 rounded shadow-lg flex items-center cursor-pointer border ${Number(PageNo) === tab.id && "bg-primary_bg_indigo"}`}
-                onClick={() => handleTabChange(tab.id)}
+                className={`px-3 py-2 rounded shadow-lg flex items-center cursor-pointer border ${tabNo === tab.id && "bg-primary_bg_indigo"}`}
+                onClick={() => handleTabJump(tab.id)}
               >
                 <Image
                   src={tab?.icon}
@@ -77,7 +82,7 @@ const TenderInputForm = ({ PageNo }: { PageNo: number }) => {
                   alt="tender-icon"
                 />
                 <span
-                  className={`text-xs font-medium text-secondary ml-2 text-nowrap ${Number(PageNo) === tab.id && "text-white"}`}
+                  className={`text-xs font-medium text-secondary ml-2 text-nowrap ${tabNo === tab.id && "text-white"}`}
                 >
                   {tab?.title}
                 </span>
@@ -86,24 +91,24 @@ const TenderInputForm = ({ PageNo }: { PageNo: number }) => {
           </div>
 
           {/* Tender Forms */}
-          {Number(PageNo) === 1 ? (
-            <TenderBasicDetailsForm />
-          ) : Number(PageNo) === 2 ? (
-            <TenderCoverDetailsForm />
-          ) : Number(PageNo) === 3 ? (
-            <TenderWorkDetailsForm />
-          ) : Number(PageNo) === 4 ? (
-            <TenderFeeDetailsForm />
-          ) : Number(PageNo) === 5 ? (
-            <TenderCriticalDatesForm />
+          {tabNo === 1 ? (
+            <TenderBasicDetailsForm handleTabChange={handleTabChange} />
+          ) : tabNo === 2 ? (
+            <TenderCoverDetailsForm handleTabChange={handleTabChange} />
+          ) : tabNo === 3 ? (
+            <TenderWorkDetailsForm handleTabChange={handleTabChange} />
+          ) : tabNo === 4 ? (
+            <TenderFeeDetailsForm handleTabChange={handleTabChange} />
+          ) : tabNo === 5 ? (
+            <TenderCriticalDatesForm handleTabChange={handleTabChange} />
           ) : (
-            Number(PageNo) === 6 && (
+            tabNo === 6 && (
               <TenderBidOpenerForm handleShowPreview={handleShowPreview} />
             )
           )}
         </>
       ) : (
-        <ViewTenderFormDetails />
+        <ViewTenderFormDetails handleBack={handleShowPreview} />
       )}
     </div>
   );

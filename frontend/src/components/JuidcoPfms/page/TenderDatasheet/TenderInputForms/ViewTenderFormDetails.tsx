@@ -4,9 +4,13 @@ import React, { useState } from "react";
 import Profile from "@/assets/icons/profile_new.png";
 import Popup from "@/components/global/molecules/Popup";
 import Button from "@/components/global/atoms/buttons/Button";
-import goBack from "@/utils/helper";
 
-const ViewTenderFormDetails = () => {
+type ViewTenderFormDetailsProps = {
+  handleBack: () => void;
+};
+
+const ViewTenderFormDetails: React.FC<ViewTenderFormDetailsProps> = (props) => {
+  const { handleBack } = props;
   const [state, setState] = useState<any>({
     activeStep: 0,
     showPopup: false,
@@ -447,7 +451,7 @@ const ViewTenderFormDetails = () => {
         </div>
       </div>
       <div className="flex items-center justify-between mt-4">
-        <Button variant="cancel" onClick={goBack}>
+        <Button variant="cancel" onClick={handleBack}>
           Back
         </Button>
         <Button variant="primary">Submit</Button>

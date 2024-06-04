@@ -30,7 +30,14 @@ import FeeIcon from "@/assets/svg/Rupee.svg";
 import Input from "@/components/global/atoms/Input";
 import RadioYesNoComponent from "../molecules/RadioYesNoComponent";
 
-const TenderFeeDetailsForm = () => {
+type TenderFeeDetailsFormProps = {
+  handleTabChange: (type: string) => void;
+};
+
+const TenderFeeDetailsForm: React.FC<TenderFeeDetailsFormProps> = (
+  props
+) => {
+  const { handleTabChange } = props
   const formRef = useRef<HTMLFormElement>(null);
   const initialValues = {
     tender_fee_examption_allowed: true,
@@ -60,6 +67,7 @@ const TenderFeeDetailsForm = () => {
   /////// Handle Submit //////
   const onSubmit = (values: FormikValues) => {
     console.log("Basic Details", values);
+    handleTabChange("next");
   };
 
   ///// handlBackAndReset
@@ -365,7 +373,7 @@ const TenderFeeDetailsForm = () => {
                   Cancel
                 </Button>
               ) : (
-                <Button onClick={goBack} buttontype="button" variant="cancel">
+                <Button onClick={() => handleTabChange("prev")} buttontype="button" variant="cancel">
                   Back
                 </Button>
               )}

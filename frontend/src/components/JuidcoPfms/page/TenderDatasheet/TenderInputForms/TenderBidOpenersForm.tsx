@@ -30,12 +30,11 @@ import Input from "@/components/global/atoms/Input";
 import BidIcon from "@/assets/svg/First Place Ribbon.svg";
 
 type TenderBidOpenerFormProps = {
-handleShowPreview: () => void;
-}
+  handleShowPreview: () => void;
+};
 
-
-const TenderBidOpenerForm:React.FC<TenderBidOpenerFormProps> = (props) => {
-  const {handleShowPreview} = props;
+const TenderBidOpenerForm: React.FC<TenderBidOpenerFormProps> = (props) => {
+  const { handleShowPreview } = props;
   const formRef = useRef<HTMLFormElement>(null);
   const initialValues = {
     bid_openers: [
@@ -327,7 +326,6 @@ const TenderBidOpenerForm:React.FC<TenderBidOpenerFormProps> = (props) => {
                               width={50}
                               alt="t"
                               className="max-h-20 w-full object-contain"
-
                             />
                           )}
                           <label

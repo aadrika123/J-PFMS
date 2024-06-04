@@ -47,7 +47,12 @@ import LosingDataConfirmPopup from "@/components/global/molecules/general/Losing
 import FolderIcon from "@/assets/svg/Folder.svg";
 import SelectForNoApi from "@/components/global/atoms/SelectForNoApi";
 
-const TenderBasicDetailsForm = () => {
+type TenderBasicDetailsFormProps = {
+  handleTabChange : (type: string) => void;
+}
+
+const TenderBasicDetailsForm:React.FC<TenderBasicDetailsFormProps> = (props) => {
+  const {handleTabChange} = props;
   const formRef = useRef<HTMLFormElement>(null);
   const initialValues = {
     reference_no: "",
@@ -92,6 +97,7 @@ const TenderBasicDetailsForm = () => {
   /////// Handle Submit //////
   const onSubmit = (values: FormikValues) => {
     console.log("Basic Details", values);
+    handleTabChange("next")
   };
 
   ///////////// Checking File Type
@@ -506,7 +512,7 @@ const TenderBasicDetailsForm = () => {
                   Cancel
                 </Button>
               ) : (
-                <Button onClick={goBack} buttontype="button" variant="cancel">
+                <Button onClick={()=> handleTabChange("prev")} buttontype="button" variant="cancel">
                   Back
                 </Button>
               )}

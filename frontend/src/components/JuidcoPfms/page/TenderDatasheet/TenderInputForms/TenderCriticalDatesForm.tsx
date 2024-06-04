@@ -28,7 +28,14 @@ import LosingDataConfirmPopup from "@/components/global/molecules/general/Losing
 import CriticalIcon from "@/assets/svg/Time Management Skills.svg";
 import DateTimePickerComponent from "../molecules/DateTimePicker";
 
-const TenderCriticalDatesForm = () => {
+type TenderCriticalDatesFormProps = {
+  handleTabChange: (type: string) => void;
+};
+
+const TenderCriticalDatesForm: React.FC<TenderCriticalDatesFormProps> = (
+  props
+) => {
+  const { handleTabChange } = props;
   const formRef = useRef<HTMLFormElement>(null);
   const initialValues = {
     publishing_date: "",
@@ -54,6 +61,7 @@ const TenderCriticalDatesForm = () => {
   /////// Handle Submit //////
   const onSubmit = (values: FormikValues) => {
     console.log("Basic Details", values);
+    handleTabChange("next");
   };
 
   ///// handlBackAndReset
@@ -255,7 +263,7 @@ const TenderCriticalDatesForm = () => {
                   Cancel
                 </Button>
               ) : (
-                <Button onClick={goBack} buttontype="button" variant="cancel">
+                <Button onClick={() => handleTabChange("prev")} buttontype="button" variant="cancel">
                   Back
                 </Button>
               )}

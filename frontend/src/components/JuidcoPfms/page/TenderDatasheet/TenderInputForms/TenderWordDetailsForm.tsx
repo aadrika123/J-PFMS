@@ -39,7 +39,14 @@ import Input from "@/components/global/atoms/Input";
 import CheckboxComponent from "../molecules/CheckboxComponent";
 import RadioYesNoComponent from "../molecules/RadioYesNoComponent";
 
-const TenderWorkDetailsForm = () => {
+type TenderWorkDetailsFormProps = {
+  handleTabChange: (type: string) => void;
+};
+
+const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (
+  props
+) => {
+  const { handleTabChange } = props
   const formRef = useRef<HTMLFormElement>(null);
   const initialValues = {
     work_title: "",
@@ -75,6 +82,7 @@ const TenderWorkDetailsForm = () => {
   /////// Handle Submit //////
   const onSubmit = (values: FormikValues) => {
     console.log("Basic Details", values);
+    handleTabChange("next");
   };
 
   ///// handlBackAndReset
@@ -447,7 +455,7 @@ const TenderWorkDetailsForm = () => {
                   Cancel
                 </Button>
               ) : (
-                <Button onClick={goBack} buttontype="button" variant="cancel">
+                <Button onClick={() => handleTabChange("prev")} buttontype="button" variant="cancel">
                   Back
                 </Button>
               )}
