@@ -1,4 +1,5 @@
 import * as Yup from "yup";
+import MeasurementRecordValidation from "./MeasurementRecordValidation";
 
 export interface AddBankDetailsData {
   id?: number;

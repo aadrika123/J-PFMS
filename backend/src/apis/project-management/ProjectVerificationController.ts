@@ -2,7 +2,7 @@ import { APIv1Response } from "../APIv1";
 import { Request } from "express";
 import ProjectVerificationDao from "./ProjectVerificationDao";
 import * as Yup from "yup";
-import { MeasurementRecordValidation, ProjectProposalStages } from "pfmslib";
+import { MeasurementRecordValidation, ProjectProposalStages, } from "pfmslib";
 
 
 /*
@@ -441,7 +441,7 @@ class ProjectVerificationController {
             reject(error);
           })
 
-        }).catch((error) => {
+        }).catch((error: any) => {
           reject(error);
         });
 

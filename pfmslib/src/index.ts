@@ -13,7 +13,7 @@ import {tenderWorkDetailsSchema} from "./validations/TenderInputFormValidation/T
 import {tenderFeeDetailsSchema} from "./validations/TenderInputFormValidation/TenderFeeDetailsValidation";
 import {tenderCriticalDateSchema} from "./validations/TenderInputFormValidation/TenderCriticalDateValidation";
 import {tenderBidDetailsSchema} from "./validations/TenderInputFormValidation/TenderBidDetailsValidation";
-
+import MeasurementRecordValidation from "./validations/MeasurementRecordValidation";
 
 // escape input string for in regular expressions
 const escapeRegExp = (text:string):string => {
@@ -49,5 +49,6 @@ export {
   tenderFeeDetailsSchema,
   tenderCriticalDateSchema,
   tenderBidDetailsSchema,
-  docType, executionBody
+  docType, executionBody,
+  MeasurementRecordValidation
 };
