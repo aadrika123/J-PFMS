@@ -64,10 +64,6 @@ const TenderCoverDetailsForm = () => {
   ///// handlBackAndReset
   const handleBackAndReset = (trigger?: () => void) => {
     setState({ ...state, showWarning: !showWarning, triggerFun: trigger });
-    if (trigger) {
-      const c: any = document?.getElementById("letter");
-      c.value = "";
-    }
   };
 
   ///// handle Complete Reset
@@ -76,7 +72,7 @@ const TenderCoverDetailsForm = () => {
     setTimeout(() => {
       setState((prev: any) => ({
         ...prev,
-        file: null,
+        files: [],
       }));
     }, 100);
   };

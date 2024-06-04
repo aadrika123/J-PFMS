@@ -76,7 +76,7 @@ const ImageUploadUi: React.FC<ImageUploadUiPropType> = (props) => {
         inProgress: false,
         error: status.error,
       }));
-      status.delete = error;
+      delete status.error;
       e.target.value = '';
     }
   };

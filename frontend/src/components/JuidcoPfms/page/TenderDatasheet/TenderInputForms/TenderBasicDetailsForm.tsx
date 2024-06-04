@@ -45,6 +45,7 @@ import pdfIcon from "@/assets/svg/pdf_icon.svg";
 import Popup from "@/components/global/molecules/Popup";
 import LosingDataConfirmPopup from "@/components/global/molecules/general/LosingDataConfirmPopup";
 import FolderIcon from "@/assets/svg/Folder.svg";
+import SelectForNoApi from "@/components/global/atoms/SelectForNoApi";
 
 const TenderBasicDetailsForm = () => {
   const formRef = useRef<HTMLFormElement>(null);
@@ -463,14 +464,17 @@ const TenderBasicDetailsForm = () => {
                 />
 
                 {values.payment_mode === "online" ? (
-                  <RadioComponent
-                    checkList={online_bank}
+                  <SelectForNoApi
+                    data={online_bank}
                     onBlur={handleBlur}
                     value={values.bank}
                     error={errors.bank}
                     touched={touched.bank}
                     required
                     name="bank"
+                    label="Online (Banks)"
+                    placeholder="Select Bank"
+                    labelColor="black font-medium"
                   />
                 ) : (
                   values.payment_mode === "offline" && (

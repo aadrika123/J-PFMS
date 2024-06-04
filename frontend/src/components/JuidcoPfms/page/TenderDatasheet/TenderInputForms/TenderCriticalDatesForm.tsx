@@ -2,17 +2,16 @@
 /**
  * | Author- Sanjiv Kumar
  * | Created On- 31-05-2024
- * | Created for- Tender Critical Details Form
+ * | Created for- Tender Critical Dates Form
  * | Status- open
  */
 
 import Button from "@/components/global/atoms/buttons/Button";
 import goBack from "@/utils/helper";
 import { Formik, FormikValues } from "formik";
-import { tenderFeeDetailsSchema } from "pfmslib";
+import { tenderCriticalDateSchema } from "pfmslib";
 import React, { useRef, useState } from "react";
-import { bg_color, emd_fee_type } from "../molecules/checkList";
-import RadioComponent from "../molecules/RadioComponent";
+import { bg_color } from "../molecules/checkList";
 import Image from "next/image";
 // const RunningAnimation = dynamic(
 //   () =>
@@ -26,31 +25,21 @@ import Image from "next/image";
 // import dynamic from "next/dynamic";
 // import Popup from "@/components/global/molecules/Popup";
 import LosingDataConfirmPopup from "@/components/global/molecules/general/LosingDataConfirmPopup";
-import FeeIcon from "@/assets/svg/Rupee.svg";
-import Input from "@/components/global/atoms/Input";
-import RadioYesNoComponent from "../molecules/RadioYesNoComponent";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import dayjs, { Dayjs } from "dayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import CriticalIcon from "@/assets/svg/Time Management Skills.svg";
 import DateTimePickerComponent from "../molecules/DateTimePicker";
 
 const TenderCriticalDatesForm = () => {
   const formRef = useRef<HTMLFormElement>(null);
   const initialValues = {
-    tender_fee_examption_allowed: true,
-    tender_fee: "",
-    processing_fee: "",
-    tender_fee_payable_to: "",
-    tender_fee_payable_at: "",
-    surcharges: "",
-    other_charges: "",
-    emd_examption_allowed: true,
-    emd_fee_type: "",
-    fixed_emd_fee: "",
-    percentage_emd_fee: "",
-    emd_fee_payable_to: "",
-    emd_fee_payable_at: "",
+    publishing_date: "",
+    bid_opeining_date: "",
+    document_sale_start_date: "",
+    document_sale_end_date: "",
+    seek_clarification_start_date: "",
+    seek_clarification_end_date: "",
+    bid_submission_start_date: "",
+    bid_submission_end_date: "",
+    pre_bid_meeting_date: "",
   };
 
   const readonly = false;
@@ -59,8 +48,6 @@ const TenderCriticalDatesForm = () => {
     triggerFun: null,
     showFinalError: false,
   });
-
-  const [date, setDate] = useState<Dayjs | null>(null);
 
   const { showWarning, triggerFun, showFinalError } = state;
 
@@ -83,14 +70,6 @@ const TenderCriticalDatesForm = () => {
         file: null,
       }));
     }, 100);
-  };
-
-  /////// Handle Exemption Allowed
-  const handleExemptionAllowed = (
-    value: boolean,
-    setFieldValue: (key: string, value: any) => void
-  ) => {
-    setFieldValue("emd_fee_type", value ? "" : "fixed");
   };
 
   return (
@@ -120,14 +99,14 @@ const TenderCriticalDatesForm = () => {
       )}
       {/* Header section */}
       <div className="flex items-center bg-primary_bg_indigo px-3 py-1 rounded mb-3 shadow-lg">
-        <Image src={FeeIcon} height={30} width={30} alt="tender-icon" />
+        <Image src={CriticalIcon} height={30} width={30} alt="tender-icon" />
         <header className="font-bold ml-2 text-white">Critical Dates</header>
       </div>
 
       {/* Form section */}
       <Formik
         initialValues={initialValues}
-        validationSchema={tenderFeeDetailsSchema}
+        validationSchema={tenderCriticalDateSchema}
         onSubmit={onSubmit}
         enableReinitialize={true}
       >
@@ -135,12 +114,10 @@ const TenderCriticalDatesForm = () => {
           values,
           errors,
           touched,
-          handleChange,
           handleBlur,
           handleSubmit,
           dirty,
           handleReset,
-          setFieldValue,
         }: any) => (
           <form
             ref={formRef}
@@ -151,27 +128,117 @@ const TenderCriticalDatesForm = () => {
             encType="multipart/form-data"
             className="flex flex-col justify-between h-full"
           >
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-2 gap-6">
               <div
                 className={`bg-${bg_color} p-4 shadow-xl border rounded grid gap-4`}
               >
-                <div className="grid grid-cols-2 gap-4">
-                  {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DateTimePicker
-                    value={date}
-                    onChange={setDate}
-                    referenceDate={dayjs("2022-04-17T15:30")}
-                  />
-                   </LocalizationProvider> */}
-                  <DateTimePickerComponent
-                    label="Start Date"
-                    name="start_date"
-                    error=""
-                    touched={false}
-                    value={""}
-                  />
-                </div>
+                <DateTimePickerComponent
+                  label="Publishing Date"
+                  onBlur={handleBlur}
+                  value={values.publishing_date}
+                  touched={touched.publishing_date}
+                  error={errors.publishing_date}
+                  name="publishing_date"
+                  readonly={readonly}
+                  required
+                />
+                <DateTimePickerComponent
+                  label="Pre Bid Meeting Date"
+                  onBlur={handleBlur}
+                  value={values.pre_bid_meeting_date}
+                  touched={touched.pre_bid_meeting_date}
+                  error={errors.pre_bid_meeting_date}
+                  name="pre_bid_meeting_date"
+                  readonly={readonly}
+                  required
+                />
               </div>
+              <div
+                className={`bg-${bg_color} p-4 shadow-xl border rounded grid gap-4`}
+              >
+                <DateTimePickerComponent
+                  label="Document Sale Start Date"
+                  onBlur={handleBlur}
+                  value={values.document_sale_start_date}
+                  touched={touched.document_sale_start_date}
+                  error={errors.document_sale_start_date}
+                  name="document_sale_start_date"
+                  readonly={readonly}
+                  required
+                />
+                <DateTimePickerComponent
+                  label="Document Sale End Date"
+                  onBlur={handleBlur}
+                  value={values.document_sale_end_date}
+                  touched={touched.document_sale_end_date}
+                  error={errors.document_sale_end_date}
+                  name="document_sale_end_date"
+                  readonly={readonly}
+                  required
+                />
+              </div>
+              <div
+                className={`bg-${bg_color} p-4 shadow-xl border rounded grid gap-4`}
+              >
+                <DateTimePickerComponent
+                  label="Seek Clarification Start Date"
+                  onBlur={handleBlur}
+                  value={values.seek_clarification_start_date}
+                  touched={touched.seek_clarification_start_date}
+                  error={errors.seek_clarification_start_date}
+                  name="seek_clarification_start_date"
+                  readonly={readonly}
+                  required
+                />
+                <DateTimePickerComponent
+                  label="Seek Clarification End Date"
+                  onBlur={handleBlur}
+                  value={values.seek_clarification_end_date}
+                  touched={touched.seek_clarification_end_date}
+                  error={errors.seek_clarification_end_date}
+                  name="seek_clarification_end_date"
+                  readonly={readonly}
+                  required
+                />
+              </div>
+              <div
+                className={`bg-${bg_color} p-4 shadow-xl border rounded grid gap-4`}
+              >
+                <DateTimePickerComponent
+                  label="Bid submission Start Date"
+                  onBlur={handleBlur}
+                  value={values.bid_submission_start_date}
+                  touched={touched.bid_submission_start_date}
+                  error={errors.bid_submission_start_date}
+                  name="bid_submission_start_date"
+                  readonly={readonly}
+                  required
+                />
+                <DateTimePickerComponent
+                  label="Bid submission End Date"
+                  onBlur={handleBlur}
+                  value={values.bid_submission_end_date}
+                  touched={touched.bid_submission_end_date}
+                  error={errors.bid_submission_end_date}
+                  name="bid_submission_end_date"
+                  readonly={readonly}
+                  required
+                />
+              </div>
+            </div>
+            <div
+              className={`bg-${bg_color} p-4 shadow-xl border rounded grid gap-4 mt-6`}
+            >
+              <DateTimePickerComponent
+                label="Bid Opening Date"
+                onBlur={handleBlur}
+                value={values.bid_opeining_date}
+                touched={touched.bid_opeining_date}
+                error={errors.bid_opeining_date}
+                name="bid_opeining_date"
+                readonly={readonly}
+                required
+              />
             </div>
             {Object.keys(errors).length !== 0 && showFinalError && (
               <span className="text-red-500 mt-3 flex justify-end">
@@ -193,7 +260,7 @@ const TenderCriticalDatesForm = () => {
                 </Button>
               )}
 
-              {!readonly && (
+              {!readonly && dirty && (
                 <>
                   <Button
                     onClick={() => handleBackAndReset(handleReset)}

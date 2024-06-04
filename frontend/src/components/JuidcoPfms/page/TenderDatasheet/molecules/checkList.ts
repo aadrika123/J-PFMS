@@ -140,27 +140,28 @@ export const payment_mode = {
   ],
 };
 
-export const online_bank = {
-  title: "Online (Banks)",
-  options: [
-    {
-      label: "ICICI",
-      value: "icici",
-    },
-    {
-      label: "SBI",
-      value: "sbi",
-    },
-    {
-      label: "UTI",
-      value: "uti",
-    },
-    {
-      label: "PNB",
-      value: "pnb",
-    },
-  ],
-};
+export const online_bank = [
+  {
+    id: 1,
+    name: "ICICI",
+    value: "1",
+  },
+  {
+    id: 2,
+    name: "SBI",
+    value: "2",
+  },
+  {
+    id: 3,
+    name: "UTI",
+    value: "3",
+  },
+  {
+    id: 4,
+    name: "PNB",
+    value: "4",
+  },
+];
 
 export const offline_instument = {
   title: "Offline (Instruments)",

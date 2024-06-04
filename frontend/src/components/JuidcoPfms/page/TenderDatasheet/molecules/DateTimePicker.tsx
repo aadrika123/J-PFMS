@@ -29,7 +29,7 @@ type DateTimePickerComponentType = {
 const DateTimePickerComponent: React.FC<DateTimePickerComponentType> = (
   props
 ) => {
-  const { label, changeHandler, onChange, readonly = false } = props;
+  const { label, changeHandler, readonly = false } = props;
   const [, , helpers] = useField(props.name);
   const { setValue } = helpers;
 
@@ -37,15 +37,14 @@ const DateTimePickerComponent: React.FC<DateTimePickerComponentType> = (
   const internalHandleChange = (value: Dayjs | null) => {
     const date: any = value?.format();
     if (!readonly) {
-      //   setValue(date);
-      onChange && onChange(date);
+      setValue(date);
       changeHandler && changeHandler(date);
     }
   };
 
   return (
     <div className={`flex flex-col ${props.className}`}>
-      <label className={`text-sm font-medium "text-black"}`}>
+      <label className={`text-sm font-medium text-black mb-1`}>
         {label}
         {props.required ? <span className="text-red-600">*</span> : ""}
       </label>
@@ -54,8 +53,31 @@ const DateTimePickerComponent: React.FC<DateTimePickerComponentType> = (
         <DateTimePicker
           value={dayjs(props.value)}
           onChange={internalHandleChange}
-          referenceDate={dayjs("2022-04-17T15:30")}
+          referenceDate={dayjs(new Date())}
           format="DD-MM-YYYY hh:mm a"
+          slotProps={{ textField: { size: "small" } }}
+          sx={{
+            "& .MuiInputBase-input": {
+              height: "20px",
+            },
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "black",
+              },
+              "&:hover fieldset": {
+                borderColor: "black",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "black",
+              },
+              "&.Mui-error fieldset": {
+                borderColor: "gray",
+              },
+              "&.Mui-disabled fieldset": {
+                borderColor: "gray",
+              },
+            },
+          }}
         />
       </LocalizationProvider>
 

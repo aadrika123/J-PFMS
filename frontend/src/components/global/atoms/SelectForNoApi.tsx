@@ -35,9 +35,11 @@ interface SelectProps {
   handler?: (id: number | string, value?: string) => void;
   onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLSelectElement>) => void;
+  labelColor?: string;
 }
 
 const SelectForNoApi: React.FC<SelectProps> = (props) => {
+  const {labelColor = "secondary"} = props;
   const [, , helpers] = useField(props.name);
   const [, , helpers1] = useField(`${props.name}_name`);
 
@@ -62,7 +64,7 @@ const SelectForNoApi: React.FC<SelectProps> = (props) => {
   return (
     <>
       <div className={`flex flex-col gap-1 ${props.readonly && 'dropdown-container'}`}>
-        <label className="text-secondary text-sm" htmlFor={fieldId}>
+        <label className={`text-${labelColor} text-sm`} htmlFor={fieldId}>
           {props.label}
           {props.required ? <span className="text-red-600 ">*</span> : ""}
         </label>

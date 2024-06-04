@@ -11,8 +11,8 @@ import {tenderBasicDetailsSchema} from "./validations/TenderInputFormValidation/
 import {tenderCoverDetailsSchema} from "./validations/TenderInputFormValidation/TenderCoverDetailsValidation";
 import {tenderWorkDetailsSchema} from "./validations/TenderInputFormValidation/TenderWorkDetailsValidation";
 import {tenderFeeDetailsSchema} from "./validations/TenderInputFormValidation/TenderFeeDetailsValidation";
-
-
+import {tenderCriticalDateSchema} from "./validations/TenderInputFormValidation/TenderCriticalDateValidation";
+import {tenderBidDetailsSchema} from "./validations/TenderInputFormValidation/TenderBidDetailsValidation";
 
 
 // escape input string for in regular expressions
@@ -47,5 +47,7 @@ export {
   tenderCoverDetailsSchema,
   tenderWorkDetailsSchema,
   tenderFeeDetailsSchema,
+  tenderCriticalDateSchema,
+  tenderBidDetailsSchema,
   docType, executionBody
 };
