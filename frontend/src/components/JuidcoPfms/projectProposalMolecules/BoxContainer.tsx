@@ -22,7 +22,7 @@ export const BoldSpan: React.FC<SpanProps> = (props) => {
   return (
     <span className={`mb-2 text-secondary ${className} `}>
       {label && <b>{label}&nbsp;</b>}
-      {content}
+      {Array.isArray(content) ? content.map((i) => i.ward_name).join(',') : content}
     </span>
   );
 };

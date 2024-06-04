@@ -58,7 +58,7 @@ const InputForUpdateField: React.FC<InputProps> = (props) => {
       <div className="flex flex-col gap-1">
         <label className="text-secondary text-sm" htmlFor={fieldId}>
           {props.label}
-          {props.required ? <span className="text-red-600 pl-2">*</span> : ""}
+          {props.required ? <span className="text-red-600 ">*</span> : ""}
         </label>
         <div
           className={`flex items-center justify-between rounded border bg-transparent border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none ${props.icon && props.iconAlign === "left" && "flex-row-reverse"}`}
@@ -72,7 +72,7 @@ const InputForUpdateField: React.FC<InputProps> = (props) => {
             onFocus={handleFocus}
             type={props.type}
             value={props?.value}
-            className={`text-primary h-[40px] p-3 bg-transparent outline-none  w-full`}
+            className={`text-primary h-[40px] p-3 outline-none  w-full ${props.readonly ? 'cursor-not-allowed bg-[#f0f0f0]' : 'bg-white '}`}
             name={props.name}
             id={fieldId}
           />

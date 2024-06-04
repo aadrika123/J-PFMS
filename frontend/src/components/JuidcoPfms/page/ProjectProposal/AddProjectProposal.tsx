@@ -1,4 +1,11 @@
 "use client";
+/**
+ * | Author- Sanjiv Kumar
+ * | Created On- 05-05-2024
+ * | Created for- Project Proposal Add
+ * | Status- open
+ */
+
 import React, { useState, lazy, Suspense } from "react";
 import { ProjectProposalSchema } from "./ProjectProposalForm";
 const ProjectProposalForm = lazy(() =>
@@ -21,6 +28,7 @@ type StateTypes = {
   showNotification: boolean;
   showConfirmation: boolean;
   projectData: FormikValues;
+  ppno: string;
 };
 
 const AddProjectProposal = () => {
@@ -37,6 +45,7 @@ const AddProjectProposal = () => {
     district_id: user?.getDistrict()?.id,
     ulb_id: user?.getUlb()?.id,
     ward_id: 0,
+    wards: [],
     pin_code: "",
     files: [
       {
@@ -54,21 +63,25 @@ const AddProjectProposal = () => {
     showNotification: false,
     showConfirmation: false,
     projectData: initialValues,
+    ppno: "",
   });
   const { showNotification, showConfirmation, projectData } = state;
 
   ///////////////// Handling Submit /////////////
   const handleSubmit = async (values: FormikValues) => {
     activateWorkingAnimation();
+    const newValues = {...values, wards: values.wards.map((i:any) => i.value)}
     const res = await axios({
       url: `${PFMS_URL.PROJ_RPOPOSAL_URL.create}`,
       method: "POST",
       data: {
-        data: values,
+        data: newValues,
       },
     });
 
     if (!res.data.status) throw "Something Went Wrong!!!";
+// console.log("first sdfsdf", res.data.data)
+//     setState({...state, ppno: res.data.data.project_proposal_no})
   };
 
   const { mutate } = useMutation(handleSubmit, {
@@ -83,7 +96,7 @@ const AddProjectProposal = () => {
     },
     onSettled: () => {
       hideWorkingAnimation();
-      queryClient.invalidateQueries([`${PFMS_URL.PROJ_RPOPOSAL_URL.get}`]);
+      queryClient.invalidateQueries([`project-proposals, ${PFMS_URL.PROJ_RPOPOSAL_URL.get}`]);
     },
   });
 
@@ -118,7 +131,7 @@ const AddProjectProposal = () => {
       )}
       {workingAnimation}
       {showNotification && (
-        <SuccesfullConfirmPopup message="Recorded Successfully" />
+        <SuccesfullConfirmPopup message={`Recorded Successfully`}/>
       )}
       <div className="shadow-lg px-4 py-2 border mb-6 bg-white">
         <span className="text-secondary font-bold">Fill Project Details</span>

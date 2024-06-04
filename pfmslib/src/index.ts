@@ -7,7 +7,13 @@ import { multiProjectProposalValidationSchema, projectProposalValidationSchema }
 import User from "./user/User";
 import {ROLES} from "./user";
 import {ProjectProposalStages} from "./standard/project_proposal_stages"
-import MeasurementRecordValidation from "./validations/MeasurementRecordValidation";
+import {tenderBasicDetailsSchema} from "./validations/TenderInputFormValidation/TenderBasicDetailsValidation";
+import {tenderCoverDetailsSchema} from "./validations/TenderInputFormValidation/TenderCoverDetailsValidation";
+import {tenderWorkDetailsSchema} from "./validations/TenderInputFormValidation/TenderWorkDetailsValidation";
+import {tenderFeeDetailsSchema} from "./validations/TenderInputFormValidation/TenderFeeDetailsValidation";
+import {tenderCriticalDateSchema} from "./validations/TenderInputFormValidation/TenderCriticalDateValidation";
+import {tenderBidDetailsSchema} from "./validations/TenderInputFormValidation/TenderBidDetailsValidation";
+
 
 // escape input string for in regular expressions
 const escapeRegExp = (text:string):string => {
@@ -37,6 +43,11 @@ export {
   projectProposalValidationSchema,
   ROLES,
   ProjectProposalStages,
-  docType, executionBody,
-  MeasurementRecordValidation
+  tenderBasicDetailsSchema,
+  tenderCoverDetailsSchema,
+  tenderWorkDetailsSchema,
+  tenderFeeDetailsSchema,
+  tenderCriticalDateSchema,
+  tenderBidDetailsSchema,
+  docType, executionBody
 };

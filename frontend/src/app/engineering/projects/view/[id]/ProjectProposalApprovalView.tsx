@@ -11,7 +11,6 @@ import { usePathname, useRouter } from "next/navigation";
 
 import list from "@/assets/svg/list.svg";
 import details from "@/assets/svg/details.svg";
-import ProjectProposalApprovalStepper from "@/components/JuidcoPfms/page/ProjectProposal/molecules/ProjectProposalApprovalStepper";
 import admi from "@/assets/svg/admi.svg";
 import { Icons } from "@/assets/svg/icons";
 import goBack, { DateFormatter } from "@/utils/helper";
@@ -29,7 +28,430 @@ import "react-tabs/style/react-tabs.css";
 
 import moment from "moment";
 import Loader from "@/components/global/atoms/Loader";
-import { MeasurementManagementComponent } from "./MeasurementManagementComponent";
+import ProjectProposalApprovalStepper from "@/components/JuidcoPfms/projectProposalMolecules/ProjectProposalApprovalStepper";
+
+
+
+const units = ["Sqm", "Day"];
+
+interface InputProps {
+  name?: string;
+  type?: string;
+  readonly?: boolean;
+  placeholder?: string | "";
+  value?: string | number | undefined;
+  error?: string | undefined;
+  touched?: boolean | undefined;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  required?: boolean | false;
+}
+
+const Input: React.FC<InputProps> = (props) => {
+  const fieldId = "id_" + props.name;
+
+  return (
+    <>
+      <div className="flex justify-center">
+        <div className="flex flex-col gap-1 w-[80%]">
+          <div
+            className={`flex items-center w-[100px] justify-between rounded border shadow-lg bg-transparent border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none overflow-hidden`}
+          >
+            <input
+              disabled={props.readonly}
+              required={props.required}
+              placeholder={props.placeholder}
+              onChange={props.onChange}
+              type={props.type}
+              value={props?.value}
+              className={`text-primary h-[40px] p-3 bg-transparent outline-none`}
+              name={props.name}
+              id={fieldId}
+            />
+          </div>
+
+          <div>
+            {props.touched && props.error && (
+              <div className="text-red-500">{props.error}</div>
+            )}
+          </div>
+
+        </div>
+      </div>
+    </>
+  );
+};
+
+
+interface DDLOptions {
+  name: string;
+  caption: string;
+}
+
+interface DDLProps {
+  name?: string;
+  type?: string;
+  readonly?: boolean;
+  value?: string | number | undefined;
+  error?: string | undefined;
+  touched?: boolean | undefined;
+  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  required?: boolean | false;
+  options: DDLOptions[];
+}
+
+const DDL: React.FC<DDLProps> = (props) => {
+  const fieldId = "id_" + props.name;
+
+
+  return (
+    <>
+      <div className="flex justify-center">
+        <div className="flex flex-col gap-1 w-[80%]">
+          <div
+            className={`flex items-center justify-between rounded border shadow-lg bg-transparent border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none`}
+          >
+            <select
+              disabled={props.readonly}
+              required={props.required}
+              onChange={props.onChange}
+              value={props?.value}
+              className={`text-primary h-[40px] p-3 bg-transparent outline-none`}
+              name={props.name}
+              id={fieldId}
+            >
+
+              {props.options.map((item, index) => {
+                return (
+                  <option key={`${item.name}-option-${index}`} value={item.name}>{item.caption}</option>
+                );
+              })}
+            </select>
+          </div>
+
+          <div>
+            {props.touched && props.error && (
+              <div className="text-red-500">{props.error}</div>
+            )}
+          </div>
+
+        </div>
+      </div>
+    </>
+  );
+};
+
+
+
+
+
+const MeasurementRecord = () => {
+
+  const [editable, setEditable] = useState<boolean>(false);
+
+  // const initialValues = {
+  //   description: "",
+  //   unit: "Sqm",
+  //   quantity: "0",
+  //   rate: "0.0",
+  //   cost: 0,
+  //   year: "",
+  //   remarks: ""
+  // };
+
+  const initialValues = {
+    description: "fdsf",
+    unit: "Sqm",
+    quantity: "5",
+    rate: "5",
+    cost: 10,
+    year: "2024",
+    remarks: "fsdf fdsf"
+  };
+
+
+  const validationSchema = Yup.object({
+    description: Yup.string().required(),
+    unit: Yup.string().oneOf(units),
+    quantity: Yup.number().required().moreThan(0),
+    rate: Yup.number().required().moreThan(0),
+    cost: Yup.number().required().moreThan(0),
+    year: Yup.number().required().moreThan(2023).lessThan(2025),
+    remarks: Yup.string().required(),
+  });
+
+
+  const save = () => {
+    // save
+    setEditable(false);
+  }
+
+  return (
+
+    <>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={() => { }}
+
+      >
+        {({ values, handleChange, errors, touched }: any) => (
+
+          <>
+            <div className="table-cell text-color-primary">
+
+              <Input
+                onChange={handleChange}
+                value={values.description}
+                error={errors.description}
+                touched={touched.description}
+                name="description"
+                placeholder="Enter Description"
+                required
+                type="text"
+                readonly={!editable}
+              />
+            </div>
+            <div className="table-cell text-color-secondary pt-2">
+              <Input
+                onChange={handleChange}
+                value={values.quantity}
+                error={errors.quantity}
+                touched={touched.quantity}
+                name="quantity"
+                placeholder="Enter quantity"
+                required
+                type="text"
+                readonly={!editable}
+              />
+            </div>
+            <div className="table-cell text-color-secondary pt-2">
+              <Input
+                onChange={handleChange}
+                value={values.rate}
+                error={errors.rate}
+                touched={touched.rate}
+                name="rate"
+                placeholder="Enter rate"
+                required
+                type="text"
+                readonly={!editable}
+              />
+            </div>
+
+            <div className="table-cell text-color-secondary pt-2">
+              <Input
+                onChange={handleChange}
+                value={values.cost}
+                error={errors.cost}
+                touched={touched.cost}
+                name="cost"
+                placeholder="Enter Cost"
+                required
+                type="text"
+                readonly={!editable}
+              />
+            </div>
+
+            <div className="table-cell text-color-secondary pt-2">
+              <Input
+                onChange={handleChange}
+                value={values.year}
+                error={errors.year}
+                touched={touched.year}
+                name="year"
+                placeholder="Enter Year"
+                required
+                type="text"
+                readonly={!editable}
+              />
+            </div>
+
+
+            <div className="table-cell text-color-secondary pt-2">
+              <Input
+                onChange={handleChange}
+                value={values.remarks}
+                error={errors.remarks}
+                touched={touched.remarks}
+                name="remarks"
+                placeholder="Enter Remarks"
+                required
+                type="text"
+                readonly={!editable}
+              />
+            </div>
+
+
+
+            <div className="table-cell text-color-secondary pt-2">
+              <DDL
+                onChange={handleChange}
+                value={values.unit}
+                error={errors.unit}
+                touched={touched.unit}
+                name="unit"
+                required
+                type="text"
+                readonly={!editable}
+                options={
+                  [
+                    { name: "Sqm", caption: "Sqm" },
+                    { name: "Day", caption: "Day" },
+
+                  ]}
+              />
+
+
+            </div>
+
+
+            <div className="table-cell text-color-secondary pt-2">
+              <Input
+                onChange={handleChange}
+                value={values.remarks}
+                error={errors.remarks}
+                touched={touched.remarks}
+                name="remarks"
+                placeholder="Enter Remarks"
+                required
+                type="text"
+                readonly={!editable}
+              />
+            </div>
+
+            <div className="table-cell text-color-secondary pt-2">
+              <Input
+                onChange={handleChange}
+                value={values.remarks}
+                error={errors.remarks}
+                touched={touched.remarks}
+                name="remarks"
+                placeholder="Enter Remarks"
+                required
+                type="text"
+                readonly={!editable}
+              />
+            </div>
+
+            <div className="table-cell text-color-secondary pt-2">
+              <Input
+                onChange={handleChange}
+                value={values.remarks}
+                error={errors.remarks}
+                touched={touched.remarks}
+                name="remarks"
+                placeholder="Enter Remarks"
+                required
+                type="text"
+                readonly={!editable}
+              />
+            </div>
+
+          </>
+
+
+        )}
+      </Formik >
+
+      {editable ? (
+        <div onClick={save}>Save</div>
+      ) : (
+        <div onClick={() => setEditable(!editable)}>Edit</div>
+      )}
+    </>
+
+  )
+}
+
+
+const MeasurementTable = () => {
+  const [limit, page, paginator, resetPaginator] = usePagination();
+  const [measurementFormVisible, setMeasurementFormVisible] = useState<boolean>(false);
+
+
+  return (
+    <>
+
+      {measurementFormVisible && (
+        <Popup width={80} zindex={30}>
+          <AddMeasurementComponent onBack={() => setMeasurementFormVisible(false)} />
+        </Popup>
+
+      )}
+
+
+      <div className="mx-2 p-2">
+        <div className="overflow-x-auto">
+          <div className="text-xs table border-2">
+            <div className="table-caption" title="Double click to change the title">
+              <div className="flex justify-between bg-primary_bg_indigo p-2">
+                <div></div>
+                <div className="flex justify-center text-2xl text-white font-bold">
+                  Prepare Cost Estimation
+                </div>
+
+                <div>
+                  {/* {!titleEditable && (<Button variant="primary" onClick={() => setTitleEditable(!titleEditable)}>Edit</Button>)} */}
+                </div>
+              </div>
+
+            </div>
+
+
+            <div className="table-row p-6 border text-center">
+              <div className="table-cell text-color-secondary p-2">Sr. No</div>
+              <div className="table-cell text-color-primary">Description</div>
+              <div className="table-cell text-color-primary">No</div>
+              <div className="table-cell text-color-primary">Length</div>
+              <div className="table-cell text-color-primary">Breadth</div>
+              <div className="table-cell text-color-primary">Height</div>
+              <div className="table-cell text-color-primary">Quantity</div>
+              <div className="table-cell text-color-primary">Unit</div>
+              <div className="table-cell text-color-primary">SOR Rate</div>
+              <div className="table-cell text-color-primary">Amount</div>
+              <div className="table-cell text-color-primary">Remarks</div>
+              <div className="table-cell text-color-primary">Edit</div>
+            </div>
+
+            <form className="table-row border">
+              <div className="table-cell text-color-secondary text-center">1</div>
+              <MeasurementRecord />
+
+            </form>
+
+
+            <form className="table-row border">
+              <div className="table-cell text-color-secondary text-center">1</div>
+              <MeasurementRecord />
+
+            </form>
+
+
+            <form className="table-row border">
+              <div className="table-cell text-color-secondary text-center">1</div>
+              <MeasurementRecord />
+            </form>
+
+          </div>
+
+          {paginator}
+
+          <div className="flex justify-end">
+            <Button variant="primary" onClick={() => setMeasurementFormVisible(true)}>Add New Measurement(s)</Button>
+          </div>
+
+        </div>
+
+      </div>
+
+
+    </>
+
+  )
+};
+
+
+
 
 
 type StateType = {
@@ -218,46 +640,61 @@ const items = [
     level: 1,
     others: [
       {
-        info: "EXECUTIVE OFFICER",
+        info: "JUNIOR ENGINEER",
         img: admi,
         approvalAmount: 200,
       },
       {
-        info: "NEW BACK OFFICE",
+        info: "ASSISTANT ENGINEER",
         img: admi,
         approvalAmount: 300,
       },
       {
-        info: "NEW CITY MANAGER",
+        info: "EXECUTIVE ENGINEER",
+        img: admi,
+        approvalAmount: 400,
+      },
+      {
+        info: "SUPERINTENDENT ENGINEER",
+        img: admi,
+        approvalAmount: 400,
+      },
+
+      {
+        info: "CHIEF ENGINEER",
         img: admi,
         approvalAmount: 400,
       },
     ],
   },
   {
-    info: "ADD DEPARTMENT",
+    info: "ADMINISTRATIVE DEPARTMENT",
     img: admi,
     level: 2,
     others: [
       {
-        info: "ADD OFFICER",
+        info: "DEPARTMENTAL SECRETARY",
         img: admi,
         approvalAmount: 200,
       },
       {
-        info: "ADD BACK OFFICE",
+        info: "DEPARTMENTAL MINISTER",
         img: admi,
         approvalAmount: 300,
       },
       {
-        info: "ADD CITY MANAGER",
+        info: "YOJNA PRADHIKRIT SAMITI",
+        img: admi,
+        approvalAmount: 400,
+      },
+      {
+        info: "CABINET",
         img: admi,
         approvalAmount: 400,
       },
     ],
   },
 ];
-
 
 
 const usePrimaryTabs = (defaultTabIndex: number, changeAllowed: boolean): [ReactNode, number, (index: number) => void] => {
@@ -518,12 +955,12 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
 
           <div className="shadow-lg p-4 border">
 
-            <ProjectProposalApprovalStepper
-              level={2}
-              subLevel={0}
-              budget={300}
-              items={items}
-            />
+        <ProjectProposalApprovalStepper
+          level={1}
+          subLevel={0}
+          budget={400}
+          items={items}
+        />
 
             <div className="flex items-center gap-2 mt-4">
               <div className="bg-gray-100 border flex flex-col p-4 h-52 w-1/3 items-center justify-center rounded">

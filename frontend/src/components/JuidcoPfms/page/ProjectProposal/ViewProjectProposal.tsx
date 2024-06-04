@@ -1,8 +1,12 @@
 "use client";
+/**
+ * | Author- Sanjiv Kumar
+ * | Created On- 07-05-2024
+ * | Created for- Project Proposal View Screen
+ * | Status- open
+ */
+
 import React, { useState } from "react";
-import BoxContainer from "./molecules/BoxContainer";
-import Steps from "./molecules/Steps";
-import ViewDetails from "./molecules/ViewDetails";
 import Table from "@/components/global/molecules/Table";
 import admi from "@/assets/svg/admi.svg";
 import { useQuery } from "react-query";
@@ -13,10 +17,13 @@ import { PFMS_URL } from "@/utils/api/urls";
 import { HeaderWidget } from "./HeaderWidget";
 import Popup from "@/components/global/molecules/Popup";
 import Button from "@/components/global/atoms/buttons/Button";
-import ProjectProposalApprovalStepper from "./molecules/ProjectProposalApprovalStepper";
 import Loader from "@/components/global/atoms/Loader";
 import pdfIcon from "@/assets/svg/pdf_icon.svg";
 import Image from "next/image";
+import BoxContainer from "../../projectProposalMolecules/BoxContainer";
+import Steps from "../../projectProposalMolecules/Steps";
+import ViewDetails from "../../projectProposalMolecules/ViewDetails";
+import ProjectProposalApprovalStepper from "../../projectProposalMolecules/ProjectProposalApprovalStepper";
 
 const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
   const user = useUser();
@@ -42,39 +49,55 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
       level: 1,
       others: [
         {
-          info: "EXECUTIVE OFFICER",
+          info: "JUNIOR ENGINEER",
           img: admi,
           approvalAmount: 200,
         },
         {
-          info: "NEW BACK OFFICE",
+          info: "ASSISTANT ENGINEER",
           img: admi,
           approvalAmount: 300,
         },
         {
-          info: "NEW CITY MANAGER",
+          info: "EXECUTIVE ENGINEER",
+          img: admi,
+          approvalAmount: 400,
+        },
+        {
+          info: "SUPERINTENDENT ENGINEER",
+          img: admi,
+          approvalAmount: 400,
+        },
+
+        {
+          info: "CHIEF ENGINEER",
           img: admi,
           approvalAmount: 400,
         },
       ],
     },
     {
-      info: "ADD DEPARTMENT",
+      info: "ADMINISTRATIVE DEPARTMENT",
       img: admi,
       level: 2,
       others: [
         {
-          info: "ADD OFFICER",
+          info: "DEPARTMENTAL SECRETARY",
           img: admi,
           approvalAmount: 200,
         },
         {
-          info: "ADD BACK OFFICE",
+          info: "DEPARTMENTAL MINISTER",
           img: admi,
           approvalAmount: 300,
         },
         {
-          info: "ADD CITY MANAGER",
+          info: "YOJNA PRADHIKRIT SAMITI",
+          img: admi,
+          approvalAmount: 400,
+        },
+        {
+          info: "CABINET",
           img: admi,
           approvalAmount: 400,
         },
@@ -182,7 +205,7 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
             <ProjectProposalApprovalStepper
               level={1}
               subLevel={0}
-              budget={300}
+              budget={400}
               items={items}
             />
             <BoxContainer projectDetails={data} />

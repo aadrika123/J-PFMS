@@ -3,12 +3,13 @@ import Popup from "./Popup";
 
 interface SuccesfullConfirmPopupProps {
   message: string;
+  subMessage?: string;
 }
 
 const SuccesfullConfirmPopup: React.FC<SuccesfullConfirmPopupProps> = (
   props
 ) => {
-  const { message } = props;
+  const { message, subMessage } = props;
   return (
     <Popup title="" zindex={50}>
       <div className="flex flex-col justify-center items-center w-auto">
@@ -46,7 +47,9 @@ const SuccesfullConfirmPopup: React.FC<SuccesfullConfirmPopupProps> = (
           </defs>
         </svg>
 
-        <span className="text-[20px] text-black my-8">{message}</span>
+        <span className="text-[20px] text-black mt-6">{message}</span>
+        {subMessage && <span className="text-[20px] text-black mt-3">{subMessage}</span>}
+
       </div>
     </Popup>
   );

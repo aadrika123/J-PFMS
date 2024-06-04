@@ -1,4 +1,11 @@
 "use client";
+/**
+ * | Author- Sanjiv Kumar
+ * | Created On- 05-05-2024
+ * | Created for- Project Proposal Edit
+ * | Status- open
+ */
+
 import React, { useState } from "react";
 import { ProjectProposalForm } from "./ProjectProposalForm";
 import { useMutation, useQuery, useQueryClient } from "react-query";
@@ -48,7 +55,7 @@ const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
     const files = values.files.filter(
       (item: any) => item.file_token !== "null"
     );
-    const data = { ...values, files };
+    const data = { ...values, files, wards: values.wards.map((i:any) => i.value) };
 
     const res = await axios({
       url: `${PFMS_URL.PROJ_RPOPOSAL_URL.update}/${ProProposalId}`,
@@ -145,6 +152,7 @@ const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
             pin_code: data?.pin_code,
             files: handleFileData(data?.files),
             state_id: data?.state_id,
+            wards: data?.wards.map((i:any) => {return {value: i.ward_id, label: i.ward_name}}),
             proposed_date: DateFormatter(data?.date),
             execution_body: data?.execution_body,
             user_id: user?.getUserId(),
@@ -153,7 +161,7 @@ const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
           additionalData={
             {
               type: data?.type,
-              ward_no: data?.ward_name
+              ward_no: data?.wards.map((i:any) => i.ward_name).join(','),
             }
           }
         />

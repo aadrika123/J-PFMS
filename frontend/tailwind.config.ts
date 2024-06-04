@@ -49,7 +49,7 @@ const config: Config = {
     themes: [
       {
         sample: {
-          primary: "#ff0000",
+          primary: "#4338ca",
           secondary: "#f6d860",
           accent: "#37cdbe",
           neutral: "#3d4451",

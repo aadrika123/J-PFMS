@@ -11,6 +11,7 @@ import measure from "@/assets/svg/measure.svg";
 import running from "@/assets/svg/running.svg";
 import userAdmin from "@/assets/svg/userAdmin.svg";
 import houseIcons from "@/assets/svg/house_icons.svg";
+import tenderIcon from "@/assets/svg/tender.svg";
 
 import { ROLES } from "pfmslib";
 
@@ -130,6 +131,14 @@ export const sidebarLinks: SidebarLinksProps = {
           ),
           path: "/dashboard",
           roles: [ROLES.CITY_MANAGER]
+        },
+        {
+          moduleName: "Tender Datasheet",
+          icon: (
+            <Image src={tenderIcon} alt="tender" width={100} height={100} />
+          ),
+          path: "/tender-datasheet",
+          roles: [ROLES.JUNIOR_ENGINEER]
         },
       ],
     },

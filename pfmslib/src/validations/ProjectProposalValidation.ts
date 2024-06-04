@@ -28,7 +28,8 @@ export const projectProposalValidationSchema = Yup.object({
   proposed_by: Yup.string()
     .required("proposed by is required")
     .matches(/^[A-Za-z0-9\s']*$/, "special character not allowed"),
-  type_id: Yup.number().required("type is required"),
+  type_id: Yup.number().required("type is required").integer()
+  .min(1, "plsease select district"),
   state_id: Yup.number()
     .required("state is required")
     .integer()
@@ -56,7 +57,15 @@ export const projectProposalValidationSchema = Yup.object({
   //   }),
   ulb_id: Yup.number().integer().optional(),
   ward_id: Yup.number().integer().optional(),
-  wards: Yup.array().optional(),
+  wards: Yup.array().required("ward is required").test("wards", (value, validationContext) =>{
+    const {createError} = validationContext;
+    if(!value.length){
+     return createError({
+      message: "please select wards",
+     })
+    }
+    return true
+  }),
   user_id: Yup.number().required("user is required"),
   address: Yup.string().required("address is required"),
   pin_code: Yup.string()

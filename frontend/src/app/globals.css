@@ -56,3 +56,29 @@ box-shadow: 8px 11px 5px 8px rgba(0,0,0,0.75);
 .dropdown-container select::-ms-expand { 
   display: none; 
 } 
+
+
+
+/* Checkbox input css */
+
+/* input[type="checkbox"] {
+  background-color: #002B4E !important;
+  color: white;
+}
+
+input[type="checkbox"]:enabled:checked {
+  background-color: #002B4E !important;
+  color: white;
+}
+
+input[type="checkbox"]:before {
+  background-color: #000000 !important;
+  color: white;
+}
+
+input[type="checkbox"]::before {
+  background-color: #002B4E !important;
+  color: white;
+} */
+
+/* Checkbox input css */

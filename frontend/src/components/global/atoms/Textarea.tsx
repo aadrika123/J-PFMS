@@ -23,10 +23,12 @@ interface TextareaProps {
   iconAlign?: "left" | "right";
   maxlength?: number;
   pattern?: any;
+  labelColor?: string;
 }
 
 const TextArea: React.FC<TextareaProps> = (props) => {
   const fieldId = "id_" + props.name;
+  const {labelColor = "secondary"} = props;
 
   ///// If the Input type will be number then MouseWheeler will be disabled ////////////
 
@@ -47,21 +49,21 @@ const TextArea: React.FC<TextareaProps> = (props) => {
   return (
     <>
       <div className="flex flex-col gap-1">
-        <label className="text-secondary text-sm" htmlFor={fieldId}>
+        <label className={`text-${labelColor} text-sm`} htmlFor={fieldId}>
           {props.label}
-          {props.required ? <span className="text-red-600 pl-2">*</span> : ""}
+          {props.required ? <span className="text-red-600 ">*</span> : ""}
         </label>
         <div
           className={`relative flex items-center justify-between rounded border bg-transparent border-zinc-400 focus-within:outline focus-within:outline-black focus-within:border-none ${props.icon && props.iconAlign === "left" && "flex-row-reverse"} ${props.readonly ? `bg-gray-300` : ""}`}
         >
           <textarea
             disabled={props.readonly}
-            required={props.required}
+            // required={props.required}
             placeholder={props.placeholder}
             onChange={handleChange}
             onBlur={props.onBlur}
             value={props?.value}
-            className={`text-primary min-h-32 px-3 pt-1 pb-3 bg-transparent outline-none hide-scrollbar w-full shadow-lg ${props.className}`}
+            className={`text-primary min-h-32 px-3 pt-1 pb-3 ${props.readonly ? 'cursor-not-allowed bg-[#f0f0f0]' : 'bg-white '} outline-none hide-scrollbar w-full shadow-lg ${props.className}`}
             name={props.name}
             id={fieldId}
           />
