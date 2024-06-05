@@ -1,5 +1,6 @@
-import { measurements, PrismaClient, project_proposals } from "@prisma/client";
+import { measurements, PrismaClient, project_proposal_checkings, project_proposals } from "@prisma/client";
 import { ProjectProposalStages } from "pfmslib";
+import { generateRes } from "../../util/generateRes";
 
 const prisma = new PrismaClient();
 
@@ -18,13 +19,42 @@ class ProjectVerificationDao {
 
   get = async (proposalId: number): Promise<project_proposals | null> => {
     return new Promise((resolve) => {
-      prisma.$queryRaw<any[]>`select * from project_proposals 
-      where id=${proposalId}`.then((result) => {
-        if (result.length == 0)
-          resolve(null);
-        else
-          resolve(result[0]);
-      });
+
+      prisma.$transaction([
+        prisma.$queryRaw<any[]>`select * from project_proposals 
+      where id=${proposalId}`,
+
+        prisma.$queryRawUnsafe<project_proposal_checkings[]>(`select * from project_proposal_checkings where id=(
+          select max(id) as id from project_proposal_checkings where project_proposal_id=${proposalId})`),
+
+        prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) from measurements where proposal_id=${proposalId}`),
+      ])
+        .then(([records,lastCheckingDetails, c]) => {
+
+
+          // the following participant information will be set at proposal creation time  (the list will be auto populated based on the ulb or suda login etc. and show to the user) with following basic fields (proposal_id, json string, participant count)
+          const participants = {
+              "Back Office": ["Back Office"],
+              "Engineering Section": ["Junior Engineer", "Assistant Engineer", "Engineer"],
+              "Administrative Section": ["Assistant Admin", "Admin Officer"],
+              "Finished": ["Sent For Tendering"]
+          };
+
+
+          console.log("lastCheckingDetails", lastCheckingDetails);
+          const count = Number(c[0]?.count);
+
+          if (records.length == 0)
+            resolve(null);
+          else {
+            const record = { ...records[0], 
+              measurements_added: count > 0,
+              approval_stage_id: lastCheckingDetails.length == 0 ? 1: lastCheckingDetails[0].approval_stage_id,
+              participants: participants
+            }
+            resolve(record);
+          }
+        });
     });
   }
 
@@ -428,10 +458,78 @@ class ProjectVerificationDao {
     });
   };
 
+
+  ////////// Approving Bill
+  sendBackProposal = async (data: any) => {
+    const { project_proposal_id, approval_stage_id, comment, checker_id } = data;
+    // await prisma.project_proposals.update({
+    //   where: {
+    //     id: bill_id,
+    //   },
+    //   data: {
+    //     status: "rejected",
+    //   },
+    // });
+    if (approval_stage_id == 1) {
+      const res = await prisma.project_proposal_checkings.create({
+        data: {
+          project_proposal_id,
+          checker_id: checker_id,
+          comment,
+          status: "rejected",
+          approval_stage_id: 1,
+        },
+      });
+
+      return generateRes(res);
+
+      // console.log("send back by junior engineer");
+      // return [];
+    }
+    else if (approval_stage_id === 2) {
+      const res = await prisma.project_proposal_checkings.deleteMany({
+        where: {
+          project_proposal_id,
+          approval_stage_id: approval_stage_id - 1,
+        },
+      });
+
+      await prisma.project_proposals.update({
+        where: {
+          id: project_proposal_id,
+        },
+        data: {
+          remarks: comment,
+        },
+      });
+      return generateRes(res);
+    } else {
+      const biiCheck: any = await prisma.project_proposal_checkings.findFirst({
+        where: {
+          project_proposal_id,
+          approval_stage_id: approval_stage_id - 1,
+        },
+      });
+
+      const res = await prisma.project_proposal_checkings.create({
+        data: {
+          project_proposal_id,
+          checker_id: biiCheck.checker_id,
+          comment,
+          status: "rejected",
+          approval_stage_id: approval_stage_id - 2,
+        },
+      });
+
+      return generateRes(res);
+    }
+  };
+
+
   getOutboxItemCount = async (ulbId: number, level?: number) => {
     return new Promise((resolve, reject) => {
       const filterCondition = `b.ulb_id = ${ulbId} and x.approval_stage_id = ${level}`;
-      
+
       const queryWithoutFieldsAndPagination = `from project_proposals b 
       left join 
       (
@@ -443,7 +541,7 @@ class ProjectVerificationDao {
       prisma.$queryRawUnsafe<CountQueryResult[]>(`select count(*) ${queryWithoutFieldsAndPagination}`).then((c) => {
         const count = Number(c[0]?.count);
         resolve(count);
-      }).catch((error)=>{
+      }).catch((error) => {
         reject(error);
       });
     });
@@ -452,12 +550,12 @@ class ProjectVerificationDao {
 
   getHigherLevelInboxItemCount = async (ulbId: number, level: number) => {
     return new Promise((resolve, reject) => {
-      
-      const filterCondition = (level ==  ProjectProposalStages.ApprovedByBackOffice?
-        `b.ulb_id = ${ulbId} and x.project_proposal_id is null`:
-      `b.ulb_id = ${ulbId} and x.approval_stage_id = ${level}`);
 
-    
+      const filterCondition = (level == ProjectProposalStages.ApprovedByBackOffice ?
+        `b.ulb_id = ${ulbId} and x.project_proposal_id is null` :
+        `b.ulb_id = ${ulbId} and x.approval_stage_id = ${level}`);
+
+
       const queryWithoutFieldsAndPagination = `from project_proposals b 
       left join 
       (
@@ -473,20 +571,20 @@ class ProjectVerificationDao {
       prisma.$queryRawUnsafe<CountQueryResult[]>(`select count(*) ${queryWithoutFieldsAndPagination}`).then((c) => {
         const count = Number(c[0]?.count);
         resolve(count);
-      }).catch((error)=>{
+      }).catch((error) => {
         reject(error);
       });
     });
   }
 
 
-  recordMeasurements = async  (data: any) => {
+  recordMeasurements = async (data: any) => {
     return new Promise((resolve, reject) => {
       prisma.measurements.createMany({
         data: data
       }).then((result) => {
         resolve(result);
-      }).catch((error:any) => {
+      }).catch((error: any) => {
         reject(error);
       });
     })
@@ -495,7 +593,7 @@ class ProjectVerificationDao {
   getMeasurements = async (proposal_id: number, filters: any, page: number, limit: number, order: number): Promise<any> => {
     return new Promise((resolve, reject) => {
       const query = `from measurements where proposal_id=${proposal_id}`;
-      
+
       const ordering = order == -1 ? "desc" : "asc";
 
       const offset = (page - 1) * limit;
@@ -506,30 +604,30 @@ class ProjectVerificationDao {
         prisma.$queryRawUnsafe(`select * ${query} order by id ${ordering} limit ${limit} offset ${offset}`),
         prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*)  ${query}`),
       ]).then(([records, c]) => {
-        
+
         const count = Number(c[0]?.count);
         const result = {
           count: count,
-          totalPage: Math.ceil(count/limit),
+          totalPage: Math.ceil(count / limit),
           currentPage: page,
           records: records
         };
-        
+
         resolve(result);
 
 
       }).catch((error) => {
         reject(error);
       })
-    }); 
+    });
   }
 
   getScheduleOfRates = async (search: string | undefined) => {
     return new Promise((resolve, reject) => {
 
-      const query =      search ? 
-      `select * from schedule_of_rates where description ilike '%${search}%' or sno ilike '%${search}%' limit 10` :
-      `select * from schedule_of_rates limit 10`;
+      const query = search ?
+        `select * from schedule_of_rates where description ilike '%${search}%' or sno ilike '%${search}%' limit 10` :
+        `select * from schedule_of_rates limit 10`;
 
       prisma.$transaction([
         prisma.$queryRawUnsafe(query)

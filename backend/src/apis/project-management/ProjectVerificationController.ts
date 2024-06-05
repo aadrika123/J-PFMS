@@ -194,14 +194,14 @@ class ProjectVerificationController {
 
       Yup.object({
         proposalId: Yup.number().required("proposalId is required"),
-      }).validate(data).then((xx) => {
+      }).validate(data).then(() => {
 
         this.dao.getLastProposalCheckingRecordByProposalId(
           data?.proposalId
         ).then((lastRecord) => {
 
           if (!lastRecord && !user.isJuniorEngineer()) {
-            reject(new Error("You are not allowed."));
+            reject(new Error("You are not allowed to approve the project."));
           } else {
             if (user.isAssistantEngineer())
               approval_stage_id = ProjectProposalStages.ApprovedByAssistantEngineer;
@@ -234,6 +234,66 @@ class ProjectVerificationController {
 
     });
   }
+
+
+  sendBackProposal = (req: Request): Promise<APIv1Response> => {
+    console.log("====================================================");
+    return new Promise((resolve, reject) => {
+      // validate
+      const { data, user } = req.body;
+      console.log(data);
+
+      let approval_stage_id: number = ProjectProposalStages.ApprovedByJuniorEngineer;
+
+      Yup.object({
+        proposalId: Yup.number().required("proposalId is required"),
+      }).validate(data).then(() => {
+
+        this.dao.getLastProposalCheckingRecordByProposalId(
+          data?.proposalId
+        ).then((lastRecord) => {
+
+          console.log("lastrecord" , lastRecord);
+
+          if (!lastRecord && !user.isJuniorEngineer()) {
+            reject(new Error("You are not allowed to to send back the proposal" ));
+          } else {
+            if(user.isJuniorEngineer())
+              approval_stage_id = ProjectProposalStages.ApprovedByBackOffice;
+            else if (user.isAssistantEngineer())
+              approval_stage_id = ProjectProposalStages.ApprovedByAssistantEngineer;
+
+            const reqData = {
+              project_proposal_id: data?.proposalId,
+              checker_id: user?.getUserId(),
+              comment: data?.comment,
+              approval_stage_id: approval_stage_id,
+            };
+
+            console.log("reqData", reqData);
+
+            this.dao.sendBackProposal(reqData).then((result) => {
+              const d = { status: true, code: 200, message: "Success", data: result };
+              resolve(d);
+            }).catch((error) => {
+              reject(error);
+            });
+          }
+
+        }).catch((error) => {
+          reject(error);
+        });
+
+
+
+      }).catch((error) => {
+        reject(error);
+      });
+
+
+    });
+  }
+
 
 
   getOutboxItemCount = (req: Request): Promise<APIv1Response> => {

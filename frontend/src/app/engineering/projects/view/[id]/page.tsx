@@ -1,6 +1,6 @@
 import PageLayout from "@/components/Layouts/PageLayout";
 import React from "react";
-import ProjectProposalApprovalView from "./ProjectProposalApprovalView";
+import ProjectProposalApprovalView from "./ProjectApprovalViewComponent";
 
 const page = ({ params }: { params: { id: string } }) => {
   const { id } = params;

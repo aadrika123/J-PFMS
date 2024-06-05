@@ -1,22 +1,16 @@
 "use client";
-import React, { ChangeEvent, ReactNode, useEffect, useState } from "react";
+import React, { ChangeEvent, ReactNode, useCallback, useEffect, useState } from "react";
 // import { usePathname } from "next/navigation";
 import Button from "@/components/global/atoms/buttons/Button";
 import ConfirmationPopup from "@/components/global/molecules/ConfirmationPopup";
-import { acknowledgeProposal, useProjectProposalDetails } from "@/hooks/data/ProjectProposalsHooks";
+import { acknowledgeProposal, PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS, useProjectProposalDetails } from "@/hooks/data/ProjectProposalsHooks";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 import Image from "next/image";
 import home from "@/assets/svg/list.svg";
-import { usePathname } from "next/navigation";
 
-import list from "@/assets/svg/list.svg";
-import details from "@/assets/svg/details.svg";
-import admi from "@/assets/svg/admi.svg";
 import { Icons } from "@/assets/svg/icons";
 import goBack, { DateFormatter } from "@/utils/helper";
-import { LinkWithLoader } from "@/components/global/atoms/LinkWithLoader";
 import Table from "@/components/global/molecules/Table";
-import { useMutation, useQuery, useQueryClient } from "react-query";
 import pdfIcon from "@/assets/svg/pdf_icon.svg";
 import { PFMS_URL } from "@/utils/api/urls";
 import axios from "@/lib/axiosConfig";
@@ -28,8 +22,12 @@ import "react-tabs/style/react-tabs.css";
 
 import moment from "moment";
 import Loader from "@/components/global/atoms/Loader";
-import ProjectProposalApprovalStepper from "@/components/JuidcoPfms/projectProposalMolecules/ProjectProposalApprovalStepper";
 import { MeasurementManagementComponent } from "./MeasurementManagementComponent";
+import { motion } from "framer-motion";
+import SuperStepper, { GroupDict } from "../super-stepper";
+import { useQuery, useQueryClient } from "react-query";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
 
 
 
@@ -46,7 +44,16 @@ type ActionPropsType = {
 };
 
 const Action: React.FC<ActionPropsType> = (props) => {
-  const { proposalId, proposalDetails } = props;
+  const pathName = usePathname();
+  const searchParams = useSearchParams();
+
+
+  const [sendBackPopupVisible, setSendBackPopupVisible] = useState<boolean>(false);
+  const [sendForwardPopupVisible, setSendForwardPopupVisible] = useState<boolean>(false);
+
+
+  const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] = useWorkingAnimation();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const user = useUser();
   const [state, setState] = useState<StateType>({
@@ -54,75 +61,92 @@ const Action: React.FC<ActionPropsType> = (props) => {
   });
   const { comment } = state;
 
-  const handleApprove = async () => {
+
+
+
+  const sendForward = async () => {
+    if (!comment) {
+      toast.error("Kindly provide some comment !");
+      return;
+    }
+
+    activateWorkingAnimation();
+
+
     const res = await axios({
       url: `${PFMS_URL.PROJECT_VERIFICATION.approve}`,
       method: "POST",
       data: {
         data: {
-          proposalId: proposalId,
+          proposalId: props?.proposalId,
           comment,
         },
       },
     });
 
+    hideWorkingAnimation();
+
     if (!res.data.status) throw "Something Went Wrong!!!";
 
+    toast.success("Forwarded successfully.");
+
+    queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.INBOX_LIST]);
+    queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.INBOX_ITEM_COUNT]);
+    queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.OUTBOX_ITEM_COUNT]);
+    router.push(pathName + '?section=outbox&viewMode=list');
     return res.data.data;
-  };
 
-  const { mutate } = useMutation(handleApprove, {
-    onSuccess: () => {
-      toast.success("Forwarded Successfully");
-      window.location.replace("/pfms/engineering/projects/outbox");
-    },
-    onError: () => {
-      console.log("error");
-      toast.error("Something Went Wrong!!");
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries();
-    },
-  });
+  }
 
-  ////////// handle send back
 
   const handleSendBack = async () => {
+
+    if (!comment) {
+      toast.error("Kindly provide some comment !");
+      return;
+    }
+
+    activateWorkingAnimation();
+
+
     const res = await axios({
       url: `${PFMS_URL.PROJECT_VERIFICATION.sendBack}`,
       method: "POST",
       data: {
         data: {
-          bill_id: props?.proposalId,
+          proposalId: props?.proposalId,
           comment,
         },
       },
     });
 
+    hideWorkingAnimation();
+
     if (!res.data.status) throw "Something Went Wrong!!!";
 
-    toast.success("Forwarded Successfully");
-    window.location.replace("/finance/bills-verify");
-    return res.data.data;
-  };
+    toast.success("Sent Back Successfully");
+    router.push(pathName + '?section=inbox&viewMode=list');
 
-  //// handling comming comment stage
-  const handleGetStage = (proposalDetails: any) => {
-    if (proposalDetails?.status === "rejected")
-      return proposalDetails?.approval_stage_id ? user?.getProjectProposalStage(proposalDetails?.approval_stage_id + 2) : user?.getProjectProposalStage(2);
-    if (!proposalDetails?.approval_stage_id) return "Vendor";
-    if (!user?.getProjectProposalStage(proposalDetails?.approval_stage_id)) return user?.getProjectProposalStage(proposalDetails?.approval_stage_id + 1)
-    return user?.getProjectProposalStage(proposalDetails?.approval_stage_id)
+
+    queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.INBOX_LIST]);
+    queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.INBOX_ITEM_COUNT]);
+
+    return res.data.data;
   };
 
   return (
     <>
+      {workingAnimation}
+      {sendBackPopupVisible && (<ConfirmationPopup message="Send the proposal back?" cancel={() => setSendBackPopupVisible(false)} continue={handleSendBack} />)}
+      {sendForwardPopupVisible && (<ConfirmationPopup message="Forward the proposal?" cancel={() => setSendForwardPopupVisible(false)} continue={sendForward} />)}
+
+
       <Toaster />
       <div className="flex mt-4">
         <div className="w-1/3 bg-[#f9fafc]">
-          <header className="bg-[#e1e8f0] p-2 flex items-center justify-center text-secondary_black">
+          {/* <header className="bg-[#e1e8f0] p-2 flex items-center justify-center text-secondary_black">
             Members
-          </header>
+          </header> */}
           <div className="p-4">
             <span className="mt-4 text-secondary_black">Comments</span>
             <textarea
@@ -141,23 +165,23 @@ const Action: React.FC<ActionPropsType> = (props) => {
               Send Comment
             </Button> */}
             <div className="flex justify-between mt-8">
-              {!user?.isJuniorEngineer() && (
+              {!user?.isBackOffice() && (
                 <Button
-                  onClick={handleSendBack}
+                  onClick={() => setSendBackPopupVisible(true)}
                   className="hover:bg-[#f44646]"
                   variant="danger"
-                  disabled={!comment}
                 >
                   Send Back
                 </Button>
               )}
-              <Button variant="primary" onClick={mutate} disabled={!comment}>
+
+              <Button variant="primary" onClick={() => setSendForwardPopupVisible(true)}>
                 Forward
               </Button>
             </div>
           </div>
         </div>
-        <div className="w-2/3">
+        {/* <div className="w-2/3">
           <header className="bg-gray-200 p-2 flex items-center justify-center text-secondary_black">
             Timeline
           </header>
@@ -200,113 +224,13 @@ const Action: React.FC<ActionPropsType> = (props) => {
               <BoldSpan label="Forward Date:" content="NA NA" />
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </>
   );
 };
 
 
-
-
-const items = [
-  {
-    info: "BACK OFFICE",
-    img: admi,
-    level: 0,
-    approvalAmount: 100,
-  },
-  {
-    info: "TECHNICAL DEPARTMENT",
-    img: admi,
-    level: 1,
-    others: [
-      {
-        info: "JUNIOR ENGINEER",
-        img: admi,
-        approvalAmount: 200,
-      },
-      {
-        info: "ASSISTANT ENGINEER",
-        img: admi,
-        approvalAmount: 300,
-      },
-      {
-        info: "EXECUTIVE ENGINEER",
-        img: admi,
-        approvalAmount: 400,
-      },
-      {
-        info: "SUPERINTENDENT ENGINEER",
-        img: admi,
-        approvalAmount: 400,
-      },
-
-      {
-        info: "CHIEF ENGINEER",
-        img: admi,
-        approvalAmount: 400,
-      },
-    ],
-  },
-  {
-    info: "ADMINISTRATIVE DEPARTMENT",
-    img: admi,
-    level: 2,
-    others: [
-      {
-        info: "DEPARTMENTAL SECRETARY",
-        img: admi,
-        approvalAmount: 200,
-      },
-      {
-        info: "DEPARTMENTAL MINISTER",
-        img: admi,
-        approvalAmount: 300,
-      },
-      {
-        info: "YOJNA PRADHIKRIT SAMITI",
-        img: admi,
-        approvalAmount: 400,
-      },
-      {
-        info: "CABINET",
-        img: admi,
-        approvalAmount: 400,
-      },
-    ],
-  },
-];
-
-
-const usePrimaryTabs = (defaultTabIndex: number, changeAllowed: boolean): [ReactNode, number, (index: number) => void] => {
-
-  const items = [
-    { caption: "List", icon: list },
-    { caption: "Details", icon: details },
-  ];
-
-  const [activeTabIndex, setActiveTabIndex] = useState<number>(defaultTabIndex);
-
-  const tabs = (
-    <div className="flex">
-
-      {items.map((item, index) => {
-        return (
-          <>
-            <div onClick={() => { if (changeAllowed) setActiveTabIndex(index); }} className={`flex items-center  pb-1 w-28 justify-center ${activeTabIndex == index ? 'border-b-2 border-b-black' : ''}`}>
-              {item.icon && <Image src={item.icon} height={20} width={20} alt="pro-1" />}
-              <span className="ml-2 text-gray-500">{item.caption}</span>
-            </div>
-          </>
-        );
-      })}
-    </div>
-
-  );
-
-  return [tabs, activeTabIndex, setActiveTabIndex]
-}
 
 
 
@@ -337,10 +261,8 @@ export const Paragraph = ({ desc }: { desc: string }) => {
 };
 
 
-const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number }) => {
-  const pathName = usePathname();
-
-
+const ProjectApprovalViewComponent = ({ ProProposalId }: { ProProposalId: number | undefined }) => {
+  if (!ProProposalId) return <>Error! Project proposal id not provided</>;
   const [state, setState] = useState<any>({
     activeStep: 0,
     showPopup: false,
@@ -354,12 +276,12 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
 
   const { isLoading: isLoading, data: projectProposalDetails, refetch: refetchProjectProposalDetails } = useProjectProposalDetails(ProProposalId);
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] = useWorkingAnimation();
-
-  const [primaryTabs] = usePrimaryTabs(1, false);
+  const [stepperItems, setStepperItems] = useState<GroupDict>();
 
   console.log(projectProposalDetails);
 
   useEffect(() => {
+    setStepperItems(projectProposalDetails?.participants);
     console.log(projectProposalDetails);
   }, [projectProposalDetails]);
 
@@ -447,60 +369,30 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
 
 
 
+  //// handling comming comment stage
+  // const getCurrentState = (proposalDetails: any) => {
+  //   if (proposalDetails?.status === "rejected")
+  //     return proposalDetails?.approval_stage_id ? user?.getProjectProposalStage(proposalDetails?.approval_stage_id + 2) : user?.getProjectProposalStage(2);
+  //   if (!proposalDetails?.approval_stage_id) return "Vendor";
+  //   if (!user?.getProjectProposalStage(proposalDetails?.approval_stage_id)) return user?.getProjectProposalStage(proposalDetails?.approval_stage_id + 1)
+  //   return user?.getProjectProposalStage(proposalDetails?.approval_stage_id)
+  // };
+
+
 
   return (
     <>
       {workingAnimation}
 
-      {isLoading ? <Loader /> : (
+      {(isLoading) ? <Loader /> : (
         <>
-          <div className="flex items-center justify-between border-b-2 pb-4 mb-4">
-            <Button
-              variant="cancel"
-              className="border-none text-primary_bg_indigo hover:text-primary_bg_indigo hover:bg-inherit"
-              onClick={goBack}
-            >
-              {Icons.back}
-              <b>Back</b>
-            </Button>
-            <h2 className="text-black">
-              <b>Project Proposal Details</b>
-            </h2>
-          </div>
 
 
-          <div className="flex justify-between">
-            <div className="flex items-center mb-2 gap-2">
-              <LinkWithLoader href={`/engineering/projects`}>
-                <Button
-                  variant="primary"
-                  className={`${(pathName.includes("outbox") || pathName.includes("archive")) && "bg-gray-200 text-gray-500"}`}
-                >
-                  {Icons.outbox}
-                  Inbox
-                </Button>
-              </LinkWithLoader>
-              <LinkWithLoader href={`/engineering/projects/outbox`}>
-                <Button
-                  variant="primary"
-                  className={`${!pathName.includes("outbox") && "bg-gray-200 text-gray-500"}`}
-                >
-                  {Icons.outbox}
-                  Outbox
-                </Button>
-              </LinkWithLoader>
+          {acknowledgementPopupVisible && (<ConfirmationPopup message="Acknowledge the assignment?" cancel={() => setAcknowledgetmentPopupVisible(false)} continue={acknowledge} />)}
 
-              <LinkWithLoader href={'/engineering/projects/archive'}>
-                <Button
-                  variant="primary"
-                  className={`${!pathName.includes("archive") && "bg-gray-200 text-gray-500"}`}
-                >
-                  {Icons.outbox}
-                  Archive
-                </Button>
-              </LinkWithLoader>
 
-            </div>
+
+          <div>
 
 
             <div>
@@ -524,24 +416,14 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
               )}
 
             </div>
-          </div>
+            <div className="flex justify-center p-2 overflow-auto">
+              <div className="p-10 rounded-2xl">
 
+                <SuperStepper items={stepperItems} activeStep={projectProposalDetails?.approval_stage_id} />
 
-          <div className="mt-10">{primaryTabs}</div>
+              </div>
 
-
-          {acknowledgementPopupVisible && (<ConfirmationPopup message="Acknowledge the assignment?" cancel={() => setAcknowledgetmentPopupVisible(false)} continue={acknowledge} />)}
-
-
-
-          <div className="shadow-lg p-4 border">
-
-        <ProjectProposalApprovalStepper
-          level={1}
-          subLevel={0}
-          budget={400}
-          items={items}
-        />
+            </div>
 
             <div className="flex items-center gap-2 mt-4">
               <div className="bg-gray-100 border flex flex-col p-4 h-52 w-1/3 items-center justify-center rounded">
@@ -584,9 +466,25 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
             <Tabs>
               <TabList>
                 <Tab>VIEW DETAILS</Tab>
-                <Tab>COST ESTIMATION</Tab>
                 <Tab>VERIFY DOCUMENTS</Tab>
-                <Tab>ACTION</Tab>
+                {projectProposalDetails?.acknowledged && (<Tab>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ ease: "easeOut", duration: 1 }}
+                  >
+                    COST ESTIMATION
+                  </motion.div>
+                </Tab>)}
+                {projectProposalDetails?.measurements_added && (<Tab>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ ease: "easeOut", duration: 1 }}
+                  >
+                    ACTION
+                  </motion.div>
+                </Tab>)}
               </TabList>
 
               <TabPanel>
@@ -655,12 +553,21 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
 
                 </>
               </TabPanel>
+
+              <TabPanel>
+                <div className="mt-4">
+                  <Table columns={columns} data={data?.files} center />
+                </div>
+              </TabPanel>
+
               <TabPanel>
                 {projectProposalDetails?.acknowledged ? (
                   <>
                     {/* Table of existing measurements */}
                     <div>
-                      <MeasurementManagementComponent proposal_id={projectProposalDetails.id} />
+                      <MeasurementManagementComponent proposal_id={projectProposalDetails.id} onNewMeasurementEntries={() => {
+                        refetchProjectProposalDetails();
+                      }} />
                     </div>
 
                     {/* <div>
@@ -702,14 +609,29 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
 
               </TabPanel >
 
-              <TabPanel>
-                <div className="mt-4">
-                  <Table columns={columns} data={data?.files} center />
-                </div>
-              </TabPanel>
+
 
               <TabPanel>
-                <Action proposalId={Number(ProProposalId)} proposalDetails={projectProposalDetails} />
+                {projectProposalDetails?.measurements_added ? (
+                  <Action proposalId={Number(ProProposalId)} proposalDetails={projectProposalDetails} />
+
+                ) : (
+                  <>
+                    <div className="w-full flex justify-center gap-4 text-center bg-primary_bg_indigo p-4 text-white rounded font-bold">
+                      Kindly add measurements first.
+                    </div>
+
+                    <div className="flex justify-center">
+                      <div className="cursor-pointer rounded border border-1 bg-primary_bg_indigo p-2 text-white" onClick={() => refetchProjectProposalDetails()}
+                      >
+                        Rrefresh
+                      </div>
+
+                    </div>
+
+                  </>
+
+                )}
               </TabPanel>
             </Tabs >
 
@@ -724,4 +646,4 @@ const ProjectProposalApprovalView = ({ ProProposalId }: { ProProposalId: number 
   );
 };
 
-export default ProjectProposalApprovalView;
+export default ProjectApprovalViewComponent;

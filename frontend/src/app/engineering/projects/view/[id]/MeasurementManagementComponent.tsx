@@ -490,6 +490,7 @@ const MeasurementTable = ({ measurements }: MeasurementTableProps) => {
 
 interface MeasurementManagementComponentProps {
     proposal_id: number;
+    onNewMeasurementEntries: () => void
 }
 
 export const MeasurementManagementComponent = (props: MeasurementManagementComponentProps) => {
@@ -533,6 +534,7 @@ export const MeasurementManagementComponent = (props: MeasurementManagementCompo
                         <AddMeasurementComponent onBack={() => setMeasurementFormVisible(false)} proposal_id={props.proposal_id} onUpdate={() => {
                             setMeasurementFormVisible(false);
                             refetchMeasurementList();
+                            props.onNewMeasurementEntries();
                         }} />
                     </PopupEx>
 

@@ -14,7 +14,7 @@ model measurements {
   unit          String
   rate          Float
   amount        Float
-  remarks       String
+  remarks       String?
 
   created_at    DateTime @default(now()) @map("created_at")
   updated_at    DateTime @default(now()) @updatedAt @map("updated_at")

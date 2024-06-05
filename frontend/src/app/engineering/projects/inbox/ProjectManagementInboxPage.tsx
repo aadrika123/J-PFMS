@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import list from "@/assets/svg/list.svg";
 import details from "@/assets/svg/details.svg";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import SimpleTable from "@/components/global/atoms/SimpleTable";
 
@@ -22,6 +22,10 @@ import { ProjectManagementLayout } from "../ProjectManagementLayout";
 const ProjectManagementInboxPage = () => {
   const router = useRouter();
   const pathName = usePathname();
+  const searchParams = useSearchParams();
+
+  const [currentView, setCurrentView] = useState<string>("list");
+
 
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [limit, page, paginator, resetPaginator] = usePagination();
@@ -48,7 +52,7 @@ const ProjectManagementInboxPage = () => {
     // { name: "summary", caption: "Summary", width: "w-[20%]", align: "left" }
     { name: "id", caption: "Sr. No." },
     { name: "project_proposal_no", caption: "Project Proposal No.", width: "w-[20%]" },
-    { name: "title", caption: "Project Title" },
+    { name: "title", caption: "Project Title"},
     { name: "type", caption: "Project Type" },
     { name: "proposed_date", caption: "Proposed Date", type: "date" },
     { name: "ward_name", caption: "Ward No" },
@@ -108,7 +112,7 @@ const ProjectManagementInboxPage = () => {
     <>
       {workingAnimation}
 
-      <ProjectManagementLayout>
+      <ProjectManagementLayout inboxComponent={<>
         <div hidden={!isFilterPanelOpen} className="w-[25%] h-[75vh] overflow-y-auto overflow-x-hidden hide-scrollbar">
           <SearchPanel onClose={toggleFilterPanel} items={searchPanelItems} values={searchPanelItemValues} onFilterChange={onFilterChange} onNoFilter={onRemoveFilter} />
         </div>
@@ -146,9 +150,12 @@ const ProjectManagementInboxPage = () => {
             {paginator}
 
           </section>
-        </div>
+        </div>      
+      </>} outboxComponent={<>
+      Outbox
+      </>}/>
 
-      </ProjectManagementLayout>
+
     </>
   )
 }

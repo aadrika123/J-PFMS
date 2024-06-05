@@ -19,6 +19,8 @@ model project_proposals {
   user_id             Int
   execution_body      Int
 
+  remarks             String?
+
   acknowledged        Boolean @default(false)
 
   project_proposal_checkings project_proposal_checkings[]
