@@ -37,7 +37,9 @@ export const sidebarLinks: SidebarLinksProps = {
           moduleName: "Engineering Section",
           icon: <Image src={project} alt="home" width={100} height={100} />,
           path: "/engineering",
-          roles: [ROLES.JUNIOR_ENGINEER, ROLES.ASSISTANT_ENGINEER],
+          roles: [ROLES.JUNIOR_ENGINEER, ROLES.ASSISTANT_ENGINEER, 
+            ROLES.EXECUTIVE_ENGINEER, ROLES.SUPERINTENDENT_ENGINEER, ROLES.CHIEF_ENGINEER,
+             ROLES.DEPUTY_MUNICIPAL_COMMISSIONER, ROLES.ASSISTANT_MUNICIPAL_COMMISSIONER, ROLES.MUNICIPAL_COMMISSIONER],
 
           subModules: [
             {

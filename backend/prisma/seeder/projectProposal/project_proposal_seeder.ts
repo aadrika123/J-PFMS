@@ -12,7 +12,7 @@ const project_proposal_seeder = async () => {
       type_id: 1,
       proposed_date: faker.date.recent(),
       title: faker.lorem.words(4),
-      description: faker.lorem.lines(1),
+      description: faker.lorem.words(100),
       state_id: 16,
       district_id: 20,
       ward_id: 31,
@@ -22,7 +22,19 @@ const project_proposal_seeder = async () => {
       execution_body: 1,
       address: faker.address.city()
     };
-    await prisma.project_proposals.create({ data: record });
+    const proposal = await prisma.project_proposals.create({ data: record });
+
+
+    await prisma.project_proposal_checkings.create({
+      data: {
+        project_proposal_id: proposal.id,
+        checker_id: 1,
+        comment: "Proposal Submitted!",
+        at_role_id: 2,  // JUNIOR ENGINEER
+        at_role_name: "JUNIOR ENGINEER"
+      }
+    });
+
   }
 };
 export default project_proposal_seeder;

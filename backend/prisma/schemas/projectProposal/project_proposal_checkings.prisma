@@ -1,18 +1,19 @@
-
 model project_proposal_checkings {
-id                  Int               @id @default(autoincrement())
+    id Int @id @default(autoincrement())
 
-project_proposal_id              Int
-project_proposal                 project_proposals     @relation(fields: [project_proposal_id], references: [id])
+    project_proposal_id Int
+    project_proposal    project_proposals @relation(fields: [project_proposal_id], references: [id])
 
-checker_id     Int
+    checker_id Int
 
-comment             String
-status              String          @default("pending")
-approval_stage_id        Int    
-approval_stage          project_proposal_stages         @relation(fields: [approval_stage_id], references: [id])       
+    comment String
 
+    at_role_id Int
+    at_role_name    String
 
-created_at       DateTime          @default(now()) @map("created_at")
-updated_at       DateTime          @default(now()) @updatedAt @map("updated_at")
+// forwarded, sent_back
+    last_action String  @default("forwarded")
+
+    created_at DateTime @default(now()) @map("created_at")
+    updated_at DateTime @default(now()) @updatedAt @map("updated_at")
 }

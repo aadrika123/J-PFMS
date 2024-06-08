@@ -1,0 +1,10 @@
+// Managed by: Bijoy
+model roles_in_order {
+  id Int @id @default(autoincrement())
+
+  name            String
+  authority_level Int
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @updatedAt @map("updated_at")
+}

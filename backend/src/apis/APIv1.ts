@@ -65,6 +65,10 @@ export class APIv1 {
         console.log(`api call (${req.path})`);
 
         const user = new User(req.body.auth);
+
+//        console.log("auth==================================================", req.body.auth);
+
+
         req.body.user = user;
                 
         // invoke the before-middlewares if any

@@ -1,15 +1,14 @@
 "use client";
-import React, { ChangeEvent, ReactNode, useCallback, useEffect, useState } from "react";
+import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
 // import { usePathname } from "next/navigation";
 import Button from "@/components/global/atoms/buttons/Button";
 import ConfirmationPopup from "@/components/global/molecules/ConfirmationPopup";
-import { acknowledgeProposal, PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS, useProjectProposalDetails } from "@/hooks/data/ProjectProposalsHooks";
+import { acknowledgeProposal, PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS, useCommentList, useProjectProposalDetails } from "@/hooks/data/ProjectProposalsHooks";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 import Image from "next/image";
 import home from "@/assets/svg/list.svg";
 
-import { Icons } from "@/assets/svg/icons";
-import goBack, { DateFormatter } from "@/utils/helper";
+import { DateFormatter } from "@/utils/helper";
 import Table from "@/components/global/molecules/Table";
 import pdfIcon from "@/assets/svg/pdf_icon.svg";
 import { PFMS_URL } from "@/utils/api/urls";
@@ -24,9 +23,11 @@ import moment from "moment";
 import Loader from "@/components/global/atoms/Loader";
 import { MeasurementManagementComponent } from "./MeasurementManagementComponent";
 import { motion } from "framer-motion";
-import SuperStepper, { GroupDict } from "../super-stepper";
+import SuperStepper, { GroupDict } from "../../../components/global/molecules/super-stepper";
 import { useQuery, useQueryClient } from "react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import admi from "@/assets/svg/admi.svg";
+
 
 
 
@@ -41,15 +42,16 @@ type StateType = {
 type ActionPropsType = {
   proposalId: number;
   proposalDetails: any;
+  readOnly: boolean;
 };
 
 const Action: React.FC<ActionPropsType> = (props) => {
   const pathName = usePathname();
-  const searchParams = useSearchParams();
-
 
   const [sendBackPopupVisible, setSendBackPopupVisible] = useState<boolean>(false);
   const [sendForwardPopupVisible, setSendForwardPopupVisible] = useState<boolean>(false);
+
+  const { isLoading: isLoadingCommentList, data: commentList } = useCommentList(props.proposalId);
 
 
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] = useWorkingAnimation();
@@ -92,7 +94,10 @@ const Action: React.FC<ActionPropsType> = (props) => {
 
     queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.INBOX_LIST]);
     queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.INBOX_ITEM_COUNT]);
+    queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.OUTBOX_LIST]);
     queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.OUTBOX_ITEM_COUNT]);
+    queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.PROPOSAL]);
+    
     router.push(pathName + '?section=outbox&viewMode=list');
     return res.data.data;
 
@@ -143,11 +148,8 @@ const Action: React.FC<ActionPropsType> = (props) => {
 
       <Toaster />
       <div className="flex mt-4">
-        <div className="w-1/3 bg-[#f9fafc]">
-          {/* <header className="bg-[#e1e8f0] p-2 flex items-center justify-center text-secondary_black">
-            Members
-          </header> */}
-          <div className="p-4">
+        <div className="bg-[#f9fafc]">
+          {!props.readOnly && (<div className="p-4">
             <span className="mt-4 text-secondary_black">Comments</span>
             <textarea
               className="bg-white border text-secondary"
@@ -158,12 +160,7 @@ const Action: React.FC<ActionPropsType> = (props) => {
                 setState({ ...state, comment: e.target.value })
               }
             />
-            {/* <Button
-              className="mt-2 bg-[#38bdf8] hover:bg-[#5bc8f7]"
-              variant="primary"
-            >
-              Send Comment
-            </Button> */}
+
             <div className="flex justify-between mt-8">
               {!user?.isBackOffice() && (
                 <Button
@@ -179,52 +176,47 @@ const Action: React.FC<ActionPropsType> = (props) => {
                 Forward
               </Button>
             </div>
+          </div>)}
+
+
+          <div>
+            Comments:
+            {commentList?.map((item: any, index: number) => {
+              return (
+                <>
+                  <hr className="mb-4" />
+
+                  <div className="bg-[#e0f2fe] p-4 mt-4 rounded-lg flex relative w-full">
+                    <div className="h-5 w-5 bg-[#3abdf3] rounded-full text-white flex items-center justify-center absolute top-0 left-0">
+                      {index + 1}
+                    </div>
+                    <div>
+                      <Image src={admi} alt="admi" />
+                    </div>
+
+                    <div>
+                      <div className="flex gap-2">
+                        <div className="whitespace-nowrap font-bold ">{item?.user_name ? item?.user_name : "No Name"}</div>
+                        <div className="whitespace-nowrap">({item?.role})</div>
+                      </div>
+                      <div>
+                        <div>{item?.comment}</div>
+                        <div>{DateFormatter(item?.created_at)}</div>
+                      </div>
+                    </div>
+
+
+                  </div>
+                </>
+              );
+            })}
           </div>
+
+
+
+
         </div>
-        {/* <div className="w-2/3">
-          <header className="bg-gray-200 p-2 flex items-center justify-center text-secondary_black">
-            Timeline
-          </header>
-          <div className="p-4 text-secondary_black">
-            <span>{handleGetStage(proposalDetails)}&apos;s Comment</span> <br />
-            {proposalDetails?.comment || proposalDetails?.remarks ? (
-              <span className="mt-4">{proposalDetails?.comment || proposalDetails?.remarks}</span>
-            ) : (
-              <span className="flex justify-center text-red-500">
-                No Comment Yet!
-              </span>
-            )}
-            <hr className="mb-4" />
-            <span>Level Comment</span>
-            <div className="bg-[#e0f2fe] p-4 mt-4 rounded-lg w-2/3 relative">
-              <div className="h-5 w-5 bg-[#3abdf3] rounded-full text-white flex items-center justify-center absolute top-0 left-0">
-                1
-              </div>
-              <div className="flex items-center">
-                <Image src={admi} alt="admi" />
-                <div className="flex flex-col ml-1">
-                  <span>
-                    <b>Rakesh Kumar</b>
-                  </span>
-                  <span>Junior Engineer</span>
-                </div>
-              </div>
-              <div className="my-1">
-                forwarded to{" "}
-                <span className="bg-gray-700 rounded p-2 text-white text-xs">
-                  Assistant Engineer
-                </span>
-              </div>
-              <BoldSpan label="Comment:" content="Verify the bill" /> <br />
-              <BoldSpan
-                label="Received Date:"
-                content="09-03-2024 16:31"
-              />{" "}
-              <br />
-              <BoldSpan label="Forward Date:" content="NA NA" />
-            </div>
-          </div>
-        </div> */}
+
       </div>
     </>
   );
@@ -261,8 +253,21 @@ export const Paragraph = ({ desc }: { desc: string }) => {
 };
 
 
-const ProjectApprovalViewComponent = ({ ProProposalId }: { ProProposalId: number | undefined }) => {
+interface ProjectApprovalViewComponent {
+  ProProposalId: number | undefined;
+  readOnly: boolean;
+}
+
+
+const ProjectApprovalViewComponent = ({ ProProposalId, readOnly }: ProjectApprovalViewComponent) => {
   if (!ProProposalId) return <>Error! Project proposal id not provided</>;
+
+  const searchParams = useSearchParams();
+  const pathName = usePathname();
+  const router = useRouter();
+
+
+
   const [state, setState] = useState<any>({
     activeStep: 0,
     showPopup: false,
@@ -277,12 +282,19 @@ const ProjectApprovalViewComponent = ({ ProProposalId }: { ProProposalId: number
   const { isLoading: isLoading, data: projectProposalDetails, refetch: refetchProjectProposalDetails } = useProjectProposalDetails(ProProposalId);
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] = useWorkingAnimation();
   const [stepperItems, setStepperItems] = useState<GroupDict>();
+  const [stepperCurrentStep, setStepperCurrentStep] = useState<number>(0);
 
   console.log(projectProposalDetails);
 
   useEffect(() => {
-    setStepperItems(projectProposalDetails?.participants);
-    console.log(projectProposalDetails);
+    if (projectProposalDetails?.department_wise_checklist) {
+      console.log(projectProposalDetails);
+      setStepperItems(JSON.parse(projectProposalDetails?.department_wise_checklist));
+
+      const checkList: string[] = JSON.parse(projectProposalDetails?.checklist);
+      setStepperCurrentStep(checkList.indexOf(projectProposalDetails?.at_role_name));
+    }
+
   }, [projectProposalDetails]);
 
   const [acknowledgementPopupVisible, setAcknowledgetmentPopupVisible] = useState<boolean>(false);
@@ -294,8 +306,11 @@ const ProjectApprovalViewComponent = ({ ProProposalId }: { ProProposalId: number
     activateWorkingAnimation();
     acknowledgeProposal(ProProposalId).then((data) => {
       console.log(data);
-      refetchProjectProposalDetails();
+      refetchProjectProposalDetails().then(() => {
+        router.push(pathName + '?' + createQueryString({ tab: 2 }));
+      });
       hideWorkingAnimation();
+
     }).catch((error) => {
       hideWorkingAnimation();
       console.log(error);
@@ -367,6 +382,20 @@ const ProjectApprovalViewComponent = ({ ProProposalId }: { ProProposalId: number
     },
   ];
 
+  const createQueryString = useCallback(
+    (newParams: any) => {
+      const params = new URLSearchParams(searchParams.toString())
+
+      const keys = Object.keys(newParams);
+      keys.forEach((key) => {
+        params.set(key, newParams[key])
+      });
+      return params.toString()
+    },
+    [searchParams]
+  )
+
+
 
 
   //// handling comming comment stage
@@ -416,16 +445,9 @@ const ProjectApprovalViewComponent = ({ ProProposalId }: { ProProposalId: number
               )}
 
             </div>
-            <div className="flex justify-center p-2 overflow-auto">
-              <div className="p-10 rounded-2xl">
 
-                <SuperStepper items={stepperItems} activeStep={projectProposalDetails?.approval_stage_id} />
 
-              </div>
-
-            </div>
-
-            <div className="flex items-center gap-2 mt-4">
+            <div className="flex gap-2 mt-4">
               <div className="bg-gray-100 border flex flex-col p-4 h-52 w-1/3 items-center justify-center rounded">
                 <BoldSpan
                   className="text-secondary_black mb-4 text-center"
@@ -447,10 +469,12 @@ const ProjectApprovalViewComponent = ({ ProProposalId }: { ProProposalId: number
 
                 </div>
               </div>
-              <div className="bg-gray-100 border flex flex-col py-4 px-8 h-52 w-full rounded">
+              <div className="bg-gray-100 border flex flex-col py-4 px-8 w-full rounded">
                 <section>
                   <Title title="Project Summary" />
-                  <Paragraph desc={projectProposalDetails?.description} />
+                  <div>
+                    {projectProposalDetails?.description}
+                  </div>
                 </section>
               </div>
               <div>
@@ -459,32 +483,43 @@ const ProjectApprovalViewComponent = ({ ProProposalId }: { ProProposalId: number
             </div>
 
 
+            <div className="flex justify-center p-2 overflow-auto">
+              <div className="p-10 rounded-2xl">
+
+                <SuperStepper items={stepperItems} activeStep={stepperCurrentStep} />
+
+              </div>
+
+            </div>
+
             <div className="mt-10">
             </div>
 
 
-            <Tabs>
+            <Tabs selectedIndex={Number(searchParams.get("tab") ? searchParams.get("tab") : "0")}>
               <TabList>
-                <Tab>VIEW DETAILS</Tab>
-                <Tab>VERIFY DOCUMENTS</Tab>
-                {projectProposalDetails?.acknowledged && (<Tab>
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ ease: "easeOut", duration: 1 }}
-                  >
-                    COST ESTIMATION
-                  </motion.div>
-                </Tab>)}
-                {projectProposalDetails?.measurements_added && (<Tab>
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ ease: "easeOut", duration: 1 }}
-                  >
-                    ACTION
-                  </motion.div>
-                </Tab>)}
+                <Tab onClick={() => router.push(pathName + '?' + createQueryString({ tab: 0 }))}>VIEW DETAILS</Tab>
+                <Tab onClick={() => router.push(pathName + '?' + createQueryString({ tab: 1 }))}>VERIFY DOCUMENTS</Tab>
+                {projectProposalDetails?.acknowledged && (
+                  <Tab onClick={() => router.push(pathName + '?' + createQueryString({ tab: 2 }))}>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ ease: "easeOut", duration: 1 }}
+                    >
+                      COST ESTIMATION
+                    </motion.div>
+                  </Tab>)}
+                {projectProposalDetails?.measurements_added && (
+                  <Tab onClick={() => router.push(pathName + '?' + createQueryString({ tab: 3 }))}>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ ease: "easeOut", duration: 1 }}
+                    >
+                      ACTION
+                    </motion.div>
+                  </Tab>)}
               </TabList>
 
               <TabPanel>
@@ -565,8 +600,10 @@ const ProjectApprovalViewComponent = ({ ProProposalId }: { ProProposalId: number
                   <>
                     {/* Table of existing measurements */}
                     <div>
-                      <MeasurementManagementComponent proposal_id={projectProposalDetails.id} onNewMeasurementEntries={() => {
-                        refetchProjectProposalDetails();
+                      <MeasurementManagementComponent readOnly={readOnly} proposal_id={projectProposalDetails.id} onNewMeasurementEntries={() => {
+                        refetchProjectProposalDetails().then(() => {
+                          // router.push(pathName + '?' + createQueryString({tab:3}));
+                        });
                       }} />
                     </div>
 
@@ -613,7 +650,7 @@ const ProjectApprovalViewComponent = ({ ProProposalId }: { ProProposalId: number
 
               <TabPanel>
                 {projectProposalDetails?.measurements_added ? (
-                  <Action proposalId={Number(ProProposalId)} proposalDetails={projectProposalDetails} />
+                  <Action proposalId={Number(ProProposalId)} proposalDetails={projectProposalDetails} readOnly={readOnly} />
 
                 ) : (
                   <>

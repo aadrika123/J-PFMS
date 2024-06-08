@@ -1,6 +1,0 @@
-model project_proposal_stages {
-    id Int @id
-    name String
-
-    project_proposal_checkings project_proposal_checkings[]
-}
