@@ -14,21 +14,25 @@ export const coverList = {
       label: "Single Cover",
       value: "1",
       list: ["Fee/Prequal/Technical/Financial"],
+      listInLower: ["fee/prequal/technical/financial"],
     },
     {
       label: "Two Cover",
       value: "2",
       list: ["Fee/Prequal/Technical", "Financial"],
+      listInLower: ["fee/prequal/technical", "financial"],
     },
     {
       label: "Three Cover",
       value: "3",
       list: ["Fee", "Prequal/Technical", "Financial"],
+      listInLower: ["fee", "prequal/technical", "financial"],
     },
     {
       label: "Four Cover",
       value: "4",
       list: ["Fee", "Prequal", "Technical", "Financial"],
+      listInLower: ["fee", "prequal", "technical", "financial"],
     },
   ],
 };
@@ -144,22 +148,22 @@ export const online_bank = [
   {
     id: 1,
     name: "ICICI",
-    value: "1",
+    value: 1,
   },
   {
     id: 2,
     name: "SBI",
-    value: "2",
+    value: 2,
   },
   {
     id: 3,
     name: "UTI",
-    value: "3",
+    value: 3,
   },
   {
     id: 4,
     name: "PNB",
-    value: "4",
+    value: 4,
   },
 ];
 
@@ -346,5 +350,10 @@ export const tabList = [
     id: 6,
     icon: BidIcon,
     title: "Bid Details",
+  },
+  {
+    id: 7,
+    icon: BidIcon,
+    title: "Preview",
   },
 ];

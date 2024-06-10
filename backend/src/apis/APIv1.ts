@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import multerUpload from "./middleware/_multer";
 import {User} from "pfmslib";
+import dmsMulterUpload from "./middleware/_dms_multer";
 
 
 
@@ -49,6 +50,15 @@ export class APIv1 {
     this.app.route(`${this.baseUrl}/${path}`)
       .post(async (req: Request, res: Response) => {
         multerUpload.fields(fields)(req, res, () => {
+          this.apiWrapper(req, res, this.generateAPIId(), handler);
+        });        
+      });
+  }
+
+  addDMSUploadRoute(path: string, handler: (req: Request) => Promise<APIv1Response>): void {
+    this.app.route(`${this.baseUrl}/${path}`)
+      .post(async (req: Request, res: Response) => {
+        dmsMulterUpload.single("doc")(req, res, () => {
           this.apiWrapper(req, res, this.generateAPIId(), handler);
         });        
       });

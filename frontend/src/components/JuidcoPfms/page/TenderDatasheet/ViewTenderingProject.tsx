@@ -11,7 +11,7 @@ import React, { useState } from "react";
 import Loader from "@/components/global/atoms/Loader";
 import Image from "next/image";
 import Table from "@/components/global/molecules/Table";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import axios from "@/lib/axiosConfig";
 import { PFMS_URL } from "@/utils/api/urls";
 import pdfIcon from "@/assets/svg/pdf_icon.svg";
@@ -27,6 +27,7 @@ import { useWorkingAnimation } from "@/components/global/molecules/general/useWo
 
 const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [, activateWorkingAnimation] = useWorkingAnimation();
 
   const pathName = usePathname();
@@ -82,12 +83,40 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
   ////////////// handleOpenTenderInputForm //////////
   const handleOpenTenderInputForm = () => {
     activateWorkingAnimation();
-    router.push(`${pathName.split('/view')[0]}/add/1`);
+    router.push(
+      `${pathName.split("/view")[0]}/add/${data.tender_datasheet_id}?pageNo=1`
+    );
   };
 
   ///////////// Handling step click ///////////
   const handleStepClick = (step: number) => {
     setState({ ...state, activeStep: step });
+  };
+
+  /////////// Handle Add Tender From ////////////
+  const handleAddTenderForm = async () => {
+    try {
+      activateWorkingAnimation();
+      const res = await axios({
+        url: `${PFMS_URL.TENDER_FORM.create}`,
+        method: "POST",
+        data: {
+          data: {
+            project_proposal_id: data.id,
+          },
+        },
+      });
+
+      if (!res.data.status) throw "Someting Went Wrong!!";
+
+      queryClient.invalidateQueries(["project-proposals-11"]),
+
+      router.push(
+        `${pathName.split("/view")[0]}/add/${res.data.data.id}?pageNo=1`
+      );
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const columns = [
@@ -143,16 +172,26 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
                 {Icons.back}
                 <b>Back</b>
               </Button>
-              <Button
-                variant="primary"
-                className="border-none"
-                onClick={handleOpenTenderInputForm}
-              >
-                <b>Prepare Tender Input Form</b>
-                <div className="h-4 w-4 bg-white text-black rounded-full flex justify-center items-center">
-                  +
-                </div>
-              </Button>
+              {!data.tender_datasheet_id ? (
+                <Button
+                  variant="primary"
+                  className="border-none"
+                  onClick={handleAddTenderForm}
+                >
+                  <b>Prepare Tender Input Form</b>
+                  <div className="h-4 w-4 bg-white text-black rounded-full flex justify-center items-center">
+                    +
+                  </div>
+                </Button>
+              ) : (
+                <Button
+                  variant="primary"
+                  className="border-none"
+                  onClick={handleOpenTenderInputForm}
+                >
+                  <b>View Prepare Tender Input Form</b>
+                </Button>
+              )}
             </div>
             <BoxContainer projectDetails={data} />
             <Steps

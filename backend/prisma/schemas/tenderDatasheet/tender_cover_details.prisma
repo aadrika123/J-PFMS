@@ -1,0 +1,11 @@
+///// Managed By :- Sanjiv
+model tender_cover_details {
+  id                  Int               @id @default(autoincrement())
+  tender_datasheet_id Int               @unique
+  tender_datasheet    tender_datasheets @relation(fields: [tender_datasheet_id], references: [id])
+  cover_no            String
+  content             String
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @map("updated_at")
+}

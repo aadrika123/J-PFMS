@@ -7,10 +7,10 @@
  */
 
 import Button from "@/components/global/atoms/buttons/Button";
-import goBack from "@/utils/helper";
+import goBack, { removeEmptyField } from "@/utils/helper";
 import { Formik, FormikValues } from "formik";
 import { tenderFeeDetailsSchema } from "pfmslib";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { bg_color, emd_fee_type } from "../molecules/checkList";
 import RadioComponent from "../molecules/RadioComponent";
 import Image from "next/image";
@@ -29,46 +29,94 @@ import LosingDataConfirmPopup from "@/components/global/molecules/general/Losing
 import FeeIcon from "@/assets/svg/Rupee.svg";
 import Input from "@/components/global/atoms/Input";
 import RadioYesNoComponent from "../molecules/RadioYesNoComponent";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import toast, { Toaster } from "react-hot-toast";
+import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
+import { PFMS_URL } from "@/utils/api/urls";
+import axios from "@/lib/axiosConfig";
 
 type TenderFeeDetailsFormProps = {
   handleTabChange: (type: string) => void;
+  tenderFormId: number;
 };
 
-const TenderFeeDetailsForm: React.FC<TenderFeeDetailsFormProps> = (
-  props
-) => {
-  const { handleTabChange } = props
+const TenderFeeDetailsForm: React.FC<TenderFeeDetailsFormProps> = (props) => {
+  const queryClient = useQueryClient();
+  const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
+    useWorkingAnimation();
+  const { handleTabChange, tenderFormId } = props;
   const formRef = useRef<HTMLFormElement>(null);
-  const initialValues = {
-    tender_fee_examption_allowed: true,
-    tender_fee: "",
-    processing_fee: "",
-    tender_fee_payable_to: "",
-    tender_fee_payable_at: "",
-    surcharges: "",
-    other_charges: "",
-    emd_examption_allowed: true,
-    emd_fee_type: "",
-    fixed_emd_fee: "",
-    percentage_emd_fee: "",
-    emd_fee_payable_to: "",
-    emd_fee_payable_at: "",
-  };
 
   const readonly = false;
   const [state, setState] = useState<any>({
     showWarning: false,
     triggerFun: null,
     showFinalError: false,
+    finalData: "",
+    showConfirmation: false,
   });
 
-  const { showWarning, triggerFun, showFinalError } = state;
+  const {
+    showWarning,
+    triggerFun,
+    showFinalError,
+  } = state;
 
-  /////// Handle Submit //////
-  const onSubmit = (values: FormikValues) => {
-    console.log("Basic Details", values);
-    handleTabChange("next");
+  const [initialDetails, setInitialDetails] = useState({
+    tender_datasheet_id: tenderFormId,
+    tender_fee_examption_allowed: false,
+    tender_fee: "",
+    processing_fee: "",
+    tender_fee_payable_to: "",
+    tender_fee_payable_at: "",
+    surcharges: "",
+    other_charges: "",
+    emd_examption_allowed: false,
+    emd_fee_type: "",
+    fixed_emd_fee: "",
+    percentage_emd_fee: "",
+    emd_fee_payable_to: "",
+    emd_fee_payable_at: "",
+  });
+
+  ///////// Fetching Data
+  const fetch = async () => {
+    const res = await axios({
+      url: `${PFMS_URL.TENDER_FEE.getById}/${tenderFormId}`,
+      method: "GET",
+    });
+
+    if (!res.data.status) throw "Someting Went Wrong!!";
+
+    return res.data.data;
   };
+
+  const { data: data }: any = useQuery(
+    ["tender-fee-details", tenderFormId],
+    fetch
+  );
+
+  useEffect(() => {
+    if (data) {
+
+      setInitialDetails({
+        tender_datasheet_id: data?.tender_datasheet_id || tenderFormId,
+        tender_fee_examption_allowed: data?.tender_fee_examption_allowed,
+        tender_fee: data?.tender_fee || "",
+        processing_fee: data?.processing_fee || "",
+        tender_fee_payable_to: data?.tender_fee_payable_to || "",
+        tender_fee_payable_at: data?.tender_fee_payable_at || "",
+        surcharges: data?.surcharges || "",
+        other_charges: data?.other_charges || "",
+        emd_examption_allowed: data?.emd_examption_allowed,
+        emd_fee_type: data?.emd_fee_type || "",
+        fixed_emd_fee: data?.fixed_emd_fee || "",
+        percentage_emd_fee: data?.percentage_emd_fee || "",
+        emd_fee_payable_to: data?.emd_fee_payable_to || "",
+        emd_fee_payable_at: data?.emd_fee_payable_at || "",
+      });
+    }
+  }, [data]);
 
   ///// handlBackAndReset
   const handleBackAndReset = (trigger?: () => void) => {
@@ -94,25 +142,49 @@ const TenderFeeDetailsForm: React.FC<TenderFeeDetailsFormProps> = (
     setFieldValue("emd_fee_type", value ? "" : "fixed");
   };
 
+  //////////// Handle Save Fee Details /////////////
+  const handleSave = async (values: any) => {
+    activateWorkingAnimation();
+    const res = await axios({
+      url: `${PFMS_URL.TENDER_FEE?.create}`,
+      method: "POST",
+      data: {
+        data: values,
+      },
+    });
+  
+    if (!res.data.status) throw "Something Went Wrong!!!";
+  };
+
+  const { mutate } = useMutation(handleSave, {
+    onSuccess: () => {
+      Promise.all([
+        queryClient.invalidateQueries(["tender-fee-openers", tenderFormId]),
+        queryClient.invalidateQueries(["tender-all-details", tenderFormId]),
+      ]);
+      toast.success("Details Saved Successfully");
+      setTimeout(() => {
+        handleTabChange("next");
+      }, 100);
+    },
+    onError: (error) => {
+      toast.error("Something Went Wrong!!");
+      console.log(error);
+    },
+    onSettled: () => {
+      hideWorkingAnimation();
+    },
+  });
+
+  /////// Handle Submit //////
+  const onSubmit = (values: FormikValues) => {
+    mutate(removeEmptyField(values));
+  };
+
   return (
     <>
-      {/* {showPopup && (
-        <Popup padding="0">
-          <iframe
-            width={1000}
-            height={570}
-            src={`${file.split(".")[1] === "pdf" ? `${process.env.img_base}${file}` : file}`}
-          ></iframe>
-          <div className="flex items-center absolute bottom-3 self-center">
-            <Button
-              onClick={() => setState({ ...state, showPopup: !showPopup })}
-              variant="cancel"
-            >
-              Close
-            </Button>
-          </div>
-        </Popup>
-      )} */}
+      <Toaster />
+      {workingAnimation}
       {showWarning && (
         <LosingDataConfirmPopup
           continue={handleCompleteReset}
@@ -129,7 +201,7 @@ const TenderFeeDetailsForm: React.FC<TenderFeeDetailsFormProps> = (
 
       {/* Form section */}
       <Formik
-        initialValues={initialValues}
+        initialValues={initialDetails}
         validationSchema={tenderFeeDetailsSchema}
         onSubmit={onSubmit}
         enableReinitialize={true}
@@ -363,23 +435,35 @@ const TenderFeeDetailsForm: React.FC<TenderFeeDetailsFormProps> = (
                 Please Fill the all required field
               </span>
             )}
-            <div className="mt-4 flex items-center gap-5 justify-end">
-              {!readonly && dirty ? (
-                <Button
-                  onClick={() => handleBackAndReset(goBack)}
-                  buttontype="button"
-                  variant="cancel"
-                >
-                  Cancel
-                </Button>
-              ) : (
-                <Button onClick={() => handleTabChange("prev")} buttontype="button" variant="cancel">
-                  Back
-                </Button>
+            <div className="mt-4 w-full">
+              {!readonly && !dirty && (
+                <div className="flex justify-between items-center">
+                  <Button
+                    onClick={() => handleTabChange("prev")}
+                    buttontype="button"
+                    variant="cancel"
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    onClick={() => handleTabChange("next")}
+                    buttontype="button"
+                    variant="cancel"
+                  >
+                    Next
+                  </Button>
+                </div>
               )}
 
               {!readonly && dirty && (
-                <>
+                <div className="flex items-center gap-5 justify-end">
+                  <Button
+                    onClick={() => handleBackAndReset(goBack)}
+                    buttontype="button"
+                    variant="cancel"
+                  >
+                    Cancel
+                  </Button>
                   <Button
                     onClick={() => handleBackAndReset(handleReset)}
                     buttontype="button"
@@ -394,7 +478,7 @@ const TenderFeeDetailsForm: React.FC<TenderFeeDetailsFormProps> = (
                   >
                     Save & Next
                   </Button>
-                </>
+                </div>
               )}
             </div>
           </form>

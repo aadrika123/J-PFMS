@@ -4,23 +4,27 @@ import { LuCloudy } from "react-icons/lu";
 import { ImBin } from "react-icons/im";
 import { IoCheckmarkCircle } from "react-icons/io5";
 import CoverIcon from "@/assets/svg/Parchment.svg";
+import Popup from "@/components/global/molecules/Popup";
+import Button from "@/components/global/atoms/buttons/Button";
 
 type ImageUploadUiPropType = {
   handleUpload: (file: any) => void;
-  handleDeleteFile: (type: string, index: number) => void;
-  fileInfo: any;
+  handleDeleteFile: (file_id: number) => void;
+  files: any;
 };
 
 const ImageUploadUi: React.FC<ImageUploadUiPropType> = (props) => {
-  const { handleUpload, handleDeleteFile, fileInfo } = props;
+  const { handleUpload, handleDeleteFile, files } = props;
   const inputFileRef = useRef<any>();
   const [state, setState] = useState({
     inProgress: false,
     error: "",
     fileUrl: "",
     fileType: "",
+    showPopup: false,
+    currentFile: "",
   });
-  const { inProgress, error } = state;
+  const { inProgress, error, showPopup, currentFile } = state;
 
   const handleUploadDoc = () => {
     inputFileRef.current.click();
@@ -35,7 +39,7 @@ const ImageUploadUi: React.FC<ImageUploadUiPropType> = (props) => {
 
   ////// Handle Upload
   const interalHandleUpload = async (e: ChangeEvent<HTMLInputElement>) => {
-    let status: any = {
+    let fileData: any = {
       file: null,
       file_name: "",
       size: 0,
@@ -52,9 +56,9 @@ const ImageUploadUi: React.FC<ImageUploadUiPropType> = (props) => {
         if (!validateFileType(file)) {
           throw Error(`'${file.type.split("/")[1]}' file not allowed`);
         }
-        status = {
-          ...status,
-          size: file.size,
+        fileData = {
+          ...fileData,
+          size: String(file.size),
           file_name: file.name,
           file: file,
         };
@@ -65,24 +69,48 @@ const ImageUploadUi: React.FC<ImageUploadUiPropType> = (props) => {
           fileUrl: URL.createObjectURL(file),
         }));
 
-        handleUpload(status);
+        handleUpload(fileData);
       }
     } catch (error: any) {
-      status.error = error.message;
+      fileData.error = error.message;
       console.log(error);
     } finally {
       setState((prev: any) => ({
         ...prev,
         inProgress: false,
-        error: status.error,
+        error: fileData.error,
       }));
-      delete status.error;
-      e.target.value = '';
+      delete fileData.error;
+      e.target.value = "";
     }
+  };
+
+  ////////// Handle Show Image in Full Screen /////////
+  const handleShowFileInFullScreen = (path: string | any) => {
+    setState({
+      ...state,
+      showPopup: !showPopup,
+      currentFile: !String(path).includes("https")
+        ? URL.createObjectURL(path)
+        : path,
+    });
   };
 
   return (
     <>
+      {showPopup && (
+        <Popup padding="0">
+          <iframe width={1000} height={570} src={currentFile}></iframe>
+          <div className="flex items-center absolute bottom-3 self-center">
+            <Button
+              onClick={() => setState({ ...state, showPopup: !showPopup })}
+              variant="cancel"
+            >
+              Close
+            </Button>
+          </div>
+        </Popup>
+      )}
       <div className="my-2 border-[3px] rounded-xl border-dashed flex justify-center items-center flex-col">
         {inProgress == false && (
           <>
@@ -119,10 +147,11 @@ const ImageUploadUi: React.FC<ImageUploadUiPropType> = (props) => {
       </div>
       {/* Document List */}
       <div className="grid gap-3">
-        {fileInfo?.tab_files?.length > 0 &&
-          fileInfo?.tab_files.map((file: any, index: number) => (
+        {files?.length > 0 &&
+          files?.map((file: any, index: number) => (
             <div
               key={index}
+              onClick={() => handleShowFileInFullScreen(file.path)}
               className="bg-gray-100 px-4 py-1 flex items-center justify-between rounded-lg"
             >
               <div className="flex items-center">
@@ -145,7 +174,7 @@ const ImageUploadUi: React.FC<ImageUploadUiPropType> = (props) => {
               </div>
               <ImBin
                 className="cursor-pointer"
-                onClick={() => handleDeleteFile(fileInfo?.type, index)}
+                onClick={() => handleDeleteFile(file?.file_id)}
               />
             </div>
           ))}

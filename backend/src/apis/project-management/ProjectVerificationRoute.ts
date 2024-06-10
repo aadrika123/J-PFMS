@@ -13,6 +13,7 @@ class ProjectVerificationRoute extends APIv1_New{
   configure(): void {
     this.addGetRoute(`get/:proposalId`, this.controller.get);
     this.addGetRoute(`get-all`, this.controller.getAll);
+    this.addGetRoute(`get-all-11`, this.controller.getAll11);
     this.addGetRoute(`inbox`, this.controller.getInbox);
     this.addGetRoute(`outbox`, this.controller.getOutbox);
     this.addGetRoute(`archive`, this.controller.getArchive);

@@ -1,0 +1,13 @@
+///// Managed By :- Sanjiv
+model tender_bid_openers {
+  id                  Int               @id @default(autoincrement())
+  tender_datasheet_id Int
+  tender_datasheet    tender_datasheets @relation(fields: [tender_datasheet_id], references: [id])
+  name                String
+  email               String
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @map("updated_at")
+
+  @@unique([tender_datasheet_id, email])
+}

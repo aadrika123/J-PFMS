@@ -15,7 +15,7 @@ import { usePathname, useRouter } from "next/navigation";
 
 import SimpleTable from "@/components/global/atoms/SimpleTable";
 
-import { useProjectProposalList } from "@/hooks/data/ProjectProposalsHooks";
+import { useProjectProposalList11 } from "@/hooks/data/ProjectProposalsHooks";
 import { FilterButton } from "@/components/global/atoms/FilterButton";
 import qs from "qs";
 import { usePagination } from "@/hooks/Pagination";
@@ -39,7 +39,7 @@ const HeroTenderDatasheet = () => {
     isFetching,
     isLoading,
     data: projectProposalData,
-  } = useProjectProposalList(searchQuery, limit, page);
+  } = useProjectProposalList11(searchQuery, limit, page);
 
   const [projectProposals, setProjectProposals] = useState<[]>();
 
@@ -54,6 +54,7 @@ const HeroTenderDatasheet = () => {
   const columns = [
     { name: "id", caption: "Sr. No." },
     { name: "title", caption: "Project Title" },
+    { name: "status", caption: "Status" },
     { name: "type", caption: "Project Type" },
     { name: "proposed_date", caption: "Proposed Date", type: "date" },
     { name: "ward_name", caption: "Ward No" },

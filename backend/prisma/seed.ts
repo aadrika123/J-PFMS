@@ -7,6 +7,7 @@ import doc_type_seeder from "./seeder/masters/doc_type_seeder";
 import project_type_seeder from "./seeder/masters/project_type_seeder";
 
 import readXlsxFile from "read-excel-file/node";
+import bank_seeder from "./seeder/masters/bank_seeder";
 
 const prisma = new PrismaClient();
 
@@ -67,6 +68,8 @@ async function main() {
     await project_proposal_stages_seeder();
 
     await doc_type_seeder();
+
+    await bank_seeder();
   }, 8000);
 
   setTimeout(async () => {

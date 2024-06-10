@@ -116,6 +116,7 @@ class project_proposalsDao {
     uwm.ward_name,
     dm.department_name as execution_body_name,
     dm.id as execution_body,
+    td.id as tender_datasheet_id,
     jsonb_agg(
       jsonb_build_object(
         'id', ppwms.id,
@@ -134,6 +135,8 @@ class project_proposalsDao {
     department_masters as dm on dm.id = pp.execution_body
     left join
     project_types as pt on pt.id = pp.type_id
+    left join
+    tender_datasheets as td on td.project_proposal_id = pp.id
     left join 
     (
       select ppwm.id, ppwm.project_proposal_id, puwm.ward_name, ppwm.ward_id
@@ -162,6 +165,7 @@ class project_proposalsDao {
     um.ulb_name,
     uwm.ward_name,
     dm.department_name,
+    td.id,
     dm.id`;
     const data: any = await prisma.$queryRawUnsafe<[]>(query);
     const doc = await prisma.$queryRaw`

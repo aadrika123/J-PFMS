@@ -25,6 +25,7 @@
     "@faker-js/faker": "^8.3.1",
     "@prisma/client": "^5.8.1",
     "@types/crypto-js": "^4.2.2",
+    "axios": "^1.7.2",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "concurrently": "^8.2.2",

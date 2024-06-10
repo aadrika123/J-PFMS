@@ -5,6 +5,8 @@
  * | Status- done
  */
 
+import moment from "moment-timezone";
+
 export default function goBack() {
   // Use the history object to navigate back
   window.history.back();
@@ -59,6 +61,18 @@ export const filterValBefStoring = (values: any) => {
   }
 };
 
+/////// Removing Empty or null field
+export const removeEmptyField = (values: any) =>{
+  const data = {...values};
+  for(const value in values){
+    if((values[value] === "" || values[value] === null) && values[value] !== undefined ){
+      delete data[value]
+    } 
+  }
+  
+  return data;
+}
+
 
   // format currency: Bijoy Paitandi
   export const fc = (n: number) => {
@@ -71,4 +85,14 @@ export const filterValBefStoring = (values: any) => {
     });
   }
 
+  /**
+ * | Author- Sanjiv Kumar
+ * | Created On- 010-06-2024
+ * | Created for- Getting Local Time
+ * | Status- closed
+ */
+
+  export const getLocalTime = (dateTime: string) =>{
+    return moment.utc(dateTime).tz("Asia/Kolkata").format("YYYY-MM-DD h:m a")
+  }
 

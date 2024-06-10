@@ -1,6 +1,30 @@
 import * as Yup from "yup";
 
+export type tenderWorkDetailsType = {
+  tender_datasheet_id: number;
+  work_title: string;
+  description: string;
+  pre_qualification_details: string;
+  product_categories: string[];
+  product_sub_category: string;
+  contract_type: string;
+  tender_value: string;
+  bid_validity: string;
+  completion_period: number;
+  work_location: string;
+  pin_code: number;
+  pre_bid_meeting: boolean;
+  bid_opening_place: string;
+  pre_bid_meeting_place: string;
+  pre_bid_meeting_address: string;
+  tenderer_class: string[];
+  inviting_officer_name: string;
+  inviting_officer_address: string;
+  inviting_officer_contact: string;
+};
+
 export const tenderWorkDetailsSchema = Yup.object({
+  tender_datasheet_id: Yup.number().required("tender datasheet id is required"),
   work_title: Yup.string().required("work title is required"),
   description: Yup.string()
     .required("description is required")
@@ -30,7 +54,7 @@ export const tenderWorkDetailsSchema = Yup.object({
       const { createError } = validationContext;
       if (value > 120) {
         return createError({
-          message: "should not be greater then 120 months",
+          message: "completion should not be greater then 120 months",
         });
       }
       return true;
@@ -43,7 +67,7 @@ export const tenderWorkDetailsSchema = Yup.object({
       const { createError } = validationContext;
       if (String(value).length !== 6) {
         return createError({
-          message: "should be 6 digit",
+          message: "pin code should be 6 digit",
         });
       }
       return true;

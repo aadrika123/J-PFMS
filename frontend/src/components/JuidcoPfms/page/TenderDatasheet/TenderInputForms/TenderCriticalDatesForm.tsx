@@ -7,10 +7,10 @@
  */
 
 import Button from "@/components/global/atoms/buttons/Button";
-import goBack from "@/utils/helper";
+import goBack, { removeEmptyField } from "@/utils/helper";
 import { Formik, FormikValues } from "formik";
 import { tenderCriticalDateSchema } from "pfmslib";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { bg_color } from "../molecules/checkList";
 import Image from "next/image";
 // const RunningAnimation = dynamic(
@@ -27,17 +27,43 @@ import Image from "next/image";
 import LosingDataConfirmPopup from "@/components/global/molecules/general/LosingDataConfirmPopup";
 import CriticalIcon from "@/assets/svg/Time Management Skills.svg";
 import DateTimePickerComponent from "../molecules/DateTimePicker";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import toast, { Toaster } from "react-hot-toast";
+import { PFMS_URL } from "@/utils/api/urls";
+import axios from "@/lib/axiosConfig";
+import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 
 type TenderCriticalDatesFormProps = {
   handleTabChange: (type: string) => void;
+  tenderFormId: number;
 };
 
 const TenderCriticalDatesForm: React.FC<TenderCriticalDatesFormProps> = (
   props
 ) => {
-  const { handleTabChange } = props;
+  const queryClient = useQueryClient();
+  const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
+    useWorkingAnimation();
+  const { handleTabChange, tenderFormId } = props;
   const formRef = useRef<HTMLFormElement>(null);
-  const initialValues = {
+
+  const readonly = false;
+  const [state, setState] = useState<any>({
+    showWarning: false,
+    triggerFun: null,
+    showFinalError: false,
+    finalData: "",
+    showConfirmation: false,
+  });
+
+  const {
+    showWarning,
+    triggerFun,
+    showFinalError,
+  } = state;
+
+  const [initialDetails, setInitialDetails] = useState({
+    tender_datasheet_id: tenderFormId,
     publishing_date: "",
     bid_opening_date: "",
     document_sale_start_date: "",
@@ -47,22 +73,43 @@ const TenderCriticalDatesForm: React.FC<TenderCriticalDatesFormProps> = (
     bid_submission_start_date: "",
     bid_submission_end_date: "",
     pre_bid_meeting_date: "",
-  };
-
-  const readonly = false;
-  const [state, setState] = useState<any>({
-    showWarning: false,
-    triggerFun: null,
-    showFinalError: false,
   });
 
-  const { showWarning, triggerFun, showFinalError } = state;
+  ///////// Fetching Data
+  const fetch = async () => {
+    const res = await axios({
+      url: `${PFMS_URL.TENDER_CRITICAL_DATES.getById}/${tenderFormId}`,
+      method: "GET",
+    });
 
-  /////// Handle Submit //////
-  const onSubmit = (values: FormikValues) => {
-    console.log("Basic Details", values);
-    handleTabChange("next");
+    if (!res.data.status) throw "Someting Went Wrong!!";
+
+    return res.data.data;
   };
+
+  const { data: data }: any = useQuery(
+    ["tender-critical-dates", tenderFormId],
+    fetch
+  );
+
+  useEffect(() => {
+    if (data) {
+     
+      setInitialDetails({
+        tender_datasheet_id: data?.tender_datasheet_id || tenderFormId,
+        publishing_date: data?.publishing_date || "",
+        bid_opening_date: data?.bid_opening_date || "",
+        document_sale_start_date: data?.document_sale_start_date || "",
+        document_sale_end_date: data?.document_sale_end_date || "",
+        seek_clarification_start_date:
+          data?.seek_clarification_start_date || "",
+        seek_clarification_end_date: data?.seek_clarification_end_date || "",
+        bid_submission_start_date: data?.bid_submission_start_date || "",
+        bid_submission_end_date: data?.bid_submission_end_date || "",
+        pre_bid_meeting_date: data?.pre_bid_meeting_date || "",
+      });
+    }
+  }, [data]);
 
   ///// handlBackAndReset
   const handleBackAndReset = (trigger?: () => void) => {
@@ -80,25 +127,49 @@ const TenderCriticalDatesForm: React.FC<TenderCriticalDatesFormProps> = (
     }, 100);
   };
 
+  //////////// Handle Save Fee Details /////////////
+  const handleSave = async (values: any) => {
+    activateWorkingAnimation();
+    const res = await axios({
+      url: `${PFMS_URL.TENDER_CRITICAL_DATES?.create}`,
+      method: "POST",
+      data: {
+        data: values,
+      },
+    });
+    
+    if (!res.data.status) throw "Something Went Wrong!!!";
+  };
+
+  const { mutate } = useMutation(handleSave, {
+    onSuccess: () => {
+      Promise.all([
+        queryClient.invalidateQueries(["tender-critical-openers", tenderFormId]),
+        queryClient.invalidateQueries(["tender-all-details", tenderFormId]),
+      ]);
+      toast.success("Details Saved Successfully");
+      setTimeout(() => {
+        handleTabChange("next");
+      }, 100);
+    },
+    onError: (error) => {
+      toast.error("Something Went Wrong!!");
+      console.log(error);
+    },
+    onSettled: () => {
+      hideWorkingAnimation();
+    },
+  });
+
+  /////// Handle Submit //////
+  const onSubmit = (values: FormikValues) => {
+    mutate(removeEmptyField(values));
+  };
+
   return (
     <>
-      {/* {showPopup && (
-        <Popup padding="0">
-          <iframe
-            width={1000}
-            height={570}
-            src={`${file.split(".")[1] === "pdf" ? `${process.env.img_base}${file}` : file}`}
-          ></iframe>
-          <div className="flex items-center absolute bottom-3 self-center">
-            <Button
-              onClick={() => setState({ ...state, showPopup: !showPopup })}
-              variant="cancel"
-            >
-              Close
-            </Button>
-          </div>
-        </Popup>
-      )} */}
+      <Toaster />
+      {workingAnimation}
       {showWarning && (
         <LosingDataConfirmPopup
           continue={handleCompleteReset}
@@ -113,7 +184,7 @@ const TenderCriticalDatesForm: React.FC<TenderCriticalDatesFormProps> = (
 
       {/* Form section */}
       <Formik
-        initialValues={initialValues}
+        initialValues={initialDetails}
         validationSchema={tenderCriticalDateSchema}
         onSubmit={onSubmit}
         enableReinitialize={true}
@@ -253,23 +324,35 @@ const TenderCriticalDatesForm: React.FC<TenderCriticalDatesFormProps> = (
                 Please Fill the all required field
               </span>
             )}
-            <div className="mt-4 flex items-center gap-5 justify-end">
-              {!readonly && dirty ? (
-                <Button
-                  onClick={() => handleBackAndReset(goBack)}
-                  buttontype="button"
-                  variant="cancel"
-                >
-                  Cancel
-                </Button>
-              ) : (
-                <Button onClick={() => handleTabChange("prev")} buttontype="button" variant="cancel">
-                  Back
-                </Button>
+            <div className="mt-4 w-full">
+              {!readonly && !dirty && (
+                <div className="flex justify-between items-center">
+                  <Button
+                    onClick={() => handleTabChange("prev")}
+                    buttontype="button"
+                    variant="cancel"
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    onClick={() => handleTabChange("next")}
+                    buttontype="button"
+                    variant="cancel"
+                  >
+                    Next
+                  </Button>
+                </div>
               )}
 
               {!readonly && dirty && (
-                <>
+                <div className="flex items-center gap-5 justify-end">
+                  <Button
+                    onClick={() => handleBackAndReset(goBack)}
+                    buttontype="button"
+                    variant="cancel"
+                  >
+                    Cancel
+                  </Button>
                   <Button
                     onClick={() => handleBackAndReset(handleReset)}
                     buttontype="button"
@@ -284,7 +367,7 @@ const TenderCriticalDatesForm: React.FC<TenderCriticalDatesFormProps> = (
                   >
                     Save & Next
                   </Button>
-                </>
+                </div>
               )}
             </div>
           </form>

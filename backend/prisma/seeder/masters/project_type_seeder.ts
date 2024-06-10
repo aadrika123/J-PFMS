@@ -3,7 +3,6 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 const project_type_seeder = async () => {
-  ///////////////// Receipt Types ////////////////////////
 
   const records: string[] = ["Road Construction", "Building Construction", "Strit Light", "Sewage Construction"];
 
