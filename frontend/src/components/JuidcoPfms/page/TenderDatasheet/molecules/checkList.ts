@@ -4,6 +4,7 @@ import WorkIcon from "@/assets/svg/New Job.svg";
 import CriticalIcon from "@/assets/svg/Time Management Skills.svg";
 import BidIcon from "@/assets/svg/First Place Ribbon.svg";
 import FeeIcon from "@/assets/svg/Rupee.svg";
+import PreviewIcon from "@/assets/svg/View.svg"
 
 export const bg_color = "white";
 
@@ -353,7 +354,7 @@ export const tabList = [
   },
   {
     id: 7,
-    icon: BidIcon,
+    icon: PreviewIcon,
     title: "Preview",
   },
 ];
