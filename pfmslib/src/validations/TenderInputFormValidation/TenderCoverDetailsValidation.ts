@@ -43,11 +43,11 @@ export const coverList = {
 };
 
 const fileSchema = Yup.object({
-  file_id: Yup.number().optional(),
+  file_id: Yup.number().nullable().optional(),
   type: Yup.string().required("type is required"),
   file_name: Yup.string().required("file name is required"),
   size: Yup.string().required("size is required"),
-  path: Yup.string().optional(),
+  path: Yup.string().nullable().optional(),
 });
 
 ///////// Tender Basic Details Schema //////////

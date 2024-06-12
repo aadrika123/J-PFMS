@@ -28,28 +28,28 @@ export const tenderFeeDetailsSchema = Yup.object({
       schema
         .required("tender fee is required")
         .min(1, "less then 1 is not allowed"),
-    otherwise: (schema) => schema.optional(),
+    otherwise: (schema) => schema.nullable().optional(),
   }),
-  processing_fee: Yup.number().min(0, "less then 0 is not allowed").optional(),
+  processing_fee: Yup.number().min(0, "less then 0 is not allowed").nullable().optional(),
   tender_fee_payable_to: Yup.string().when("tender_fee_examption_allowed", {
     is: false,
     then: (schema) => schema.required("tender fee payable to is required"),
-    otherwise: (schema) => schema.optional(),
+    otherwise: (schema) => schema.nullable().optional(),
   }),
   tender_fee_payable_at: Yup.string().when("tender_fee_examption_allowed", {
     is: false,
     then: (schema) => schema.required("tender fee payable at is required"),
-    otherwise: (schema) => schema.optional(),
+    otherwise: (schema) => schema.nullable().optional(),
   }),
-  surcharges: Yup.number().min(0, "less then 0 is not allowed").optional(),
-  other_charges: Yup.number().optional().min(0, "less then 0 is not allowed"),
+  surcharges: Yup.number().min(0, "less then 0 is not allowed").nullable().optional(),
+  other_charges: Yup.number().nullable().optional().min(0, "less then 0 is not allowed"),
   emd_examption_allowed: Yup.boolean().required(
     "emd examption allowed is required"
   ),
   emd_fee_type: Yup.string().when("emd_examption_allowed", {
     is: false,
     then: (schema) => schema.required("emd fee type is required"),
-    otherwise: (schema) => schema.optional(),
+    otherwise: (schema) => schema.nullable().optional(),
   }),
   fixed_emd_fee: Yup.number().when("emd_fee_type", {
     is: "fixed",
@@ -57,7 +57,7 @@ export const tenderFeeDetailsSchema = Yup.object({
       schema
         .required("fixed emd fee is required")
         .min(1, "less then 1 is not allowed"),
-    otherwise: (schema) => schema.optional(),
+    otherwise: (schema) => schema.nullable().optional(),
   }),
   percentage_emd_fee: Yup.number().when("emd_fee_type", {
     is: "percentage",
@@ -66,16 +66,16 @@ export const tenderFeeDetailsSchema = Yup.object({
         .required("percentage emd fee is required")
         .max(100, "greater then 100 is not allowed")
         .min(1, "less then 1 is not allowed"),
-    otherwise: (schema) => schema.optional(),
+    otherwise: (schema) => schema.nullable().optional(),
   }),
   emd_fee_payable_to: Yup.string().when("emd_examption_allowed", {
     is: false,
     then: (schema) => schema.required("emd fee payable to is required"),
-    otherwise: (schema) => schema.optional(),
+    otherwise: (schema) => schema.nullable().optional(),
   }),
   emd_fee_payable_at: Yup.string().when("emd_examption_allowed", {
     is: false,
     then: (schema) => schema.required("emd fee payable at is required"),
-    otherwise: (schema) => schema.optional(),
+    otherwise: (schema) => schema.nullable().optional(),
   }),
 });

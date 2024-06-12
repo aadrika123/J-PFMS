@@ -29,7 +29,7 @@ export const tenderWorkDetailsSchema = Yup.object({
   description: Yup.string()
     .required("description is required")
     .matches(/^[A-Za-z0-9_(),.\s']*$/, "special character not allowed"),
-  pre_qualification_details: Yup.string().optional(),
+  pre_qualification_details: Yup.string().nullable().optional(),
   product_categories: Yup.array()
     .required("product categories is required")
     .test("product_categories", (value, validationContext) => {
@@ -76,17 +76,17 @@ export const tenderWorkDetailsSchema = Yup.object({
   bid_opening_place: Yup.string().when("pre_bid_meeting", {
     is: true,
     then: (schema) => schema.required("bid opening place is required"),
-    otherwise: (schema) => schema.optional(),
+    otherwise: (schema) => schema.nullable().optional(),
   }),
   pre_bid_meeting_place: Yup.string().when("pre_bid_meeting", {
     is: true,
     then: (schema) => schema.required("pre bid meeting place is required"),
-    otherwise: (schema) => schema.optional(),
+    otherwise: (schema) => schema.nullable().optional(),
   }),
   pre_bid_meeting_address: Yup.string().when("pre_bid_meeting", {
     is: true,
     then: (schema) => schema.required("pre bid meeting address is required"),
-    otherwise: (schema) => schema.optional(),
+    otherwise: (schema) => schema.nullable().optional(),
   }),
   tenderer_class: Yup.array()
     .required("tenderer class is required")

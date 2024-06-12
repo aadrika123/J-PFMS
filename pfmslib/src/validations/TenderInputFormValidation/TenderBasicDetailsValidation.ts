@@ -59,16 +59,16 @@ export const tenderBasicDetailsSchema = Yup.object({
   bank_id: Yup.number().when("payment_mode", {
     is: "online",
     then: (schema) => schema.required("bank is required"),
-    otherwise: (schema) => schema.optional(),
+    otherwise: (schema) => schema.nullable().optional(),
   }),
   instrument: Yup.string().when("payment_mode", {
     is: "offline",
     then: (schema) => schema.required("instrument is required"),
-    otherwise: (schema) => schema.optional(),
+    otherwise: (schema) => schema.nullable().optional(),
   }),
   file: Yup.object({
     file_name: Yup.string().required("file name is required"),
-    size: Yup.string().optional(),
-    path: Yup.string().optional(),
+    size: Yup.string().nullable().optional(),
+    path: Yup.string().nullable().optional(),
   }),
 });

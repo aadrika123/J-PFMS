@@ -129,6 +129,7 @@ class TenderDatasheetsDao {
     ) as critical_dates,
 
     jsonb_build_object(
+      'tender_datasheet_id', td.id,
       'bid_openers', jsonb_agg(
         DISTINCT jsonb_build_object(
           'name' , tbo.name,
