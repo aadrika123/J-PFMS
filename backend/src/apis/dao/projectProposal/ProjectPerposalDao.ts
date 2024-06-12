@@ -63,26 +63,21 @@ class project_proposalsDao {
   };
 
   create = async (data: any) => {
-    console.log(data);
     return await prisma.project_proposals.createMany({
       data: data,
     });
   };
 
-  createOne = async (data: any, docRecords: any) => {
+  createOne = async (data: any, docRecord: any) => {
     const wards = data.wards;
     delete data.wards;
     return prisma.$transaction(async (tx) => {
       const project_proposals_record = await tx.project_proposals.create({
         data: data,
       });
-      if (docRecords.length > 0) {
-        docRecords.forEach((docRecord: any) => {
-          docRecord.project_proposal_id = project_proposals_record.id;
-        });
-
-        await tx.project_proposal_documents.createMany({
-          data: docRecords,
+      if (docRecord) {
+        await tx.project_proposal_documents.create({
+          data: {...docRecord, project_proposal_id: project_proposals_record.id},
         });
       }
       const wardData = wards.map((i: number) => {
@@ -168,35 +163,26 @@ class project_proposalsDao {
     td.id,
     dm.id`;
     const data: any = await prisma.$queryRawUnsafe<[]>(query);
-    const doc = await prisma.$queryRaw`
+    const doc: any = await prisma.$queryRaw`
     select
     path,
     null as file_token,
-    description as file_name,
-    doc_type_id as document_type_id
+    description as file_name
     from
     project_proposal_documents
     where project_proposal_id = ${data[0]?.id}
     `;
 
-    // const doc = await prisma.project_proposal_documents.findMany({
-    //   select: {
-    //     path: true,
-    //     description: true,
-    //   },
-    //   where: {
-    //     project_proposal_id: data[0]?.id,
-    //   },
-    // });
     const newData = data[0];
-    newData.files = doc;
+    newData.file = doc[0];
 
     return newData;
   };
 
-  update = async (id: number, data: any, docRecords: any): Promise<any> => {
+  update = async (id: number, data: any, docRecord: any): Promise<any> => {
     const wards = data.wards;
     delete data.wards;
+
     return prisma.$transaction(async (tx) => {
       const project_proposals_record = await tx.project_proposals.update({
         where: {
@@ -204,33 +190,23 @@ class project_proposalsDao {
         },
         data,
       });
-      if (docRecords.length > 0) {
-        await Promise.all(
-          docRecords.map(async (docRecord: any) => {
-            if (docRecord.doc_type_id === 0) {
-              await tx.project_proposal_documents.updateMany({
-                where: {
-                  project_proposal_id: id,
-                  doc_type_id: docRecord.doc_type_id,
-                },
-                data: docRecord,
-              });
-            } else {
-              await tx.$queryRaw`
-              update project_proposal_documents
-              set description = ${docRecord.description},
-              path = ${docRecord.path},
-              doc_type_id = ${docRecord.doc_type_id}
-              where project_proposal_id = ${id} and doc_type_id != 0
-              `;
-            }
-          })
-        );
-      }
-    
-      if(wards.length){
+
+      await tx.project_proposal_documents.deleteMany({
+        where: {
+          project_proposal_id: id,
+        },
+      });
+
+      await tx.project_proposal_documents.create({
+        data: { ...docRecord, project_proposal_id: id },
+      });
+
+      if (wards.length) {
         const wardData = wards.map((i: number) => {
-          return { ward_id: i, project_proposal_id: project_proposals_record.id };
+          return {
+            ward_id: i,
+            project_proposal_id: project_proposals_record.id,
+          };
         });
         await tx.project_propo_ward_maps.deleteMany({
           where: { project_proposal_id: id },

@@ -13,7 +13,6 @@ import { PFMS_URL } from "@/utils/api/urls";
 import { projectProposalValidationSchema } from "pfmslib";
 import goBack from "@/utils/helper";
 import Image from "next/image";
-import upload from "@/assets/svg/upload.svg";
 import axios from "@/lib/axiosConfig";
 import { useQuery } from "react-query";
 // import SelectForNoApi from "@/components/global/atoms/SelectForNoApi";
@@ -31,18 +30,17 @@ import LosingDataConfirmPopup from "@/components/global/molecules/general/Losing
 import toast, { Toaster } from "react-hot-toast";
 import TextArea from "@/components/global/atoms/Textarea";
 import Button from "@/components/global/atoms/buttons/Button";
-import CustomImage from "@/components/global/molecules/general/CustomImage";
-import pdfIcon from "@/assets/svg/pdf_icon.svg";
 import Popup from "@/components/global/molecules/Popup";
 import { useUser } from "@/components/global/molecules/general/useUser";
 import Select from "@/components/global/atoms/Select";
 import MultiSelect from "@/components/global/atoms/MultiSelect";
+import { Icons } from "@/assets/svg/icons";
+import uploadImg from "@/assets/svg/upload.svg";
 
 type FileTypes = {
-  document_type_id: number;
-  file_token: string;
-  file_name?: string;
-  path?: string;
+  size: string;
+  file_name: string;
+  path: string;
 };
 
 export type ProjectProposalSchema = {
@@ -59,7 +57,7 @@ export type ProjectProposalSchema = {
   user_id: number;
   address: string;
   pin_code: number | string;
-  files: FileTypes[];
+  file: FileTypes;
   wards: any[];
 };
 
@@ -85,25 +83,21 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     ulbId: initialValues.ulb_id,
     districtId: initialValues.district_id,
     exeBodyId: initialValues.execution_body,
-    file: initialValues.files[0]?.path
-      ? `${initialValues.files[0]?.path}`
-      : null,
     inProgress: false,
     showWarning: false,
     triggerFun: null,
     validationError: null,
-    fileType: initialValues.files[0]?.path?.split(".")[1],
     showPopup: false,
     isReset: false,
+    currentFile:"",
   });
   const {
     ulbId,
     inProgress,
     showWarning,
+    currentFile,
     triggerFun,
     validationError,
-    file,
-    fileType,
     showPopup,
     isReset,
   } = state;
@@ -166,7 +160,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
       return { ...prev, inProgress: true };
     });
     try {
-      if (e.target.files) {
+      if (e.target.files?.length) {
         const file = e.target.files[0];
         if (file.size > 2 * 1024 * 1024 || file.size! < 9 * 1024) {
           setState({
@@ -178,40 +172,26 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
         if (!validateFileType(file)) {
           setState({
             ...state,
-            validationError: `'${file.type.split("/")[1]}' file not allowed`,
+            validationError: `'${file.name.substring(file.name.lastIndexOf("."))}' file is not allowed`,
           });
           return;
         }
 
-        const formData = new FormData();
-
-        formData.append("doc", file);
-        const res = await axios({
-          url: `${PFMS_URL.FILE_UPLOAD_URL.upload}`,
-          method: "POST",
-          data: formData,
-        });
-        if (!res.data.status) throw "Something Went Wrong";
-
-        setFieldValue(`files[${index}].file_token`, res.data.data.file_token);
-        setFieldValue(`files[${index}].file_name`, file.name);
+        setFieldValue(`file.path`, file);
+        setFieldValue(`file.file_name`, file.name);
+        setFieldValue("file.size", String(file.size));
         setState({
           ...state,
           validationError: null,
           file: URL.createObjectURL(file),
-          fileType: file?.type?.includes("pdf") ? "pdf" : "",
+          // fileType: file?.type?.includes("pdf") ? "pdf" : "",
         });
       }
     } catch (error: any) {
-      setFieldValue(`files[${index}].file_token`, "");
       toast.error(error);
       console.log(error);
     } finally {
-      setState((prev: any) => {
-        if (index === 0) return { ...prev, inProgress1: false };
-
-        return { ...prev, inProgress: false };
-      });
+      setState((prev: any) => ({ ...prev, inProgress: false }));
     }
   };
 
@@ -257,6 +237,46 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
     setProjectDetails({ ...projectDetails, [key]: value });
   };
 
+    ////////// Handle Show Image in Full Screen /////////
+    const handleShowFileInFullScreen = (path: string | any) => {
+      setState({
+        ...state,
+        showPopup: !showPopup,
+        currentFile: !String(path).includes("https")
+          ? URL.createObjectURL(path)
+          : path,
+      });
+    };
+  
+    ///////// Get Visibal Image /////
+    const getVisibleImage = (path: any): any => {
+      if (!String(path).includes("https")) {
+        return path?.name.includes(".pdf") ? (
+          Icons.pdf
+        ) : (
+          <img
+            src={URL.createObjectURL(path)}
+            height={50}
+            width={50}
+            alt="t"
+            className="max-h-20 w-20 object-cover"
+          />
+        );
+      } else {
+        return String(path).includes(".pdf") ? (
+          Icons.pdf
+        ) : (
+          <img
+            src={path}
+            height={50}
+            width={50}
+            alt="t"
+            className="max-h-20 w-20 object-cover"
+          />
+        );
+      }
+    };
+
   return (
     <>
       <Toaster />
@@ -265,7 +285,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
           <iframe
             width={1000}
             height={570}
-            src={`${file.split(".")[1] === "pdf" ? `${process.env.img_base}${file}` : file}`}
+            src={currentFile}
           ></iframe>
           <div className="flex items-center absolute bottom-3 self-center">
             <Button
@@ -327,7 +347,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                       readonly={readonly}
                       className="min-h-4 max-h-10"
                     />
-                    
+
                     <TextArea
                       onChange={(e) => {
                         handleChange(e);
@@ -417,26 +437,27 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                           />
                         </>
                       )}
-                     {isUlb() && ( <MultiSelect
-                      handler={(value: any) =>{ 
-                        const v = value.map((i:any) => i.label).join(',')
-                        handleAllChange(v, "ward_no")
-                      }}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.wards}
-                      error={errors.wards}
-                      touched={touched.wards}
-                      label="Wards"
-                      name="wards"
-                      placeholder="Enter Project Title"
-                      required
-                      readonly={readonly}
-                      data={wards?.map((ward: any) => {
-                        return { value: ward.id, label: ward.name };
-                      })}
-                    />
-                    )} 
+                      {isUlb() && (
+                        <MultiSelect
+                          handler={(value: any) => {
+                            const v = value.map((i: any) => i.label).join(",");
+                            handleAllChange(v, "ward_no");
+                          }}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          value={values.wards}
+                          error={errors.wards}
+                          touched={touched.wards}
+                          label="Wards"
+                          name="wards"
+                          placeholder="Enter Project Title"
+                          required
+                          readonly={readonly}
+                          data={wards?.map((ward: any) => {
+                            return { value: ward.id, label: ward.name };
+                          })}
+                        />
+                      )}
                       {/* {isUlb() && (
                         <SelectForNoApi
                           data={wards}
@@ -473,12 +494,8 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                         readonly={readonly}
                       />
                     </div>
-                    <div className="flex items-end w-full">
+                    <div className="flex items-center w-full">
                       <div className="flex flex-col min-w-28">
-                        <span className="text-secondary text-sm mb-1">
-                          Upload Letter (jpeg, jpg, pdf)
-                          <span className="ml-2 text-red-500">*</span>
-                        </span>
                         <input
                           id="letter"
                           type="file"
@@ -493,10 +510,10 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                           className={`bg-primary_bg_indigo relative p-1 shadow-lg rounded flex text-white justify-between px-2 ${readonly ? "bg-opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
                           htmlFor="letter"
                         >
-                          {values.files[0]?.file_token && !inProgress
+                          {values.file.path && !inProgress
                             ? "Uploaded"
-                            : "Upload"}
-                          {values.files[0]?.file_token && !inProgress ? (
+                            : "Upload Document"}
+                          {values.file.path && !inProgress ? (
                             <Image
                               src={Check}
                               width={20}
@@ -509,20 +526,20 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                             </div>
                           ) : (
                             <Image
-                              src={upload}
+                              src={uploadImg}
                               width={20}
                               height={20}
                               alt="letter"
                             />
                           )}
                         </label>
-                        {!values?.files[0]?.file_token &&
+                        {!values.file.path &&
                         !validationError &&
-                        touched?.files &&
-                        errors?.files &&
-                        errors?.files[0]?.file_token ? (
+                        touched.file &&
+                        errors.file &&
+                        errors.file.path ? (
                           <span className="text-red-500">
-                            {errors.files[0]?.file_token}
+                            {errors.file.path}
                           </span>
                         ) : validationError ? (
                           <span className="text-red-500">
@@ -530,7 +547,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                           </span>
                         ) : (
                           <span>
-                            {values.files[0]?.file_name || (
+                            {values.file.file_name || (
                               <span className="text-sm text-red-500">
                                 file size should 10 kb to 2 mb
                               </span>
@@ -538,21 +555,14 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
                           </span>
                         )}
                       </div>
-                      {file && (
-                        <div className="hide-scrollbar ml-4">
-                          {fileType !== "pdf" ? (
-                            <CustomImage src={file} width={100} height={80} />
-                          ) : (
-                            <Image
-                              onClick={() =>
-                                setState({ ...state, showPopup: !showPopup })
-                              }
-                              src={pdfIcon}
-                              width={70}
-                              height={70}
-                              alt="pdf-icon"
-                            />
-                          )}
+                      {values.file.path !== "" && (
+                        <div
+                          className="hide-scrollbar ml-6"
+                          onClick={() =>
+                            handleShowFileInFullScreen(values.file?.path)
+                          }
+                        >
+                          {getVisibleImage(values.file.path)}
                         </div>
                       )}
                     </div>

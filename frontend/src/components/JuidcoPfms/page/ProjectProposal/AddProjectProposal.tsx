@@ -23,6 +23,7 @@ import Loader from "@/components/global/atoms/Loader";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 import { useUser } from "@/components/global/molecules/general/useUser";
 import ConfirmationPopup from "@/components/global/molecules/ConfirmationPopup";
+import { upload } from "@/utils/fileUploadAndGet";
 
 type StateTypes = {
   showNotification: boolean;
@@ -47,13 +48,11 @@ const AddProjectProposal = () => {
     ward_id: 0,
     wards: [],
     pin_code: "",
-    files: [
-      {
-        document_type_id: 0,
-        file_token: "",
-        file_name: "",
-      },
-    ],
+    file: {
+      file_name: "",
+      size: "",
+      path: "",
+    },
     state_id: user?.getState()?.id,
     user_id: user?.getUserId(),
     execution_body: user?.getDepartment()?.id,
@@ -70,7 +69,15 @@ const AddProjectProposal = () => {
   ///////////////// Handling Submit /////////////
   const handleSubmit = async (values: FormikValues) => {
     activateWorkingAnimation();
-    const newValues = {...values, wards: values.wards.map((i:any) => i.value)}
+    if (!String(values.file.path).includes("https")) {
+      const file_path = await upload(values.file.path);
+
+      values.file.path = file_path;
+    }
+    const newValues = {
+      ...values,
+      wards: values.wards.map((i: any) => i.value),
+    };
     const res = await axios({
       url: `${PFMS_URL.PROJ_RPOPOSAL_URL.create}`,
       method: "POST",
@@ -80,8 +87,8 @@ const AddProjectProposal = () => {
     });
 
     if (!res.data.status) throw "Something Went Wrong!!!";
-// console.log("first sdfsdf", res.data.data)
-//     setState({...state, ppno: res.data.data.project_proposal_no})
+    // console.log("first sdfsdf", res.data.data)
+    //     setState({...state, ppno: res.data.data.project_proposal_no})
   };
 
   const { mutate } = useMutation(handleSubmit, {
@@ -96,7 +103,9 @@ const AddProjectProposal = () => {
     },
     onSettled: () => {
       hideWorkingAnimation();
-      queryClient.invalidateQueries([`project-proposals, ${PFMS_URL.PROJ_RPOPOSAL_URL.get}`]);
+      queryClient.invalidateQueries([
+        `project-proposals, ${PFMS_URL.PROJ_RPOPOSAL_URL.get}`,
+      ]);
     },
   });
 
@@ -131,7 +140,7 @@ const AddProjectProposal = () => {
       )}
       {workingAnimation}
       {showNotification && (
-        <SuccesfullConfirmPopup message={`Recorded Successfully`}/>
+        <SuccesfullConfirmPopup message={`Recorded Successfully`} />
       )}
       <div className="shadow-lg px-4 py-2 border mb-6 bg-white">
         <span className="text-secondary font-bold">Fill Project Details</span>

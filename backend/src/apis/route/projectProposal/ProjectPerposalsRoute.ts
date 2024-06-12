@@ -1,6 +1,6 @@
 import express from "express";
 import { APIv1 } from "../../APIv1";
-import project_proposalsController from "../../controller/payments/ProjectProposalsController";
+import project_proposalsController from "../../controller/projectProposal/ProjectProposalsController";
 
 class ProjectPerposalsRoute extends APIv1{
   private controller: project_proposalsController;

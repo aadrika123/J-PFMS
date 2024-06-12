@@ -1,6 +1,6 @@
 import express from "express";
 import AuthRoute from "./apis/route/auth/Auth";
-import BillsRoute from "./apis/route/payments/ProjectPerposalsRoute";
+import BillsRoute from "./apis/route/projectProposal/ProjectPerposalsRoute";
 import FileHandlerRoute from "./apis/route/FileHandlerRoute";
 // import BillVerificationRoute from "./route/payments/BillVerificationRoute";
 import DashboardRoute from "./apis/route/dashboard/dashboardRoute";
