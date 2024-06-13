@@ -1,90 +1,108 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 interface ProposalDetail {
   label: string;
   content: string;
 }
 
-const proposalDetails: ProposalDetail[] = [
-  {
-    label: "To Page",
-    content: "Back Officee",
-  },
-  {
-    label: "Checked By",
-    content: "JE enginner",
-  },
-  {
-    label: "Checked Date",
-    content: "25/05/25",
-  },
-  {
-    label: "Measurement Book No",
-    content: "50BNS56",
-  },
-  {
-    label: "From Page ",
-    content: "Executive enginner",
-  },
-  {
-    label: "Remarks",
-    content: "All are fine",
-  },
-
-];
-
-const projectDesc =
-  "Junior Engineer.";
-const date = "25/05/24";
-const date1 = "";
-
-const DetailsCards: React.FC = () => {
-     const firstFiveDetails = proposalDetails.slice(0, 5);
-     const remainingDetails = proposalDetails.slice(5);
-
-  return (
-    <div className="border w-full mt-0 border-gray-300 bg-gray-100 rounded-lg p-6 shadow-md">
-      <section>
-        <div className="flex justify-between">
-          <h2 className="text-xl font-semibold mb-4">
-            Person Recording the measurement{" "}
-          </h2>
-          <h2 className="text-xl font-semibold mb-4">Record Date </h2>
-
-          <b className="text-indigo-700">MB Bill of Record No</b>
-        </div>
-        <div className="flex justify-between gap-4">
-          <p>{projectDesc}</p>
-          <p>{date}</p>
-          <p>{date1}</p>
-        </div>
-      </section>
-      <hr className="my-4 border-gray-400" />
-      <div className="flex justify-between gap-4">
-        {firstFiveDetails.map((detail, index) => (
-          <div key={index} className="flex flex-col">
-            <span className="font-bold">{detail.label}:</span>
-            <span>{detail.content}</span>
-          </div>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-4 mt-4">
-        {remainingDetails.map((detail, index) => (
-          <div key={index} className="flex flex-col">
-            <span className="font-bold">{detail.label}:</span>
-            <span>{detail.content}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
 const MBRecordBill: React.FC = () => {
+  const [proposalDetails, setProposalDetails] = useState<ProposalDetail[]>([]);
+
+  useEffect(() => {
+    // Fetch data from the backend endpoint
+    fetch("http://localhost:2001/mbrecordbill")
+      .then((response) => response.json())
+      .then((data) => {
+        setProposalDetails(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching proposal details:", error);
+      });
+  }, []);
+
+  console.log(proposalDetails);
+
   return (
     <div className=" mx-auto mt-0 p-4">
-      <DetailsCards />
+      <section>
+        <Accordion>
+          <AccordionSummary
+            aria-controls="abstract-content"
+            id="abstract-header"
+            className="bg-indigo-700 text-white text-center"
+            style={{
+              width: "100%",
+              height: "50px",
+            }}
+          >
+            <div className="flex justify-between ">
+              <ExpandMoreIcon />
+              <h2 className="text-xl flex flex-1 font-semibold">
+                MB Record for Bill No{" "}
+              </h2>
+            </div>
+          </AccordionSummary>
+          <AccordionDetails>
+            <div className="flex flex-1 flex-col p-4 bg-slate-100">
+              <div className="flex flex-1 flex-col">
+                <div className="flex font-bold text-md">
+                  {proposalDetails.length > 0 && proposalDetails[0]?.label}
+                </div>
+                <div className="flex text-md">
+                  {proposalDetails.length > 0 && proposalDetails[0]?.content}
+                </div>
+              </div>
+              <div className="flex flex-1 justify-between flex-row mt-4">
+                <div className="flex flex-col">
+                  <div className="flex font-bold ">
+                    {proposalDetails.length > 0 && proposalDetails[1]?.label}
+                  </div>
+                  <div className="flex text-md">
+                    {proposalDetails.length > 0 && proposalDetails[1]?.content}
+                  </div>
+                </div>
+                <div className="flex ">
+                  <div className="flex flex-col">
+                    <div className="flex font-bold ">
+                      {proposalDetails.length > 0 && proposalDetails[2]?.label}
+                    </div>
+                    <div className="flex text-md">
+                      {proposalDetails.length > 0 &&
+                        proposalDetails[2]?.content}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex mr-4">
+                  <div className="flex flex-col">
+                    <div className="flex font-bold ">
+                      {proposalDetails.length > 0 && proposalDetails[3]?.label}
+                    </div>
+                    <div className="flex text-md">
+                      {proposalDetails.length > 0 &&
+                        proposalDetails[3]?.content}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-1 mt-4">
+                <div className="flex flex-col">
+                  <div className="flex font-bold ">
+                    {proposalDetails.length > 0 && proposalDetails[4]?.label}
+                  </div>
+                  <div className="flex text-md">
+                    {proposalDetails.length > 0 && proposalDetails[4]?.content}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </AccordionDetails>
+        </Accordion>
+      </section>
     </div>
   );
 };

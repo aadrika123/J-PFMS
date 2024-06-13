@@ -9,7 +9,9 @@
 //////////////////////////////////////////////////////////////////////////////////////
 
 import React from "react";
-import AddMeasurementModal from "./AddMeasurementModal";
+import { AddMeasurementComponent } from "./AddMeasurementComponent";
+// import AddMeasurementModal from "./AddMeasurementModal";
+// import AddMeasurementComponent from "./E_Measurement";
 // import cancel from "@/Components/assets/user copy.png";
 
 interface MeasurmentModalProps {
@@ -44,7 +46,7 @@ const MeasurmentModal: React.FC<MeasurmentModalProps> = (props) => {
           >
             <p className="text-3xl pr-3">&times;</p>
           </button>
-          <AddMeasurementModal
+          <AddMeasurementComponent
             measurementModal={true}
             setMeasurementModal={props.setMeasModal}
           />

@@ -8,6 +8,7 @@ import DistrictRoute from "./apis/route/masters/districtRoute";
 import StateRoute from "./apis/route/masters/stateRoute";
 import UlbRoute from "./apis/route/masters/ulbRoute";
 import ProjectTypeRoute from "./apis/route/masters/projectTypeRoute";
+import PreparedEstimatedRoute from "./apis/prepared-estimated/PreparedEstimatedRoute";
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +48,7 @@ class FinanceRoute {
     // (new BillVerificationRoute("54", app).configure());
 
     (new DashboardRoute("55", app)).configure();
+    new PreparedEstimatedRoute("56", app).configure();
 
   }
 }

@@ -7,6 +7,7 @@ import doc_type_seeder from "./seeder/masters/doc_type_seeder";
 import project_type_seeder from "./seeder/masters/project_type_seeder";
 
 import readXlsxFile from "read-excel-file/node";
+import Boq_Table_detail from "./seeder/Boq/Boq_Table_detaill";
 
 const prisma = new PrismaClient();
 
@@ -71,6 +72,9 @@ async function main() {
 
   setTimeout(async () => {
     await foreign_wrapper();
+  }, 9000);
+  setTimeout(async () => {
+    await Boq_Table_detail();
   }, 9000);
 }
 main()

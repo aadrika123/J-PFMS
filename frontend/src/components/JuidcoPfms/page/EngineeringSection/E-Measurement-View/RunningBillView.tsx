@@ -4,30 +4,14 @@ import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-// import { number } from "yup";
-// import { indigo } from "@mui/material/colors";
 interface ProposalDetail {
   label: string;
   content: string;
 }
-interface ProposalDetail1 {
-  label: string;
-  content: string;
-}
-const proposalDetails1: ProposalDetail1[] = [
-  {
-    label: "S.No",
-    content: "1",
-  },
-  {
-    label: "Description",
-    content: "This is a dummy Abstract of Estimated Cost  for the frontend-only version.",
 
-  },
-];
 const proposalDetails: ProposalDetail[] = [
   {
-    label: "No",
+    label: "S.No",
     content: "1",
   },
   {
@@ -57,7 +41,8 @@ const proposalDetails: ProposalDetail[] = [
   },
 ];
 
-// const projectDesc =
+const projectDesc =
+  "This is a dummy Measurement Description  for the frontend-only version.";
 
 const DetailsCards: React.FC = () => {
   return (
@@ -66,33 +51,21 @@ const DetailsCards: React.FC = () => {
         <AccordionSummary
           // expandIcon={<ExpandMoreIcon />}
           aria-controls="abstract-content"
-          id="abstract-header"
+          id="abstract-center"
           className="bg-indigo-700 text-white text-center"
           style={{
             width: "100%",
             height: "50px",
           }}
         >
-          <div className="flex justify-between ">
+          <div className="flex justify-between">
             <ExpandMoreIcon />
-            <h2 className="text-xl flex flex-1 font-semibold">
-              Abstract of Estimated Cost Description{" "}
-            </h2>
+            <h2 className="text-xl font-semibold ">Running Bills</h2>
           </div>
         </AccordionSummary>
         <AccordionDetails>
-          <div>
-            <div className=" flex justify-start gap-40">
-              {proposalDetails1.map((detail, index) => (
-                <div key={index} className="flex flex-col">
-                  <span className="font-bold">{detail.label}:</span>
-                  <span>{detail.content}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* <p>{projectDesc}</p> */}
-          </div>
+          <p>{projectDesc}</p>
+          <hr className="my-4 border-gray-400" />
           <div className=" flex justify-between gap-4">
             {proposalDetails.map((detail, index) => (
               <div key={index} className="flex flex-col">
@@ -107,7 +80,7 @@ const DetailsCards: React.FC = () => {
   );
 };
 
-const EstimatedCost: React.FC = () => {
+const CardDetails: React.FC = () => {
   return (
     <div className=" mx-auto mt-0 p-4">
       <DetailsCards />
@@ -115,4 +88,4 @@ const EstimatedCost: React.FC = () => {
   );
 };
 
-export default EstimatedCost;
+export default CardDetails;
