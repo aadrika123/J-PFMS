@@ -1,10 +1,8 @@
 import { Request } from "express";
 import { APIv1Response } from "../../APIv1";
-import project_proposalsDao from "../../dao/payments/ProjectPerposalDao";
+import project_proposalsDao from "../../dao/projectProposal/ProjectPerposalDao";
 import * as Yup from "yup";
 import { projectProposalValidationSchema } from "pfmslib";
-import { decryptV1 } from "../../../util/cryptographyV1";
-import * as fs from "fs";
 
 /**
  * | Author- Bijoy Paitandi
@@ -51,7 +49,10 @@ class project_proposalsController {
     let id;
     do {
       const randomNumber = Math.floor(Math.random() * 1000);
-      id = `${date.getFullYear()}${String(date.getMonth()+1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}${randomNumber}`;
+      id = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}${String(date.getDate()).padStart(2, "0")}${randomNumber}`;
     } while (existing.includes(id));
 
     existing.push(id);
@@ -60,6 +61,9 @@ class project_proposalsController {
 
   create = async (req: Request): Promise<APIv1Response> => {
     //validate
+    const date = new Date();
+    req.body.data.proposed_date = date;
+    
     await projectProposalValidationSchema.validate(req.body.data);
     // req.body.data.wards=[1,2];
 
@@ -68,55 +72,20 @@ class project_proposalsController {
 
     const existingIDs: string[] = [];
 
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-
-    const rootDir = `./public/pdfs`;
-    const relativeDir = `${year}/${month}/${day}`;
-    const destDir = `${rootDir}/${relativeDir}`;
-
     // generate bill numbers
     record.proposed_date = new Date();
     record.project_proposal_no =
       "PPN-" + this.generateUniqueRandomID(existingIDs);
 
-    if (record?.files) {
-      console.log(record.files);
-      const files = record.files;
-      const docRecords = [];
+    const docRecord = {
+      description: record.file.file_name,
+      path: record.file.path,
+      size: record.file.size,
+    };
 
-      fs.mkdirSync(destDir, { recursive: true });
+    delete record.file;
 
-      let src = "";
-      let dst = "";
-
-      for (const file of files) {
-        const fileDetails = JSON.parse(decryptV1(file.file_token));
-
-        const relativePath = `${relativeDir}/${fileDetails.fileName}`;
-        const destPath = `${rootDir}/${relativePath}`;
-
-        src = fileDetails.path;
-        dst = destPath;
-        
-
-        const docRecord = {
-          description: file.file_name,
-          path: relativePath,
-          doc_type_id: file.document_type_id,
-        };
-
-        
-        docRecords.push(docRecord);
-      }
-      delete record.files;
-
-      await this.dao.createOne(record, docRecords);
-      fs.renameSync(`./${src}`, dst);
-    }
-    
+    await this.dao.createOne(record, docRecord);
 
     // call dao
     // const result = await this.dao.create(data)
@@ -150,47 +119,21 @@ class project_proposalsController {
     //  await projectProposalValidationSchema.validate(req.body.data);
 
     // collect the input
+    const date = new Date();
+    req.body.data.proposed_date = date;
     const record = req.body.data;
     const id = Number(req.params.id);
     // req.body.data.wards=[1, 3];
 
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
+    const docRecord = {
+      description: record.file.file_name,
+      path: record.file.path,
+      size: record.file.size,
+    };
 
-    const rootDir = `./public/pdfs`;
-    const relativeDir = `${year}/${month}/${day}`;
-    const destDir = `${rootDir}/${relativeDir}`;
+    delete record.file;
 
-    // generate bill numbers
-    record.proposed_date = new Date();
-
-    const docRecords = [];
-    if (record?.files && record.files.length > 0) {
-      const files = record.files;
-
-      fs.mkdirSync(destDir, { recursive: true });
-
-      for (const file of files) {
-        const fileDetails = JSON.parse(decryptV1(file.file_token));
-
-        const relativePath = `${relativeDir}/${fileDetails.fileName}`;
-        const destPath = `${rootDir}/${relativePath}`;
-
-        fs.renameSync(`./${fileDetails.path}`, destPath);
-
-        const docRecord = {
-          description: file.file_name,
-          path: relativePath,
-          doc_type_id: file.document_type_id,
-        };
-        docRecords.push(docRecord);
-      }
-
-    }
-    delete record.files;
-    await this.dao.update(id, record, docRecords);
+    await this.dao.update(id, record, docRecord);
 
     // call dao
     // const result = await this.dao.create(data)

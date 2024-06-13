@@ -28,44 +28,26 @@ import { tenderBidDetailsSchema } from "pfmslib";
 import Input from "@/components/global/atoms/Input";
 // import { LuCloudy } from "react-icons/lu";
 import BidIcon from "@/assets/svg/First Place Ribbon.svg";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import toast, { Toaster } from "react-hot-toast";
+import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
+import { upload } from "@/utils/fileUploadAndGet";
+import { PFMS_URL } from "@/utils/api/urls";
+import axios from "@/lib/axiosConfig";
+import Popup from "@/components/global/molecules/Popup";
+import { Icons } from "@/assets/svg/icons";
 
 type TenderBidOpenerFormProps = {
-  handleShowPreview: () => void;
+  handleTabChange: (type: string) => void;
+  tenderFormId: number;
 };
 
 const TenderBidOpenerForm: React.FC<TenderBidOpenerFormProps> = (props) => {
-  const { handleShowPreview } = props;
+  const queryClient = useQueryClient();
+  const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
+    useWorkingAnimation();
+  const { handleTabChange, tenderFormId } = props;
   const formRef = useRef<HTMLFormElement>(null);
-  const initialValues = {
-    bid_openers: [
-      {
-        name: "",
-        email: "",
-      },
-      {
-        name: "",
-        email: "",
-      },
-      {
-        name: "",
-        email: "",
-      },
-    ],
-    files: [
-      {
-        file_name: "",
-        file_description: "",
-        file_size: "",
-        file: "",
-      },
-      {
-        file_name: "",
-        file_description: "",
-        file_size: "",
-        file: "",
-      },
-    ],
-  };
 
   const readonly = false;
   const [state, setState] = useState<any>({
@@ -73,15 +55,61 @@ const TenderBidOpenerForm: React.FC<TenderBidOpenerFormProps> = (props) => {
     triggerFun: null,
     showFinalError: false,
     file_errors: [{ error: "" }, { error: "" }],
+    showPopup: false,
+    currentFile: "",
   });
 
-  const { showWarning, triggerFun, showFinalError } = state;
+  const { showWarning, triggerFun, showFinalError, showPopup, currentFile } =
+    state;
 
-  /////// Handle Submit //////
-  const onSubmit = (values: FormikValues) => {
-    console.log("Basic Details", values);
-    handleShowPreview();
+  ///////// Fetching Data
+  const fetch = async () => {
+    const res = await axios({
+      url: `${PFMS_URL.TENDER_BID_OPENERS.getById}/${tenderFormId}`,
+      method: "GET",
+    });
+
+    if (!res.data.status) throw "Someting Went Wrong!!";
+
+    return res.data.data;
   };
+
+  const { data: data }: any = useQuery(
+    ["tender-bid-openers", tenderFormId],
+    fetch
+  );
+
+  const initialDetails = {
+    tender_datasheet_id: data?.tender_datasheet_id || tenderFormId,
+    bid_openers: [
+      {
+        name: data?.bid_openers[0]?.name || "",
+        email: data?.bid_openers[0]?.email || "",
+      },
+      {
+        name: data?.bid_openers[1]?.name || "",
+        email: data?.bid_openers[1]?.email || "",
+      },
+      {
+        name: data?.bid_openers[2]?.name || "",
+        email: data?.bid_openers[2]?.email || "",
+      },
+    ],
+    files: data?.files?.length ? data?.files : [
+      {
+        file_name: "",
+        description: "",
+        size: "",
+        path: "",
+      },
+      {
+        file_name: "",
+        description: "",
+        size: "",
+        path: "",
+      },
+    ],
+  }
 
   ///// handlBackAndReset
   const handleBackAndReset = (trigger?: () => void) => {
@@ -127,8 +155,9 @@ const TenderBidOpenerForm: React.FC<TenderBidOpenerFormProps> = (props) => {
           throw Error(`'${file.type.split("/")[1]}' file not allowed`);
         }
 
-        setFieldValue(`files[${index}].file`, file);
-        setFieldValue(`files[${index}].file_size`, file.size);
+        setFieldValue(`files[${index}].file_name`, file.name);
+        setFieldValue(`files[${index}].path`, file);
+        setFieldValue(`files[${index}].size`, String(file.size));
       }
     } catch (error: any) {
       errors[index].error = error;
@@ -137,15 +166,108 @@ const TenderBidOpenerForm: React.FC<TenderBidOpenerFormProps> = (props) => {
       console.log(error);
     }
   };
+
+  //////////// Adding File path /////////
+  const addingFilePath = async (files: any[]) => {
+    for (const file of files) {
+      if (!String(file.path).includes("https")) {
+        file.path = await upload(file.path);
+      }
+    }
+    return files;
+  };
+
+  //////////// Handle Save Bid Openers /////////////
+  const handleSave = async (values: any) => {
+    activateWorkingAnimation();
+    values.files = await addingFilePath(values.files);
+    const res = await axios({
+      url: `${PFMS_URL.TENDER_BID_OPENERS.create}`,
+      method: "POST",
+      data: {
+        data: values,
+      },
+    });
+
+    if (!res.data.status) throw "Something Went Wrong!!!";
+  };
+
+  const { mutate } = useMutation(handleSave, {
+    onSuccess: () => {
+      Promise.all([
+        queryClient.invalidateQueries(["tender-bid-openers", tenderFormId]),
+        queryClient.invalidateQueries(["tender-all-details", tenderFormId]),
+      ]);
+      toast.success("Details Saved Successfully");
+      setTimeout(() => {
+        handleTabChange("next");
+      }, 100);
+    },
+    onError: (error) => {
+      toast.error("Something Went Wrong!!");
+      console.log(error);
+    },
+    onSettled: () => {
+      hideWorkingAnimation();
+    },
+  });
+
+  /////// Handle Submit //////
+  const onSubmit = (values: FormikValues) => {
+    const data = {
+      ...values,
+      bid_openers: values.bid_openers.filter((i: any) => i.email !== ""),
+    };
+    mutate(data);
+  };
+
+  ////////// Handle Show Image in Full Screen /////////
+  const handleShowFileInFullScreen = (path: string | any) => {
+    setState({
+      ...state,
+      showPopup: !showPopup,
+      currentFile: !String(path).includes("https")
+        ? URL.createObjectURL(path)
+        : path,
+    });
+  };
+
+  ///////// Get Visibal Image /////
+  const getVisibleImage = (path: any): any => {
+    if (!String(path).includes("https")) {
+      return path.name.includes(".pdf") ? (
+        Icons.pdf
+      ) : (
+        <img
+          src={URL.createObjectURL(path)}
+          height={50}
+          width={50}
+          alt="t"
+          className="max-h-20 w-full object-contain"
+        />
+      );
+    } else {
+      return String(path).includes(".pdf") ? (
+        Icons.pdf
+      ) : (
+        <img
+          src={path}
+          height={50}
+          width={50}
+          alt="t"
+          className="max-h-20 w-full object-contain"
+        />
+      );
+    }
+  };
+
   return (
     <>
-      {/* {showPopup && (
+      <Toaster />
+      {workingAnimation}
+      {showPopup && (
         <Popup padding="0">
-          <iframe
-            width={1000}
-            height={570}
-            src={`${file.split(".")[1] === "pdf" ? `${process.env.img_base}${file}` : file}`}
-          ></iframe>
+          <iframe width={1000} height={570} src={currentFile}></iframe>
           <div className="flex items-center absolute bottom-3 self-center">
             <Button
               onClick={() => setState({ ...state, showPopup: !showPopup })}
@@ -155,7 +277,7 @@ const TenderBidOpenerForm: React.FC<TenderBidOpenerFormProps> = (props) => {
             </Button>
           </div>
         </Popup>
-      )} */}
+      )}
       {showWarning && (
         <LosingDataConfirmPopup
           continue={handleCompleteReset}
@@ -172,7 +294,7 @@ const TenderBidOpenerForm: React.FC<TenderBidOpenerFormProps> = (props) => {
 
       {/* Form section */}
       <Formik
-        initialValues={initialValues}
+        initialValues={initialDetails}
         validationSchema={tenderBidDetailsSchema}
         onSubmit={onSubmit}
         enableReinitialize={true}
@@ -280,14 +402,12 @@ const TenderBidOpenerForm: React.FC<TenderBidOpenerFormProps> = (props) => {
                         label="Description"
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        value={values.files[idx]?.file_description}
+                        value={values.files[idx]?.description}
                         touched={
-                          touched.files && touched.files[idx]?.file_description
+                          touched.files && touched.files[idx]?.description
                         }
-                        error={
-                          errors.files && errors.files[idx]?.file_description
-                        }
-                        name={`files[${idx}].file_description`}
+                        error={errors.files && errors.files[idx]?.description}
+                        name={`files[${idx}].description`}
                         placeholder="Enter Description"
                         readonly={readonly}
                         required
@@ -298,35 +418,36 @@ const TenderBidOpenerForm: React.FC<TenderBidOpenerFormProps> = (props) => {
                         label="Document Size (kb)"
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        value={values.files[idx]?.file_size}
-                        touched={touched.files && touched.files[idx]?.file_size}
-                        error={errors.files && errors.files[idx]?.file_size}
-                        name={`files[${idx}].file_size`}
+                        value={values.files[idx]?.size}
+                        touched={touched.files && touched.files[idx]?.size}
+                        error={errors.files && errors.files[idx]?.size}
+                        name={`files[${idx}].size`}
                         readonly={true}
                         required
                       />
                       <div className="border-[3px] rounded-xl border-dashed flex justify-center items-center flex-col">
-                        <div className="">
+                        <div className="flex flex-col items-center">
                           <input
                             id={`doc-file-${idx}`}
                             type="file"
                             accept=".jpg, .jpeg, .pdf .png"
                             className="hidden"
-                            name={`files[${idx}].file`}
+                            name={`files[${idx}].path`}
                             onChange={(e) =>
                               interalHandleUpload(e, setFieldValue, idx)
                             }
                           />
-
                           {/* {error && <p className="text-red-500 text-sm m-2">{error}</p>} */}
-                          {values.files[idx].file !== "" && (
-                            <Image
-                              src={URL.createObjectURL(values.files[idx].file)}
-                              height={50}
-                              width={50}
-                              alt="t"
-                              className="max-h-20 w-full object-contain"
-                            />
+                          {values.files[idx].path !== "" && (
+                            <div
+                              onClick={() =>
+                                handleShowFileInFullScreen(
+                                  values.files[idx].path
+                                )
+                              }
+                            >
+                              {getVisibleImage(values.files[idx].path)}
+                            </div>
                           )}
                           <label
                             htmlFor={`doc-file-${idx}`}
@@ -346,23 +467,35 @@ const TenderBidOpenerForm: React.FC<TenderBidOpenerFormProps> = (props) => {
                 Please Fill the all required field
               </span>
             )}
-            <div className="mt-4 flex items-center gap-5 justify-end">
-              {!readonly && dirty ? (
-                <Button
-                  onClick={() => handleBackAndReset(goBack)}
-                  buttontype="button"
-                  variant="cancel"
-                >
-                  Cancel
-                </Button>
-              ) : (
-                <Button onClick={goBack} buttontype="button" variant="cancel">
-                  Back
-                </Button>
+            <div className="mt-4 w-full">
+              {!readonly && !dirty && (
+                <div className="flex justify-between items-center">
+                  <Button
+                    onClick={() => handleTabChange("prev")}
+                    buttontype="button"
+                    variant="cancel"
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    onClick={() => handleTabChange("next")}
+                    buttontype="button"
+                    variant="cancel"
+                  >
+                    Next
+                  </Button>
+                </div>
               )}
 
               {!readonly && dirty && (
-                <>
+                <div className="flex items-center gap-5 justify-end">
+                  <Button
+                    onClick={() => handleBackAndReset(goBack)}
+                    buttontype="button"
+                    variant="cancel"
+                  >
+                    Cancel
+                  </Button>
                   <Button
                     onClick={() => handleBackAndReset(handleReset)}
                     buttontype="button"
@@ -375,9 +508,9 @@ const TenderBidOpenerForm: React.FC<TenderBidOpenerFormProps> = (props) => {
                     variant="primary"
                     className="animate-pulse"
                   >
-                    Save & Preview
+                    Save & Next
                   </Button>
-                </>
+                </div>
               )}
             </div>
           </form>

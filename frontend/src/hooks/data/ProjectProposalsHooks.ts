@@ -22,6 +22,7 @@ export const PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS = Object.freeze({
 
 const projectProposalApi = `${baseURL}/project-verification/get`;
 const projectProposalsApi = `${baseURL}/project-verification/get-all`;
+const projectProposalsApi11 = `${baseURL}/project-verification/get-all-11`;
 const projectProposalsInboxApi = `${baseURL}/project-verification/inbox`;
 const projectProposalsOutboxApi = `${baseURL}/project-verification/outbox`;
 const projectProposalAcknowledgementApi = `${baseURL}/project-verification/acknowledge`;
@@ -45,6 +46,24 @@ export const useProjectProposalList = (searchQuery: string, limit: number, page:
   return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.INBOX_LIST, searchQuery, limit, page, pathName], (): Promise<any> => {
     return new Promise((resolve, reject) => {
       axios.get(`${projectProposalsApi}?limit=${limit}&page=${page}&order=-1&${searchQuery && searchQuery.length > 0 ? `&${searchQuery}` : ''}`).then(resp => {
+        console.log(resp.data.message);
+        if (!resp.data.status) {
+          reject(resp.data.message);
+        } else {
+          resolve(resp.data.data);
+        }
+      }).catch((reason) => {
+        reject(reason);
+      });
+    });
+  });
+}
+
+export const useProjectProposalList11 = (searchQuery: string, limit: number, page: number) => {
+  const pathName = usePathname();
+  return useQuery(["project-proposals-11", searchQuery, limit, page, pathName], (): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      axios.get(`${projectProposalsApi11}?limit=${limit}&page=${page}&order=-1&${searchQuery && searchQuery.length > 0 ? `&${searchQuery}` : ''}`).then(resp => {
         console.log(resp.data.message);
         if (!resp.data.status) {
           reject(resp.data.message);

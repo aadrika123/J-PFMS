@@ -141,8 +141,6 @@ const ProjectManagementOutboxPage = () => {
         </div>
 
       </ProjectManagementLayout>
-
-
     </>
   )
 }

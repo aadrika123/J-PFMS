@@ -1,5 +1,21 @@
 import * as Yup from "yup";
 
+///////// TenderCoverDetailsType ///////////
+type files = {
+  file_id: number;
+  type: string;
+  file_name: string;
+  size: string;
+  path: string;
+};
+
+export type tenderCoverDetailsType = {
+  tender_datasheet_id: number;
+  content: string;
+  cover_no: string;
+  files: files[];
+};
+
 export const coverList = {
   title: "No of Covers",
   options: [
@@ -27,18 +43,16 @@ export const coverList = {
 };
 
 const fileSchema = Yup.object({
+  file_id: Yup.number().nullable().optional(),
   type: Yup.string().required("type is required"),
-  tab_files: Yup.array(
-    Yup.object({
-      file_name: Yup.string().required("file name is required"),
-      size: Yup.string().required("size is required"),
-      path: Yup.string().optional(),
-    })
-  ).required("files are required"),
+  file_name: Yup.string().required("file name is required"),
+  size: Yup.string().required("size is required"),
+  path: Yup.string().nullable().optional(),
 });
 
 ///////// Tender Basic Details Schema //////////
 export const tenderCoverDetailsSchema = Yup.object({
+  tender_datasheet_id: Yup.number().required("tender datasheet id is required"),
   cover_no: Yup.string().required("cover no is required"),
   content: Yup.string().required("content is required"),
   files: Yup.array(fileSchema)
@@ -58,9 +72,7 @@ export const tenderCoverDetailsSchema = Yup.object({
       const fileList = coverList.options.find((i) => i.value === cover_no).list;
 
       /*  Making a object of comming file types from request */
-      const commingFile = new Set(
-        value.map((i) =>  i.type)
-      );
+      const commingFile = new Set(value.map((i) => i.type));
 
       /*  Getting the Remaing files */
       const remainingFiles = fileList.filter(

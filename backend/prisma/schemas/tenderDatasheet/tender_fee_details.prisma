@@ -1,0 +1,22 @@
+///// Managed By :- Sanjiv
+model tender_fee_details {
+  id                           Int               @id @default(autoincrement())
+  tender_datasheet_id          Int               @unique
+  tender_datasheet             tender_datasheets @relation(fields: [tender_datasheet_id], references: [id])
+  tender_fee_examption_allowed Boolean
+  tender_fee                   Int?
+  processing_fee               Int?
+  tender_fee_payable_to        String?
+  tender_fee_payable_at        String?
+  surcharges                   Int?
+  other_charges                Int?
+  emd_examption_allowed        Boolean
+  emd_fee_type                 String?
+  fixed_emd_fee                Int?
+  percentage_emd_fee           Int?
+  emd_fee_payable_to           String?
+  emd_fee_payable_at           String?
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @map("updated_at")
+}

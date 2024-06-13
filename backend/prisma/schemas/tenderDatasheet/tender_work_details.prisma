@@ -1,0 +1,28 @@
+///// Managed By :- Sanjiv
+model tender_work_details {
+  id                        Int               @id @default(autoincrement())
+  tender_datasheet_id       Int               @unique
+  tender_datasheet          tender_datasheets @relation(fields: [tender_datasheet_id], references: [id])
+  work_title                String
+  description               String
+  pre_qualification_details String?
+  product_categories        String[]
+  product_sub_category      String?
+  contract_type             String
+  tender_value              String
+  bid_validity              String
+  completion_period         Int
+  work_location             String
+  pin_code                  Int
+  pre_bid_meeting           Boolean
+  bid_opening_place         String?
+  pre_bid_meeting_place     String?
+  pre_bid_meeting_address   String?
+  tenderer_class            String[]
+  inviting_officer_name     String
+  inviting_officer_address  String
+  inviting_officer_contact  String
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @map("updated_at")
+}

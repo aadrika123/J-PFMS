@@ -12,9 +12,7 @@
     "lint": "eslint src/",
     "start": "node build/src/server.js",
     "dev": "nodemon src/server.ts",
-    "migrate": "rm -rf prisma/migrations &&  npx prisma migrate dev --name init",
     "migrate_dev": "npx prisma migrate dev",
-    "migrate_win": "rmdir /s .\\prisma\\migrations &&  npx prisma migrate dev --name init",
     "magic": "node magic/index.js",
     "doc": "python3 magic/gen_doc.py",
     "pdftest": "node typesettings/pdf.ts"
@@ -25,6 +23,7 @@
     "@faker-js/faker": "^8.3.1",
     "@prisma/client": "^5.8.1",
     "@types/crypto-js": "^4.2.2",
+    "axios": "^1.7.2",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "concurrently": "^8.2.2",

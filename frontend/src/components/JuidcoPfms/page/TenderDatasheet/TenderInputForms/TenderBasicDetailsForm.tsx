@@ -1,4 +1,3 @@
-"use client";
 /**
  * | Author- Sanjiv Kumar
  * | Created On- 28-05-2024
@@ -8,7 +7,7 @@
 
 import Button from "@/components/global/atoms/buttons/Button";
 import Input from "@/components/global/atoms/Input";
-import goBack from "@/utils/helper";
+import goBack, { removeEmptyField } from "@/utils/helper";
 import { Formik, FormikValues } from "formik";
 import { tenderBasicDetailsSchema } from "pfmslib";
 import React, { ChangeEvent, useRef, useState } from "react";
@@ -24,7 +23,6 @@ import {
 } from "../molecules/checkList";
 import RadioComponent from "../molecules/RadioComponent";
 import RadioYesNoComponent from "../molecules/RadioYesNoComponent";
-import CustomImage from "@/components/global/molecules/general/CustomImage";
 import Image from "next/image";
 import { PFMS_URL } from "@/utils/api/urls";
 import axios from "@/lib/axiosConfig";
@@ -39,66 +37,87 @@ const RunningAnimation = dynamic(
   }
 );
 import Check from "@/assets/svg/Check.svg";
-import upload from "@/assets/svg/upload.svg";
+import uploadImg from "@/assets/svg/upload.svg";
 import dynamic from "next/dynamic";
-import pdfIcon from "@/assets/svg/pdf_icon.svg";
 import Popup from "@/components/global/molecules/Popup";
 import LosingDataConfirmPopup from "@/components/global/molecules/general/LosingDataConfirmPopup";
 import FolderIcon from "@/assets/svg/Folder.svg";
 import SelectForNoApi from "@/components/global/atoms/SelectForNoApi";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
+import { upload } from "@/utils/fileUploadAndGet";
+import { Icons } from "@/assets/svg/icons";
 
 type TenderBasicDetailsFormProps = {
-  handleTabChange : (type: string) => void;
-}
+  handleTabChange: (type: string) => void;
+  tenderFormId: number;
+};
 
-const TenderBasicDetailsForm:React.FC<TenderBasicDetailsFormProps> = (props) => {
-  const {handleTabChange} = props;
+const TenderBasicDetailsForm: React.FC<TenderBasicDetailsFormProps> = (
+  props
+) => {
+  const queryClient = useQueryClient();
+  const { handleTabChange, tenderFormId } = props;
   const formRef = useRef<HTMLFormElement>(null);
-  const initialValues = {
-    reference_no: "",
-    tender_type: "",
-    contract_forms: [],
-    tender_categories: [],
-    allow_resubmission: undefined,
-    allow_withdrawal: undefined,
-    allow_offline_submission: undefined,
-    payment_mode: "online" || "offline",
-    bank: "",
-    instrument: "",
-    file: {
-      file_name: "",
-      size: "",
-      file_token: "",
-    },
-  };
+  const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
+    useWorkingAnimation();
   const readonly = false;
   const [state, setState] = useState<any>({
     file: "",
     showPopup: false,
     inProgress: false,
     validationError: null,
-    fileType: "",
     showWarning: false,
     triggerFun: null,
     showFinalError: false,
+    currentFile:""
   });
 
   const {
-    file,
     showPopup,
     validationError,
     inProgress,
-    fileType,
     showWarning,
     triggerFun,
     showFinalError,
+    currentFile
   } = state;
 
-  /////// Handle Submit //////
-  const onSubmit = (values: FormikValues) => {
-    console.log("Basic Details", values);
-    handleTabChange("next")
+  ///////// Fetching Data
+  const fetch = async () => {
+    const res = await axios({
+      url: `${PFMS_URL.TENDER_BASIC.getById}/${tenderFormId}`,
+      method: "GET",
+    });
+
+    if (!res.data.status) throw "Someting Went Wrong!!";
+
+    return res.data.data;
   };
+
+  const { data: data }: any = useQuery(
+    ["tender-basic-details", tenderFormId],
+    fetch
+  );
+
+  const initialDetails = {
+    tender_datasheet_id: data?.tender_datasheet_id || tenderFormId,
+    reference_no: data?.reference_no || "",
+    tender_type: data?.tender_type || "",
+    contract_forms: data?.contract_forms || [],
+    tender_categories: data?.tender_categories || [],
+    allow_resubmission: data?.allow_resubmission,
+    allow_withdrawal: data?.allow_withdrawal,
+    allow_offline_submission: data?.allow_offline_submission,
+    payment_mode: data?.payment_mode || "online",
+    bank_id: data?.bank?.id || "",
+    instrument: data?.instrument || "",
+    file: {
+      file_name: data?.file?.file_name || "",
+      size: data?.file?.size || "",
+      path: data?.file?.path || "",
+    },
+  }
 
   ///////////// Checking File Type
   const validateFileType = (file: any) => {
@@ -136,19 +155,9 @@ const TenderBasicDetailsForm:React.FC<TenderBasicDetailsFormProps> = (props) => 
           return;
         }
 
-        const formData = new FormData();
-
-        formData.append("doc", file);
-        const res = await axios({
-          url: `${PFMS_URL.FILE_UPLOAD_URL.upload}`,
-          method: "POST",
-          data: formData,
-        });
-        if (!res.data.status) throw "Something Went Wrong";
-
-        setFieldValue(`file.file_token`, res.data.data.file_token);
+        setFieldValue(`file.path`, file);
         setFieldValue(`file.file_name`, file.name);
-        setFieldValue("file.size", file.size);
+        setFieldValue("file.size", String(file.size));
         setState({
           ...state,
           validationError: null,
@@ -157,7 +166,6 @@ const TenderBasicDetailsForm:React.FC<TenderBasicDetailsFormProps> = (props) => 
         });
       }
     } catch (error: any) {
-      setFieldValue(`file.file_token`, "");
       toast.error(error);
       console.log(error);
     } finally {
@@ -185,27 +193,118 @@ const TenderBasicDetailsForm:React.FC<TenderBasicDetailsFormProps> = (props) => 
     }, 100);
   };
 
-  ///////// Handle Reset Payment Mode
-  const handleResetPaymentMode = (
-    setFieldValue: (key: string, value: string) => void,
-    value: string
-  ) => {
-    if (value === "online") {
-      setFieldValue("instrument", "");
+  //////////// Handle Save Basic Details /////////////
+  const handleSave = async (values: any) => {
+    activateWorkingAnimation();
+    if (!String(values.file.path).includes("https")) {
+      const file_path = await upload(values.file.path);
+
+      values.file.path = file_path;
+    }
+    const res = await axios({
+      url: `${PFMS_URL.TENDER_BASIC.create}`,
+      method: "POST",
+      data: {
+        data: values,
+      },
+    });
+
+    if (!res.data.status) throw "Something Went Wrong!!!";
+  };
+
+  const { mutate } = useMutation(handleSave, {
+    onSuccess: () => {
+      Promise.all([
+        queryClient.invalidateQueries(["tender-basic-openers", tenderFormId]),
+        queryClient.invalidateQueries(["tender-all-details", tenderFormId]),
+      ]);
+      toast.success("Details Saved Successfully");
+      setTimeout(() => {
+        handleTabChange("next");
+      }, 100);
+    },
+    onError: (error) => {
+      toast.error("Something Went Wrong!!");
+      console.log(error);
+    },
+    onSettled: () => {
+      hideWorkingAnimation();
+    },
+  });
+
+  ////////// Handle Show Image in Full Screen /////////
+  const handleShowFileInFullScreen = (path: string | any) => {
+    setState({
+      ...state,
+      showPopup: !showPopup,
+      currentFile: !String(path).includes("https")
+        ? URL.createObjectURL(path)
+        : path,
+    });
+  };
+
+  ///////// Get Visibal Image /////
+  const getVisibleImage = (path: any): any => {
+    if (!String(path).includes("https")) {
+      return path.name.includes(".pdf") ? (
+        Icons.pdf
+      ) : (
+        <img
+          src={URL.createObjectURL(path)}
+          height={50}
+          width={50}
+          alt="t"
+          className="max-h-20 w-20 object-cover"
+        />
+      );
     } else {
-      setFieldValue("bank", "");
+      return String(path).includes(".pdf") ? (
+        Icons.pdf
+      ) : (
+        <img
+          src={path}
+          height={50}
+          width={50}
+          alt="t"
+          className="max-h-20 w-20 object-cover"
+        />
+      );
     }
   };
+
+  ////////////// handle cancle /////////////
+  // const handleCancel = () => {
+  //   setState({ ...state, showConfirmation: false });
+  // };
+
+  /////// Handle Submit //////
+  const onSubmit = (values: FormikValues) => {
+    mutate(removeEmptyField(values));
+    // setState({ ...state, showConfirmation: true, finalData: { ...values } });
+  };
+
+  ////////////// handle cancle /////////////
+  // const handleContinue = () => {
+  //   mutate(removeEmptyField(finalData));
+  // };
 
   return (
     <>
       <Toaster />
+      {workingAnimation}
+      {/* {showConfirmation && (
+        <ConfirmationPopup
+          message="Are you sure? want to save the details?"
+          cancel={handleCancel}
+          continue={handleContinue}
+        />
+      )} */}
       {showPopup && (
         <Popup padding="0">
           <iframe
             width={1000}
             height={570}
-            src={`${file.split(".")[1] === "pdf" ? `${process.env.img_base}${file}` : file}`}
+            src={currentFile}
           ></iframe>
           <div className="flex items-center absolute bottom-3 self-center">
             <Button
@@ -228,7 +327,7 @@ const TenderBasicDetailsForm:React.FC<TenderBasicDetailsFormProps> = (props) => 
         <header className="font-bold ml-2 text-white">Basic Details</header>
       </div>
       <Formik
-        initialValues={initialValues}
+        initialValues={initialDetails}
         validationSchema={tenderBasicDetailsSchema}
         onSubmit={onSubmit}
         enableReinitialize={true}
@@ -343,7 +442,7 @@ const TenderBasicDetailsForm:React.FC<TenderBasicDetailsFormProps> = (props) => 
               >
                 <div className="flex flex-col">
                   <label
-                    className={`text-sm font-medium ${touched?.file?.file_token && errors?.file?.file_token ? "text-red-600" : "text-black"}`}
+                    className={`text-sm font-medium ${touched?.file?.path && errors?.file?.path ? "text-red-600" : "text-black"}`}
                   >
                     NIT Document
                     <span className="text-red-600">*</span>
@@ -352,7 +451,7 @@ const TenderBasicDetailsForm:React.FC<TenderBasicDetailsFormProps> = (props) => 
                     {"(Only .jpg, .jpeg and .pdf files are supported )"}
                   </span>
                 </div>
-                {values?.file?.file_token && (
+                {values?.file?.path && (
                   <table className="border">
                     <thead className="bg-primary_bg_indigo text-white">
                       <th className="border">File Name</th>
@@ -390,10 +489,10 @@ const TenderBasicDetailsForm:React.FC<TenderBasicDetailsFormProps> = (props) => 
                       className={`bg-primary_bg_indigo relative p-1 shadow-lg rounded flex text-white justify-between px-2 ${readonly ? "bg-opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
                       htmlFor="letter"
                     >
-                      {values.file.file_token && !inProgress
+                      {values.file.path && !inProgress
                         ? "Uploaded"
                         : "Upload NIT Document"}
-                      {values.file.file_token && !inProgress ? (
+                      {values.file.path && !inProgress ? (
                         <Image
                           src={Check}
                           width={20}
@@ -406,21 +505,19 @@ const TenderBasicDetailsForm:React.FC<TenderBasicDetailsFormProps> = (props) => 
                         </div>
                       ) : (
                         <Image
-                          src={upload}
+                          src={uploadImg}
                           width={20}
                           height={20}
                           alt="letter"
                         />
                       )}
                     </label>
-                    {!values?.file.file_token &&
+                    {!values?.file.path &&
                     !validationError &&
                     touched?.file &&
                     errors?.file &&
-                    errors?.file.file_token ? (
-                      <span className="text-red-500">
-                        {errors.file.file_token}
-                      </span>
+                    errors?.file.path ? (
+                      <span className="text-red-500">{errors.file.path}</span>
                     ) : validationError ? (
                       <span className="text-red-500">{validationError}</span>
                     ) : (
@@ -433,21 +530,14 @@ const TenderBasicDetailsForm:React.FC<TenderBasicDetailsFormProps> = (props) => 
                       </span>
                     )}
                   </div>
-                  {file && (
-                    <div className="hide-scrollbar ml-4">
-                      {fileType !== "pdf" ? (
-                        <CustomImage src={file} width={100} height={80} />
-                      ) : (
-                        <Image
-                          onClick={() =>
-                            setState({ ...state, showPopup: !showPopup })
-                          }
-                          src={pdfIcon}
-                          width={70}
-                          height={70}
-                          alt="pdf-icon"
-                        />
-                      )}
+                  {values.file.path !== "" && (
+                    <div
+                    className="hide-scrollbar ml-6"
+                      onClick={() =>
+                        handleShowFileInFullScreen(values.file.path)
+                      }
+                    >
+                      {getVisibleImage(values.file.path)}
                     </div>
                   )}
                 </div>
@@ -462,9 +552,6 @@ const TenderBasicDetailsForm:React.FC<TenderBasicDetailsFormProps> = (props) => 
                   value={values.payment_mode}
                   error={errors.payment_mode}
                   touched={touched.payment_mode}
-                  changeHandler={(value: string) =>
-                    handleResetPaymentMode(setFieldValue, value)
-                  }
                   required
                   name="payment_mode"
                 />
@@ -473,11 +560,11 @@ const TenderBasicDetailsForm:React.FC<TenderBasicDetailsFormProps> = (props) => 
                   <SelectForNoApi
                     data={online_bank}
                     onBlur={handleBlur}
-                    value={values.bank}
-                    error={errors.bank}
-                    touched={touched.bank}
+                    value={values.bank_id}
+                    error={errors.bank_id}
+                    touched={touched.bank_id}
                     required
-                    name="bank"
+                    name="bank_id"
                     label="Online (Banks)"
                     placeholder="Select Bank"
                     labelColor="black font-medium"
@@ -502,23 +589,35 @@ const TenderBasicDetailsForm:React.FC<TenderBasicDetailsFormProps> = (props) => 
                 Please Fill the all required field
               </span>
             )}
-            <div className="mt-4 flex items-center gap-5 justify-end">
-              {!readonly && dirty ? (
-                <Button
-                  onClick={() => handleBackAndReset(goBack)}
-                  buttontype="button"
-                  variant="cancel"
-                >
-                  Cancel
-                </Button>
-              ) : (
-                <Button onClick={()=> handleTabChange("prev")} buttontype="button" variant="cancel">
-                  Back
-                </Button>
+            <div className="mt-4 w-full">
+              {!readonly && !dirty && (
+                <div className="flex justify-between items-center">
+                  <Button
+                    onClick={() => handleTabChange("prev")}
+                    buttontype="button"
+                    variant="cancel"
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    onClick={() => handleTabChange("next")}
+                    buttontype="button"
+                    variant="cancel"
+                  >
+                    Next
+                  </Button>
+                </div>
               )}
 
               {!readonly && dirty && (
-                <>
+                <div className="flex items-center gap-5 justify-end">
+                  <Button
+                    onClick={() => handleBackAndReset(goBack)}
+                    buttontype="button"
+                    variant="cancel"
+                  >
+                    Cancel
+                  </Button>
                   <Button
                     onClick={() => handleBackAndReset(handleReset)}
                     buttontype="button"
@@ -533,7 +632,7 @@ const TenderBasicDetailsForm:React.FC<TenderBasicDetailsFormProps> = (props) => 
                   >
                     Save & Next
                   </Button>
-                </>
+                </div>
               )}
             </div>
           </form>

@@ -14,7 +14,14 @@ type PfmsUrlKeys =
   | "DISTRICT_URL"
   | "STATE_URL"
   | "FILE_UPLOAD_URL"
-  | "PROJ_RPOPOSAL_URL";
+  | "PROJ_RPOPOSAL_URL"
+  | "TENDER_FORM"
+  | "TENDER_WORK"
+  | "TENDER_COVER"
+  | "TENDER_BASIC"
+  | "TENDER_FEE"
+  | "TENDER_CRITICAL_DATES"
+  | "TENDER_BID_OPENERS";
 
 type Urls = {
   [key in PfmsUrlKeys]: {
@@ -37,6 +44,8 @@ type Urls = {
     getByUlb?: string;
     getDepartments?: string;
     getType?: string;
+    getAllDetails?: string;
+    submit?: string;
   };
 };
 
@@ -85,4 +94,34 @@ export const PFMS_URL: Urls = {
     getTopUlb: "dashboard/ulbs/get",
     getTopPaymentMode: "dashboard/payment-modes/get",
   },
+  TENDER_FORM:{
+    create: "tender/datasheet/create",
+    getAllDetails: "tender/datasheet/get",
+    submit: "tender/datasheet/update",
+    getById: "tender/datasheet/get-by-id"
+  },
+  TENDER_BASIC:{
+    getById: "tender/basic-details/get",
+    create :"tender/basic-details/create"
+  },
+  TENDER_COVER:{
+    getById: "tender/cover-details/get",
+    create :"tender/cover-details/create"
+  },
+  TENDER_WORK:{
+    getById: "tender/work-details/get",
+    create :"tender/work-details/create"
+  },
+  TENDER_FEE:{
+    getById: "tender/fee-details/get",
+    create :"tender/fee-details/create"
+  },
+  TENDER_CRITICAL_DATES:{
+    getById: "tender/critical-dates/get",
+    create :"tender/critical-dates/create"
+  },
+  TENDER_BID_OPENERS:{
+    getById: "tender/bid-openers/get",
+    create :"tender/bid-openers/create"
+  }
 };

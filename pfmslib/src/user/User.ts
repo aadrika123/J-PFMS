@@ -9,6 +9,7 @@ export const ROLES = Object.freeze({
     JUNIOR_ENGINEER: "JUNIOR ENGINEER",
     ASSISTANT_ENGINEER: "ASSISTANT ENGINEER",
     EXECUTIVE_ENGINEER: "EXECUTIVE ENGINEER",
+    EXECUTIVE_OFFICER: "EXECUTIVE OFFICER",
     SUPERINTENDENT_ENGINEER: "SUPERINTENDENT ENGINEER",
     CHIEF_ENGINEER: "CHIEF ENGINEER",
     DEPUTY_MUNICIPAL_COMMISSIONER: "DEPUTY MUNICIPAL COMMISSIONER",
@@ -34,10 +35,9 @@ class User {
     return this.user?.role?.includes(ROLES.ASSISTANT_ENGINEER);
   }
 
-
-  // isExecutiveOfficer = () => {
-  //   return this.user?.role?.includes(ROLES.EXE_OFFICER);
-  // }
+  isExecutiveOfficer = () => {
+    return this.user?.role?.includes(ROLES.EXECUTIVE_OFFICER);
+  }
 
   // isCityManager = () => {
   //   return this.user?.role?.includes(ROLES.CITY_MANAGER);

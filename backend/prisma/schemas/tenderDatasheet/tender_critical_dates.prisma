@@ -1,0 +1,18 @@
+///// Managed By :- Sanjiv
+model tender_critical_dates {
+  id                            Int               @id @default(autoincrement())
+  tender_datasheet_id           Int               @unique
+  tender_datasheet              tender_datasheets @relation(fields: [tender_datasheet_id], references: [id])
+  publishing_date               DateTime
+  bid_opening_date              DateTime
+  document_sale_start_date      DateTime
+  document_sale_end_date        DateTime
+  seek_clarification_start_date DateTime
+  seek_clarification_end_date   DateTime
+  bid_submission_start_date     DateTime
+  bid_submission_end_date       DateTime
+  pre_bid_meeting_date          DateTime
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @map("updated_at")
+}

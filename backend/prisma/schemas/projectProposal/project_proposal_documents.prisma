@@ -4,10 +4,9 @@ model project_proposal_documents {
   project_proposal_id Int
   project_proposal    project_proposals @relation(fields: [project_proposal_id], references: [id])
 
-  doc_type_id Int
-
   description String
   path        String
+  size        String
   approved    String @default("pending")
 
   approved_by_id Int?

@@ -19,17 +19,18 @@ import toast, { Toaster } from "react-hot-toast";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 import { useUser } from "@/components/global/molecules/general/useUser";
 import ConfirmationPopup from "@/components/global/molecules/ConfirmationPopup";
+import { upload } from "@/utils/fileUploadAndGet";
 
 const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
-  const user = useUser()
+  const user = useUser();
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
     useWorkingAnimation();
   const parma: any = useSearchParams().get("mode");
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   const [state, setState] = useState({
     showNotification: false,
     showConfirmation: false,
-    projectData: null
+    projectData: null,
   });
 
   const { showNotification, showConfirmation, projectData } = state;
@@ -51,10 +52,15 @@ const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
   ///////// Handle Submit
   const handleSubmit = async (values: any) => {
     activateWorkingAnimation();
-    const files = values.files.filter(
-      (item: any) => item.file_token !== "null"
-    );
-    const data = { ...values, files, wards: values.wards.map((i:any) => i.value) };
+    if (!String(values.file.path).includes("https")) {
+      const file_path = await upload(values.file.path);
+
+      values.file.path = file_path;
+    }
+    const data = {
+      ...values,
+      wards: values.wards.map((i: any) => i.value),
+    };
 
     const res = await axios({
       url: `${PFMS_URL.PROJ_RPOPOSAL_URL.update}/${ProProposalId}`,
@@ -85,14 +91,6 @@ const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
       hideWorkingAnimation();
     },
   });
-
-  //// Handle files
-  const handleFileData = (files: []): any[] => {
-    return files.map((file: any) => ({
-      ...file,
-      file_token: String(file.file_token),
-    }));
-  };
 
   /////// Handle showing comfirmation popup
   const handleConfirmSubmit = (values: any) => {
@@ -149,20 +147,24 @@ const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
             ulb_id: data?.ulb_id,
             ward_id: data?.ward_id,
             pin_code: data?.pin_code,
-            files: handleFileData(data?.files),
+            file: {
+              file_name: data?.file?.file_name ?? "",
+              size: data?.file?.size ?? "",
+              path: data?.file?.path ?? "",
+            },
             state_id: data?.state_id,
-            wards: data?.wards.map((i:any) => {return {value: i.ward_id, label: i.ward_name}}),
+            wards: data?.wards.map((i: any) => {
+              return { value: i.ward_id, label: i.ward_name };
+            }),
             proposed_date: DateFormatter(data?.date),
             execution_body: data?.execution_body,
             user_id: user?.getUserId(),
           }}
           readonly={parma === "view"}
-          additionalData={
-            {
-              type: data?.type,
-              ward_no: data?.wards.map((i:any) => i.ward_name).join(','),
-            }
-          }
+          additionalData={{
+            type: data?.type,
+            ward_no: data?.wards.map((i: any) => i.ward_name).join(","),
+          }}
         />
       )}
     </>

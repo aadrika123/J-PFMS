@@ -1,0 +1,16 @@
+///// Managed By :- Sanjiv
+model tender_documents {
+  id             Int     @id @default(autoincrement())
+  reference_id   Int
+  reference_type String
+  type           String?
+  description    String?
+  path           String
+  file_name      String
+  size           String
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @map("updated_at")
+
+  @@unique([reference_id, path])
+}

@@ -11,7 +11,7 @@ import React, { useState } from "react";
 import Loader from "@/components/global/atoms/Loader";
 import Image from "next/image";
 import Table from "@/components/global/molecules/Table";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import axios from "@/lib/axiosConfig";
 import { PFMS_URL } from "@/utils/api/urls";
 import pdfIcon from "@/assets/svg/pdf_icon.svg";
@@ -24,9 +24,14 @@ import goBack from "@/utils/helper";
 import { Icons } from "@/assets/svg/icons";
 import { usePathname, useRouter } from "next/navigation";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
+import ProjectProposalApprovalStepper from "../../projectProposalMolecules/ProjectProposalApprovalStepper";
+import admi from "@/assets/svg/admi.svg";
+import { useUser } from "@/components/global/molecules/general/useUser";
 
 const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
   const router = useRouter();
+  const user = useUser();
+  const queryClient = useQueryClient();
   const [, activateWorkingAnimation] = useWorkingAnimation();
 
   const pathName = usePathname();
@@ -82,12 +87,45 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
   ////////////// handleOpenTenderInputForm //////////
   const handleOpenTenderInputForm = () => {
     activateWorkingAnimation();
-    router.push(`${pathName.split('/view')[0]}/add/1`);
+    if (user?.isJuniorEngineer()) {
+      router.push(
+        `${pathName.split("/view")[0]}/add/${data.tender_datasheet_id}?pageNo=1`
+      );
+    } else {
+      router.push(
+        `${pathName.split("/view")[0]}/verification/${data.tender_datasheet_id}`
+      );
+    }
   };
 
   ///////////// Handling step click ///////////
   const handleStepClick = (step: number) => {
     setState({ ...state, activeStep: step });
+  };
+
+  /////////// Handle Add Tender From ////////////
+  const handleAddTenderForm = async () => {
+    try {
+      activateWorkingAnimation();
+      const res = await axios({
+        url: `${PFMS_URL.TENDER_FORM.create}`,
+        method: "POST",
+        data: {
+          data: {
+            project_proposal_id: data.id,
+          },
+        },
+      });
+
+      if (!res.data.status) throw "Someting Went Wrong!!";
+
+      queryClient.invalidateQueries(["project-proposals-11"]),
+        router.push(
+          `${pathName.split("/view")[0]}/add/${res.data.data.id}?pageNo=1`
+        );
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const columns = [
@@ -110,6 +148,24 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
       caption: "Remarks",
     },
   ];
+
+  const items = [
+    {
+      info: "JUNIOR ENGINEER",
+      img: admi,
+      level: 0,
+    },
+    {
+      info: "EXECUTIVE ENGINEER",
+      img: admi,
+      level: 1,
+    },
+    {
+      info: "EXECUTIVE OFFICER",
+      img: admi,
+      level: 2,
+    },
+  ];
   return (
     <>
       {showPopup && (
@@ -129,12 +185,12 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
           </div>
         </Popup>
       )}
-      <div className="shadow-lg bg-white p-4 border">
+      <>
         {!data ? (
           <Loader />
         ) : (
           <>
-            <div className="flex justify-between items-center">
+            <div className="shadow-lg bg-white p-4 border mb-4 flex justify-between items-center">
               <Button
                 variant="cancel"
                 className="border-none shadow-none text-primary_bg_indigo hover:text-primary_bg_indigo hover:bg-inherit"
@@ -143,35 +199,48 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
                 {Icons.back}
                 <b>Back</b>
               </Button>
-              <Button
-                variant="primary"
-                className="border-none"
-                onClick={handleOpenTenderInputForm}
-              >
-                <b>Prepare Tender Input Form</b>
-                <div className="h-4 w-4 bg-white text-black rounded-full flex justify-center items-center">
-                  +
-                </div>
-              </Button>
+              {!data.tender_datasheet_id && user?.isJuniorEngineer() ? (
+                <Button
+                  variant="primary"
+                  className="border-none"
+                  onClick={handleAddTenderForm}
+                >
+                  <b>Prepare Tender Input Form</b>
+                  <div className="h-4 w-4 bg-white text-black rounded-full flex justify-center items-center">
+                    +
+                  </div>
+                </Button>
+              ) : (
+                <Button
+                  variant="primary"
+                  className="border-none"
+                  onClick={handleOpenTenderInputForm}
+                >
+                  <b>View Prepare Tender Input Form</b>
+                </Button>
+              )}
             </div>
-            <BoxContainer projectDetails={data} />
-            <Steps
-              handleClick={handleStepClick}
-              activeStep={activeStep}
-              className="mt-4"
-            />
-            {activeStep === 0 ? (
-              <ViewDetails projectDetails={data} />
-            ) : (
-              activeStep === 1 && (
-                <div className="mt-4">
-                  <Table columns={columns} data={data?.files} center />
-                </div>
-              )
-            )}
+            <div className="shadow-lg bg-white p-4 border">
+              <ProjectProposalApprovalStepper level={1} items={items} />
+              <BoxContainer projectDetails={data} />
+              <Steps
+                handleClick={handleStepClick}
+                activeStep={activeStep}
+                className="mt-4"
+              />
+              {activeStep === 0 ? (
+                <ViewDetails projectDetails={data} />
+              ) : (
+                activeStep === 1 && (
+                  <div className="mt-4">
+                    <Table columns={columns} data={data?.files} center />
+                  </div>
+                )
+              )}
+            </div>
           </>
         )}
-      </div>
+      </>
     </>
   );
 };

@@ -1,0 +1,20 @@
+///// Managed By :- Sanjiv
+model tender_basic_details {
+  id                       Int               @id @default(autoincrement())
+  tender_datasheet_id      Int               @unique
+  tender_datasheet         tender_datasheets @relation(fields: [tender_datasheet_id], references: [id])
+  reference_no             String
+  contract_forms           String[]
+  tender_type              String
+  tender_categories        String[]
+  allow_resubmission       Boolean
+  allow_withdrawal         Boolean
+  allow_offline_submission Boolean
+  payment_mode             String
+  bank_id                  Int?
+  bank                     banks?            @relation(fields: [bank_id], references: [id])
+  instrument               String?
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @map("updated_at")
+}

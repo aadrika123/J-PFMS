@@ -6,111 +6,157 @@
  * | Status- open
  */
 
-import React, { useState } from "react";
+import React, { useEffect, useRef } from "react";
 import TenderBasicDetailsForm from "./TenderInputForms/TenderBasicDetailsForm";
 import Image from "next/image";
 import TenderIcon from "@/assets/svg/tender_form.svg";
 import { tabList } from "./molecules/checkList";
 import TenderCoverDetailsForm from "./TenderInputForms/TenderCoverDetailsForm";
-import TenderWorkDetailsForm from "./TenderInputForms/TenderWordDetailsForm";
+import TenderWorkDetailsForm from "./TenderInputForms/TenderWorkDetailsForm";
 import TenderFeeDetailsForm from "./TenderInputForms/TenderFeeDetailsForm";
 import TenderCriticalDatesForm from "./TenderInputForms/TenderCriticalDatesForm";
 import TenderBidOpenerForm from "./TenderInputForms/TenderBidOpenersForm";
 import ViewTenderFormDetails from "./TenderInputForms/ViewTenderFormDetails";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import axios from "@/lib/axiosConfig";
+import { PFMS_URL } from "@/utils/api/urls";
+import goBack from "@/utils/helper";
+import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
+import Button from "@/components/global/atoms/buttons/Button";
+import { useReactToPrint } from "react-to-print";
 
-const TenderInputForm = ({ PageNo }: { PageNo: number }) => {
-  const [state, setState] = useState({
-    tabNo: 1,
-    showPreview: false,
-  });
+const TenderInputForm = ({ tenderFormId }: { tenderFormId: number }) => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const componentRef = useRef<any>();
+  const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
+    useWorkingAnimation();
 
-  const { tabNo, showPreview } = state;
+  const pageNo: number = Number(searchParams.get("pageNo"));
+
+  ////// Checking TenderFormId is valid or not ////
+  useEffect(() => {
+    (async function () {
+      activateWorkingAnimation();
+      const res = await axios({
+        url: `${PFMS_URL.TENDER_FORM.getById}/${tenderFormId}`,
+        method: "GET",
+      });
+
+      if (!res.data.data) goBack();
+
+      hideWorkingAnimation();
+    })();
+  }, [tenderFormId]);
 
   //////////// Handle Tab Jump //////////
   const handleTabJump = (tabNo: number) => {
-    setState({ ...state, tabNo });
+    router.push(`${pathname}?pageNo=${tabNo}`);
   };
 
   //////////// Handle Tab Change //////////
   const handleTabChange = (changeType: string) => {
     if (changeType === "prev") {
-      setState({ ...state, tabNo: tabNo - 1 });
+      goBack();
     } else if (changeType === "next") {
-      setState({ ...state, tabNo: tabNo + 1 });
+      if (pageNo < 7) {
+        router.push(`${pathname}?pageNo=${pageNo + 1}`);
+      }
     }
   };
 
-  console.log("page No", PageNo);
-
-  /* Handle Show Preview */
-  const handleShowPreview = () => {
-    setState({ ...state, showPreview: !showPreview });
-  };
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
 
   return (
-    <div>
+    <>
+      {workingAnimation}
       {/* Header */}
       <div className="bg-white shadow-lg p-4 flex justify-between items-center rounded mb-6">
         <div className="flex items-center">
           <Image src={TenderIcon} height={30} width={30} alt="tender-icon" />
-          <header className="font-bold ml-2">Tender Input Form</header>
+          <header className="font-bold ml-2">{`Tender Input Form ${pageNo === 7 ? " - Preview Details" : ""}`}</header>
         </div>
-        <div className="flex items-center w-1/4">
-          <progress
-            className="progress progress-primary primary  w-56"
-            value={tabNo * (100 / 6)}
-            max="100"
-          ></progress>
-          <span className="text-xs text-nowrap ml-2">Steps-{tabNo}/6</span>
-        </div>
+        {pageNo === 7 ? (
+          <Button onClick={handlePrint} variant="primary">
+            Print
+          </Button>
+        ) : (
+          <div className="flex items-center w-1/4">
+            <progress
+              className="progress progress-primary primary  w-56"
+              value={pageNo * (100 / 6)}
+              max="100"
+            ></progress>
+            <span className="text-xs text-nowrap ml-2">Steps-{pageNo}/6</span>
+          </div>
+        )}
       </div>
 
-      {!showPreview ? (
-        <>
-          {/* Header Tabs */}
-          <div className="flex items-center gap-4 mb-4">
-            {tabList.map((tab, index) => (
-              <div
-                key={index}
-                className={`px-3 py-2 rounded shadow-lg flex items-center cursor-pointer border ${tabNo === tab.id && "bg-primary_bg_indigo"}`}
-                onClick={() => handleTabJump(tab.id)}
+      {/* {!showPreview ? ( */}
+      <>
+        {/* Header Tabs */}
+        <div className="flex items-center gap-4 mb-4">
+          {tabList.map((tab, index) => (
+            <div
+              key={index}
+              className={`px-3 py-2 rounded shadow-lg flex items-center cursor-pointer border ${pageNo === tab.id && "bg-primary_bg_indigo"}`}
+              onClick={() => handleTabJump(tab.id)}
+            >
+              <Image src={tab?.icon} height={30} width={30} alt="tender-icon" />
+              <span
+                className={`text-xs font-medium text-secondary ml-2 text-nowrap ${pageNo === tab.id && "text-white"}`}
               >
-                <Image
-                  src={tab?.icon}
-                  height={30}
-                  width={30}
-                  alt="tender-icon"
-                />
-                <span
-                  className={`text-xs font-medium text-secondary ml-2 text-nowrap ${tabNo === tab.id && "text-white"}`}
-                >
-                  {tab?.title}
-                </span>
-              </div>
-            ))}
-          </div>
+                {tab?.title}
+              </span>
+            </div>
+          ))}
+        </div>
 
-          {/* Tender Forms */}
-          {tabNo === 1 ? (
-            <TenderBasicDetailsForm handleTabChange={handleTabChange} />
-          ) : tabNo === 2 ? (
-            <TenderCoverDetailsForm handleTabChange={handleTabChange} />
-          ) : tabNo === 3 ? (
-            <TenderWorkDetailsForm handleTabChange={handleTabChange} />
-          ) : tabNo === 4 ? (
-            <TenderFeeDetailsForm handleTabChange={handleTabChange} />
-          ) : tabNo === 5 ? (
-            <TenderCriticalDatesForm handleTabChange={handleTabChange} />
-          ) : (
-            tabNo === 6 && (
-              <TenderBidOpenerForm handleShowPreview={handleShowPreview} />
-            )
-          )}
-        </>
-      ) : (
-        <ViewTenderFormDetails handleBack={handleShowPreview} />
-      )}
-    </div>
+        {/* Tender Forms */}
+        {pageNo === 1 ? (
+          <TenderBasicDetailsForm
+            handleTabChange={handleTabChange}
+            tenderFormId={tenderFormId}
+          />
+        ) : pageNo === 2 ? (
+          <TenderCoverDetailsForm
+            handleTabChange={handleTabChange}
+            tenderFormId={tenderFormId}
+          />
+        ) : pageNo === 3 ? (
+          <TenderWorkDetailsForm
+            handleTabChange={handleTabChange}
+            tenderFormId={tenderFormId}
+          />
+        ) : pageNo === 4 ? (
+          <TenderFeeDetailsForm
+            handleTabChange={handleTabChange}
+            tenderFormId={tenderFormId}
+          />
+        ) : pageNo === 5 ? (
+          <TenderCriticalDatesForm
+            handleTabChange={handleTabChange}
+            tenderFormId={tenderFormId}
+          />
+        ) : pageNo === 6 ? (
+          <TenderBidOpenerForm
+            handleTabChange={handleTabChange}
+            tenderFormId={tenderFormId}
+          />
+        ) : (
+          pageNo === 7 && (
+            <ViewTenderFormDetails
+              componentRef={componentRef}
+              handleTabChange={handleTabChange}
+              tenderFormId={tenderFormId}
+            />
+          )
+        )}
+      </>
+    </>
   );
 };
 

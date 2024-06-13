@@ -7,7 +7,7 @@
  */
 
 import Button from "@/components/global/atoms/buttons/Button";
-import goBack from "@/utils/helper";
+import goBack, { removeEmptyField } from "@/utils/helper";
 import { Formik, FormikValues } from "formik";
 import { tenderWorkDetailsSchema } from "pfmslib";
 import React, { useRef, useState } from "react";
@@ -38,37 +38,23 @@ import TextArea from "@/components/global/atoms/Textarea";
 import Input from "@/components/global/atoms/Input";
 import CheckboxComponent from "../molecules/CheckboxComponent";
 import RadioYesNoComponent from "../molecules/RadioYesNoComponent";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
+import { PFMS_URL } from "@/utils/api/urls";
+import axios from "@/lib/axiosConfig";
+import toast, { Toaster } from "react-hot-toast";
 
 type TenderWorkDetailsFormProps = {
   handleTabChange: (type: string) => void;
+  tenderFormId: number;
 };
 
-const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (
-  props
-) => {
-  const { handleTabChange } = props
+const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (props) => {
+  const queryClient = useQueryClient();
+  const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
+    useWorkingAnimation();
+  const { handleTabChange, tenderFormId } = props;
   const formRef = useRef<HTMLFormElement>(null);
-  const initialValues = {
-    work_title: "",
-    description: "",
-    pre_qualification_details: "",
-    product_categories: [],
-    product_sub_category: "",
-    contract_type: "",
-    tender_value: "",
-    bid_validity: "",
-    completion_period: "",
-    work_location: "",
-    pin_code: "",
-    pre_bid_meeting: true,
-    bid_opening_place: "",
-    pre_bid_meeting_place: "",
-    pre_bid_meeting_address: "",
-    tenderer_class: [],
-    inviting_officer_name: "",
-    inviting_officer_address: "",
-    inviting_officer_contact: "",
-  };
 
   const readonly = false;
   const [state, setState] = useState<any>({
@@ -79,11 +65,45 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (
 
   const { showWarning, triggerFun, showFinalError } = state;
 
-  /////// Handle Submit //////
-  const onSubmit = (values: FormikValues) => {
-    console.log("Basic Details", values);
-    handleTabChange("next");
+  ///////// Fetching Data
+  const fetch = async () => {
+    const res = await axios({
+      url: `${PFMS_URL.TENDER_WORK.getById}/${tenderFormId}`,
+      method: "GET",
+    });
+
+    if (!res.data.status) throw "Someting Went Wrong!!";
+
+    return res.data.data;
   };
+
+  const { data: data }: any = useQuery(
+    ["tender-work-details", tenderFormId],
+    fetch
+  );
+
+  const initialDetails = {
+    tender_datasheet_id: data?.tender_datasheet_id || tenderFormId,
+    work_title: data?.work_title || "",
+    description: data?.description || "",
+    pre_qualification_details: data?.pre_qualification_details || "",
+    product_categories: data?.product_categories || [],
+    product_sub_category: data?.product_sub_category || "",
+    contract_type: data?.contract_type || "",
+    tender_value: data?.tender_value || "",
+    bid_validity: data?.bid_validity || "",
+    completion_period: data?.completion_period || "",
+    work_location: data?.work_location || "",
+    pin_code: data?.pin_code || "",
+    pre_bid_meeting: data?.pre_bid_meeting,
+    bid_opening_place: data?.bid_opening_place || "",
+    pre_bid_meeting_place: data?.pre_bid_meeting_place || "",
+    pre_bid_meeting_address: data?.pre_bid_meeting_address || "",
+    tenderer_class: data?.tenderer_class || [],
+    inviting_officer_name: data?.inviting_officer_name || "",
+    inviting_officer_address: data?.inviting_officer_address || "",
+    inviting_officer_contact: data?.inviting_officer_contact || "",
+  }
 
   ///// handlBackAndReset
   const handleBackAndReset = (trigger?: () => void) => {
@@ -101,25 +121,49 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (
     }, 100);
   };
 
+  //////////// Handle Save Work Details /////////////
+  const handleSave = async (values: any) => {
+    activateWorkingAnimation();
+    const res = await axios({
+      url: `${PFMS_URL.TENDER_WORK.create}`,
+      method: "POST",
+      data: {
+        data: values,
+      },
+    });
+
+    if (!res.data.status) throw "Something Went Wrong!!!";
+  };
+
+  const { mutate } = useMutation(handleSave, {
+    onSuccess: () => {
+      Promise.all([
+        queryClient.invalidateQueries(["tender-work-openers", tenderFormId]),
+        queryClient.invalidateQueries(["tender-all-details", tenderFormId]),
+      ]);
+      toast.success("Details Saved Successfully");
+      setTimeout(() => {
+        handleTabChange("next");
+      }, 100);
+    },
+    onError: (error) => {
+      toast.error("Something Went Wrong!!");
+      console.log(error);
+    },
+    onSettled: () => {
+      hideWorkingAnimation();
+    },
+  });
+
+  /////// Handle Submit //////
+  const onSubmit = (values: FormikValues) => {
+    mutate(removeEmptyField(values));
+  };
+
   return (
     <>
-      {/* {showPopup && (
-        <Popup padding="0">
-          <iframe
-            width={1000}
-            height={570}
-            src={`${file.split(".")[1] === "pdf" ? `${process.env.img_base}${file}` : file}`}
-          ></iframe>
-          <div className="flex items-center absolute bottom-3 self-center">
-            <Button
-              onClick={() => setState({ ...state, showPopup: !showPopup })}
-              variant="cancel"
-            >
-              Close
-            </Button>
-          </div>
-        </Popup>
-      )} */}
+      <Toaster />
+      {workingAnimation}
       {showWarning && (
         <LosingDataConfirmPopup
           continue={handleCompleteReset}
@@ -134,7 +178,7 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (
 
       {/* Form section */}
       <Formik
-        initialValues={initialValues}
+        initialValues={initialDetails}
         validationSchema={tenderWorkDetailsSchema}
         onSubmit={onSubmit}
         enableReinitialize={true}
@@ -338,10 +382,10 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (
                     touched={touched.bid_opening_place}
                     label="Bid Opening Place"
                     name="bid_opening_place"
-                    required
                     placeholder="Enter Bid Opening Place"
                     maxlength={50}
-                    readonly={readonly}
+                    required={values.pre_bid_meeting}
+                    readonly={!values.pre_bid_meeting || readonly}
                     labelColor="black font-medium"
                   />
                   <Input
@@ -352,10 +396,10 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (
                     touched={touched.pre_bid_meeting_place}
                     label="Pre Bid Meeting Place"
                     name="pre_bid_meeting_place"
-                    required
                     placeholder="Enter Pre Bid Meeting Place"
                     maxlength={50}
-                    readonly={readonly}
+                    required={values.pre_bid_meeting}
+                    readonly={!values.pre_bid_meeting || readonly}
                     labelColor="black font-medium"
                   />
                 </div>
@@ -369,9 +413,9 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (
                   name="pre_bid_meeting_address"
                   placeholder="Enter Pre Bid Meeting Address"
                   maxlength={150}
-                  required
                   className="min-h-[80px] max-h-[80px]"
-                  readonly={readonly}
+                  required={values.pre_bid_meeting}
+                  readonly={!values.pre_bid_meeting || readonly}
                   labelColor="black font-medium"
                 />
               </div>
@@ -445,23 +489,35 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (
                 Please Fill the all required field
               </span>
             )}
-            <div className="mt-4 flex items-center gap-5 justify-end">
-              {!readonly && dirty ? (
-                <Button
-                  onClick={() => handleBackAndReset(goBack)}
-                  buttontype="button"
-                  variant="cancel"
-                >
-                  Cancel
-                </Button>
-              ) : (
-                <Button onClick={() => handleTabChange("prev")} buttontype="button" variant="cancel">
-                  Back
-                </Button>
+            <div className="mt-4 w-full">
+              {!readonly && !dirty && (
+                <div className="flex justify-between items-center">
+                  <Button
+                    onClick={() => handleTabChange("prev")}
+                    buttontype="button"
+                    variant="cancel"
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    onClick={() => handleTabChange("next")}
+                    buttontype="button"
+                    variant="cancel"
+                  >
+                    Next
+                  </Button>
+                </div>
               )}
 
               {!readonly && dirty && (
-                <>
+                <div className="flex items-center gap-5 justify-end">
+                  <Button
+                    onClick={() => handleBackAndReset(goBack)}
+                    buttontype="button"
+                    variant="cancel"
+                  >
+                    Cancel
+                  </Button>
                   <Button
                     onClick={() => handleBackAndReset(handleReset)}
                     buttontype="button"
@@ -476,7 +532,7 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (
                   >
                     Save & Next
                   </Button>
-                </>
+                </div>
               )}
             </div>
           </form>

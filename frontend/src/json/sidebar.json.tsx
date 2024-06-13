@@ -6,9 +6,6 @@ import rupeeIcons from "@/assets/svg/rupee_icons.svg";
 import { SidebarLinksProps } from "@/utils/types/types";
 import project from "@/assets/svg/project.svg";
 import contract from "@/assets/svg/contract.svg";
-import technical from "@/assets/svg/technical.svg";
-import measure from "@/assets/svg/measure.svg";
-import running from "@/assets/svg/running.svg";
 import userAdmin from "@/assets/svg/userAdmin.svg";
 import houseIcons from "@/assets/svg/house_icons.svg";
 import tenderIcon from "@/assets/svg/tender.svg";
@@ -37,33 +34,68 @@ export const sidebarLinks: SidebarLinksProps = {
           moduleName: "Engineering Section",
           icon: <Image src={project} alt="home" width={100} height={100} />,
           path: "/engineering",
-          roles: [ROLES.JUNIOR_ENGINEER, ROLES.ASSISTANT_ENGINEER, 
-            ROLES.EXECUTIVE_ENGINEER, ROLES.SUPERINTENDENT_ENGINEER, ROLES.CHIEF_ENGINEER,
-             ROLES.DEPUTY_MUNICIPAL_COMMISSIONER, ROLES.ASSISTANT_MUNICIPAL_COMMISSIONER, ROLES.MUNICIPAL_COMMISSIONER],
+          roles: [
+            ROLES.JUNIOR_ENGINEER,
+            ROLES.ASSISTANT_ENGINEER,
+            ROLES.EXECUTIVE_ENGINEER,
+            ROLES.SUPERINTENDENT_ENGINEER,
+            ROLES.CHIEF_ENGINEER,
+            ROLES.DEPUTY_MUNICIPAL_COMMISSIONER,
+            ROLES.ASSISTANT_MUNICIPAL_COMMISSIONER,
+            ROLES.MUNICIPAL_COMMISSIONER,
+          ],
 
           subModules: [
             {
               moduleName: "Projects",
-              icon: <Image src={houseIcons} alt="projects" width={100} height={100} />,
+              icon: (
+                <Image
+                  src={houseIcons}
+                  alt="projects"
+                  width={100}
+                  height={100}
+                />
+              ),
               path: "/engineering/projects",
             },
             {
               moduleName: "e-Measurement Book",
-              icon: <Image src={houseIcons} alt="e-measurement" width={100} height={100} />,
+              icon: (
+                <Image
+                  src={houseIcons}
+                  alt="e-measurement"
+                  width={100}
+                  height={100}
+                />
+              ),
               path: "/engineering/e-measurement-book",
             },
             {
               moduleName: "Running Bills",
-              icon: <Image src={houseIcons} alt="running-bills" width={100} height={100} />,
+              icon: (
+                <Image
+                  src={houseIcons}
+                  alt="running-bills"
+                  width={100}
+                  height={100}
+                />
+              ),
               path: "/engineering/running-bills",
             },
             {
               moduleName: "Schedule Of Rates",
-              icon: <Image src={houseIcons} alt="running-bills" width={100} height={100} />,
+              icon: (
+                <Image
+                  src={houseIcons}
+                  alt="running-bills"
+                  width={100}
+                  height={100}
+                />
+              ),
               path: "/engineering/schedule-of-rates",
-          roles: [ROLES.EXE_OFFICER, ROLES.CITY_MANAGER],
-            },         
-          ]
+              roles: [ROLES.EXECUTIVE_ENGINEER],
+            },
+          ],
         },
         {
           moduleName: "Fund Management",
@@ -76,7 +108,7 @@ export const sidebarLinks: SidebarLinksProps = {
             />
           ),
           path: "/fund-management",
-          roles: [ROLES.CITY_MANAGER]
+          roles: [],
         },
         {
           moduleName: "Contract Management",
@@ -89,29 +121,7 @@ export const sidebarLinks: SidebarLinksProps = {
             />
           ),
           path: "/contract-management",
-          roles: [ROLES.CITY_MANAGER]
-        },
-        {
-          moduleName: "Engineering Section",
-          icon: <Image src={technical} alt="engineering-section" width={100} height={100} />,
-          path: "/engineering-section",
-          roles: [ROLES.CITY_MANAGER]
-        },
-        {
-          moduleName: "e-Measurement",
-          icon: (
-            <Image src={measure} alt="e-measurement" width={100} height={100} />
-          ),
-          path: "/e-measurement",
-          roles: [ROLES.CITY_MANAGER]
-        },
-        {
-          moduleName: "Running Bills",
-          icon: (
-            <Image src={running} alt="running-bills" width={100} height={100} />
-          ),
-          path: "/running-bills",
-          roles: [ROLES.CITY_MANAGER]
+          roles: [],
         },
         {
           moduleName: "Adminstrative Section",
@@ -124,7 +134,7 @@ export const sidebarLinks: SidebarLinksProps = {
             />
           ),
           path: "/adminstrative-section",
-          roles: [ROLES.CITY_MANAGER]
+          roles: [],
         },
         {
           moduleName: "Dashboard",
@@ -132,7 +142,7 @@ export const sidebarLinks: SidebarLinksProps = {
             <Image src={mastersLogo} alt="dashboard" width={100} height={100} />
           ),
           path: "/dashboard",
-          roles: [ROLES.CITY_MANAGER]
+          roles: [],
         },
         {
           moduleName: "Tender Datasheet",
@@ -140,10 +150,39 @@ export const sidebarLinks: SidebarLinksProps = {
             <Image src={tenderIcon} alt="tender" width={100} height={100} />
           ),
           path: "/tender-datasheet",
-          roles: [ROLES.JUNIOR_ENGINEER]
+          roles: [
+            ROLES.JUNIOR_ENGINEER,
+            ROLES.EXECUTIVE_ENGINEER,
+            ROLES.EXECUTIVE_OFFICER,
+          ],
+          subModules: [
+            {
+              moduleName: "Tender Input Form",
+              icon: (
+                <Image
+                  src={mastersLogo}
+                  alt="dashboard"
+                  width={100}
+                  height={100}
+                />
+              ),
+              path: "/tender-datasheet",
+            },
+            {
+              moduleName: "Awarded Tenders",
+              icon: (
+                <Image
+                  src={mastersLogo}
+                  alt="awarded"
+                  width={100}
+                  height={100}
+                />
+              ),
+              path: "/tender-datasheet/awarded-tenders",
+            },
+          ],
         },
       ],
     },
   ],
 };
-

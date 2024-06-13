@@ -7,10 +7,10 @@
  */
 
 import Button from "@/components/global/atoms/buttons/Button";
-import goBack from "@/utils/helper";
+import goBack, { removeEmptyField } from "@/utils/helper";
 import { Formik, FormikValues } from "formik";
 import { tenderCoverDetailsSchema } from "pfmslib";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { bg_color, coverList } from "../molecules/checkList";
 import RadioComponent from "../molecules/RadioComponent";
 import Image from "next/image";
@@ -29,23 +29,29 @@ import LosingDataConfirmPopup from "@/components/global/molecules/general/Losing
 import CoverIcon from "@/assets/svg/Parchment.svg";
 import ImageUploadUi from "./ImageUploadUi";
 import Input from "@/components/global/atoms/Input";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { upload } from "@/utils/fileUploadAndGet";
+import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
+import axios from "@/lib/axiosConfig";
+import { PFMS_URL } from "@/utils/api/urls";
+import toast, { Toaster } from "react-hot-toast";
 
 type TenderCoverDetailsFormProps = {
   handleTabChange: (type: string) => void;
+  tenderFormId: number;
 };
 
 const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
   props
 ) => {
-  const { handleTabChange } = props;
-  const formRef = useRef<HTMLFormElement>(null);
-  const initialValues = {
-    cover_no: "1",
-    content: "",
-    files: [],
-  };
+  const queryClient = useQueryClient();
+  const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
+    useWorkingAnimation();
+  const { handleTabChange, tenderFormId } = props;
+  // const formRef = useRef<HTMLFormElement>(null);
 
   const readonly = false;
+
   const [state, setState] = useState<any>({
     tabNo: 1,
     coverNo: "1",
@@ -58,15 +64,39 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
   const { tabNo, coverNo, files, showWarning, triggerFun, showFinalError } =
     state;
 
+  ///////// Fetching Data
+  const fetch = async () => {
+    const res = await axios({
+      url: `${PFMS_URL.TENDER_COVER.getById}/${tenderFormId}`,
+      method: "GET",
+    });
+
+    if (!res.data.status) throw "Someting Went Wrong!!";
+
+    return res.data.data;
+  };
+
+  const { data: data }: any = useQuery(
+    ["tender-cover-details", tenderFormId],
+    fetch
+  );
+
+  const initialDetails = {
+    tender_datasheet_id: data?.tender_datasheet_id || tenderFormId,
+    cover_no: data?.cover_no,
+    content: data?.content,
+    files: data?.files.length ? data?.files : [],
+  };
+
+  useEffect(() => {
+    if (data) {
+      setState({ ...state, files: data?.files, coverNo: data?.cover_no });
+    }
+  }, [data]);
+
   ////////////// Handle Cover No Change ////////////
   const handleFileTabChange = (tabNo: number) => {
     setState({ ...state, tabNo });
-  };
-
-  /////// Handle Submit //////
-  const onSubmit = (values: FormikValues) => {
-    console.log("Basic Details", values);
-    handleTabChange("next");
   };
 
   ///// handlBackAndReset
@@ -87,7 +117,7 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
 
   /////// Handle Upload
   const handleUpload = (
-    status: any,
+    fileData: any,
     setFieldValue: (key: string, value: any[]) => void
   ) => {
     const lists: string[] =
@@ -97,34 +127,14 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
     const tabName = lists[tabNo - 1]?.toLowerCase();
 
     const tabFile: any = {
+      file_id: files[files.length - 1]?.file_id + 1 || 1,
       type: tabName,
+      file_name: fileData.file_name,
+      path: fileData.file,
+      size: fileData.size,
     };
 
-    const prevFile = state.files.find((f: any) => f.type === tabName);
-
-    if (prevFile) {
-      tabFile.tab_files = [
-        ...prevFile.tab_files,
-        {
-          file_name: status.file_name,
-          path: "",
-          size: status.size,
-        },
-      ];
-    } else {
-      tabFile.tab_files = [
-        {
-          file_name: status.file_name,
-          path: "",
-          size: status.size,
-        },
-      ];
-    }
-
-    const newArray = [
-      ...state.files.filter((i: any) => i.type !== tabName),
-      tabFile,
-    ];
+    const newArray = [...state.files, tabFile];
     setFieldValue("files", newArray);
     setState({
       ...state,
@@ -134,47 +144,24 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
 
   ////// Find Current File Tab Name
   const findCurrentTabFiles = (files: any[]) => {
-    return files.find(
-      (i: any) =>
-        i.type ===
-        coverList?.options
-          ?.find((cover: any) => cover.value === coverNo)
-          ?.list[tabNo - 1]?.toLowerCase()
-    );
+    const currentTab = coverList?.options?.find(
+      (cover: any) => cover.value === coverNo
+    )?.list[tabNo - 1];
+    return files.filter((i: any) => i.type === currentTab?.toLowerCase());
   };
 
   /////////////// Handle Delete File
   const handleDeleteFile = (
-    type: string,
-    index: number,
+    file_id: number,
     setFieldValue: (key: string, value: any) => void
   ) => {
-    const allFiles = [...state.files];
+    const newFileList = files.filter((i: any) => i.file_id !== file_id);
 
-    const tabInfo = findCurrentTabFiles(allFiles);
-
-    const notChangedFiles = [
-      ...state.files.filter((i: any) => i.type !== tabInfo.type),
-    ];
-    if (tabInfo.tab_files.length === 1) {
-      setState({
-        ...state,
-        files: notChangedFiles,
-      });
-      setFieldValue("files", notChangedFiles);
-    } else {
-      const tab_files = tabInfo.tab_files.filter(
-        (item: any, i: number) => i !== index
-      );
-
-      const updatedTabInfo = { ...tabInfo, tab_files };
-
-      setState({
-        ...state,
-        files: [...notChangedFiles, updatedTabInfo],
-      });
-      setFieldValue("files", [...notChangedFiles, updatedTabInfo]);
-    }
+    setState({
+      ...state,
+      files: newFileList,
+    });
+    setFieldValue("files", newFileList);
   };
 
   //////////// Get List of Remaing file tab ///////////
@@ -188,25 +175,65 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
     }
   };
 
+  //////////// Adding File path /////////
+  const addingFilePath = async (files: any[]) => {
+    const tabs = coverList?.options?.find(
+      (cover: any) => cover.value === coverNo
+    )?.listInLower;
+
+    const newFiles = files.filter((i) => tabs?.includes(`${i.type}`));
+    for (const file of newFiles) {
+      if (!String(file.path).includes("https")) {
+        file.path = await upload(file.path);
+      }
+    }
+    return newFiles;
+  };
+
+  //////////// Handle Save Cover Details /////////////
+  const handleSave = async (values: any) => {
+    activateWorkingAnimation();
+    values.files = await addingFilePath(values.files);
+    const res = await axios({
+      url: `${PFMS_URL.TENDER_COVER.create}`,
+      method: "POST",
+      data: {
+        data: values,
+      },
+    });
+
+    if (!res.data.status) throw "Something Went Wrong!!!";
+  };
+
+  const { mutate } = useMutation(handleSave, {
+    onSuccess: () => {
+      Promise.all([
+        queryClient.invalidateQueries(["tender-cover-openers", tenderFormId]),
+        queryClient.invalidateQueries(["tender-all-details", tenderFormId]),
+      ]);
+      toast.success("Details Saved Successfully");
+      setTimeout(() => {
+        handleTabChange("next");
+      }, 100);
+    },
+    onError: (error) => {
+      toast.error("Something Went Wrong!!");
+      console.log(error);
+    },
+    onSettled: () => {
+      hideWorkingAnimation();
+    },
+  });
+
+  /////// Handle Submit //////
+  const onSubmit = (values: FormikValues) => {
+    mutate(removeEmptyField(values));
+  };
+
   return (
     <>
-      {/* {showPopup && (
-        <Popup padding="0">
-          <iframe
-            width={1000}
-            height={570}
-            src={`${file.split(".")[1] === "pdf" ? `${process.env.img_base}${file}` : file}`}
-          ></iframe>
-          <div className="flex items-center absolute bottom-3 self-center">
-            <Button
-              onClick={() => setState({ ...state, showPopup: !showPopup })}
-              variant="cancel"
-            >
-              Close
-            </Button>
-          </div>
-        </Popup>
-      )} */}
+      <Toaster />
+      {workingAnimation}
       {showWarning && (
         <LosingDataConfirmPopup
           continue={handleCompleteReset}
@@ -221,7 +248,7 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
 
       {/* Form section */}
       <Formik
-        initialValues={initialValues}
+        initialValues={initialDetails}
         validationSchema={tenderCoverDetailsSchema}
         onSubmit={onSubmit}
         enableReinitialize={true}
@@ -238,7 +265,7 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
           setFieldValue,
         }: any) => (
           <form
-            ref={formRef}
+            // ref={formRef}
             onSubmit={(e) => {
               setState({ ...state, showFinalError: true });
               handleSubmit(e);
@@ -278,13 +305,13 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
 
               {/* File Upload */}
               <ImageUploadUi
-                handleUpload={(status: any) =>
-                  handleUpload(status, setFieldValue)
+                handleUpload={(fileData: any) =>
+                  handleUpload(fileData, setFieldValue)
                 }
-                handleDeleteFile={(type: string, index: number) =>
-                  handleDeleteFile(type, index, setFieldValue)
+                handleDeleteFile={(file_id: number) =>
+                  handleDeleteFile(file_id, setFieldValue)
                 }
-                fileInfo={findCurrentTabFiles(files)}
+                files={findCurrentTabFiles(files)}
               />
 
               <Input
@@ -307,27 +334,35 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
                 Please Fill the all required field
               </span>
             )}
-            <div className="mt-4 flex items-center gap-5 justify-end">
-              {!readonly && dirty ? (
-                <Button
-                  onClick={() => handleBackAndReset(goBack)}
-                  buttontype="button"
-                  variant="cancel"
-                >
-                  Cancel
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => handleTabChange("prev")}
-                  buttontype="button"
-                  variant="cancel"
-                >
-                  Back
-                </Button>
+            <div className="mt-4 w-full">
+              {!readonly && !dirty && (
+                <div className="flex justify-between items-center">
+                  <Button
+                    onClick={() => handleTabChange("prev")}
+                    buttontype="button"
+                    variant="cancel"
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    onClick={() => handleTabChange("next")}
+                    buttontype="button"
+                    variant="cancel"
+                  >
+                    Next
+                  </Button>
+                </div>
               )}
 
               {!readonly && dirty && (
-                <>
+                <div className="flex items-center gap-5 justify-end">
+                  <Button
+                    onClick={() => handleBackAndReset(goBack)}
+                    buttontype="button"
+                    variant="cancel"
+                  >
+                    Cancel
+                  </Button>
                   <Button
                     onClick={() => handleBackAndReset(handleReset)}
                     buttontype="button"
@@ -342,7 +377,7 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
                   >
                     Save & Next
                   </Button>
-                </>
+                </div>
               )}
             </div>
           </form>
