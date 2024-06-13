@@ -101,14 +101,6 @@ export class APIv1 {
       });
   }
 
-  addDMSUploadRoute(path: string, handler: (req: Request) => Promise<APIv1Response>): void {
-    this.app.route(`${this.baseUrl}/${path}`)
-      .post(async (req: Request, res: Response) => {
-        dmsMulterUpload.single("doc")(req, res, () => {
-          this.apiWrapper(req, res, this.generateAPIId(), handler);
-        });        
-      });
-  }
 
   private generateAPIId = () => {
     return `${this.routeId}` + `${++this.apiCount}`.padStart(3, "0");
