@@ -16,7 +16,7 @@ import { useReactToPrint } from "react-to-print";
 type ViewTenderFormDetailsProps = {
   handleTabChange: (type: string) => void;
   tenderFormId: number;
-  componentRef: any;
+  componentRef?: any;
 };
 
 const ViewTenderFormDetails: React.FC<ViewTenderFormDetailsProps> = (props) => {

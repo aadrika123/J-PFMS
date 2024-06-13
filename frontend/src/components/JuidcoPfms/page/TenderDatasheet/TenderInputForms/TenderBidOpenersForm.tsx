@@ -9,7 +9,7 @@
 import Button from "@/components/global/atoms/buttons/Button";
 import goBack from "@/utils/helper";
 import { Formik, FormikValues } from "formik";
-import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, useRef, useState } from "react";
 import { bg_color } from "../molecules/checkList";
 import Image from "next/image";
 // const RunningAnimation = dynamic(
@@ -62,38 +62,6 @@ const TenderBidOpenerForm: React.FC<TenderBidOpenerFormProps> = (props) => {
   const { showWarning, triggerFun, showFinalError, showPopup, currentFile } =
     state;
 
-  const [initialDetails, setInitialDetails] = useState({
-    tender_datasheet_id: tenderFormId,
-    bid_openers: [
-      {
-        name: "",
-        email: "",
-      },
-      {
-        name: "",
-        email: "",
-      },
-      {
-        name: "",
-        email: "",
-      },
-    ],
-    files: [
-      {
-        file_name: "",
-        description: "",
-        size: "",
-        path: "",
-      },
-      {
-        file_name: "",
-        description: "",
-        size: "",
-        path: "",
-      },
-    ],
-  });
-
   ///////// Fetching Data
   const fetch = async () => {
     const res = await axios({
@@ -111,28 +79,37 @@ const TenderBidOpenerForm: React.FC<TenderBidOpenerFormProps> = (props) => {
     fetch
   );
 
-  useEffect(() => {
-    if (data && data.bid_openers.length && data.files.length) {
-      setInitialDetails({
-        tender_datasheet_id: data?.tender_datasheet_id || tenderFormId,
-        bid_openers: [
-          {
-            name: data?.bid_openers[0]?.name || "",
-            email: data?.bid_openers[0]?.email || "",
-          },
-          {
-            name: data?.bid_openers[1]?.name || "",
-            email: data?.bid_openers[1]?.email || "",
-          },
-          {
-            name: data?.bid_openers[2]?.name || "",
-            email: data?.bid_openers[2]?.email || "",
-          },
-        ],
-        files: data?.files,
-      });
-    }
-  }, [data]);
+  const initialDetails = {
+    tender_datasheet_id: data?.tender_datasheet_id || tenderFormId,
+    bid_openers: [
+      {
+        name: data?.bid_openers[0]?.name || "",
+        email: data?.bid_openers[0]?.email || "",
+      },
+      {
+        name: data?.bid_openers[1]?.name || "",
+        email: data?.bid_openers[1]?.email || "",
+      },
+      {
+        name: data?.bid_openers[2]?.name || "",
+        email: data?.bid_openers[2]?.email || "",
+      },
+    ],
+    files: data?.files?.length ? data?.files : [
+      {
+        file_name: "",
+        description: "",
+        size: "",
+        path: "",
+      },
+      {
+        file_name: "",
+        description: "",
+        size: "",
+        path: "",
+      },
+    ],
+  }
 
   ///// handlBackAndReset
   const handleBackAndReset = (trigger?: () => void) => {

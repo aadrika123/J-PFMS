@@ -51,12 +51,7 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
   // const formRef = useRef<HTMLFormElement>(null);
 
   const readonly = false;
-  const [initialDetails, setInitialDetails] = useState({
-    tender_datasheet_id: tenderFormId,
-    cover_no: "1",
-    content: "",
-    files: [],
-  });
+
   const [state, setState] = useState<any>({
     tabNo: 1,
     coverNo: "1",
@@ -66,14 +61,8 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
     showFinalError: false,
   });
 
-  const {
-    tabNo,
-    coverNo,
-    files,
-    showWarning,
-    triggerFun,
-    showFinalError
-  } = state;
+  const { tabNo, coverNo, files, showWarning, triggerFun, showFinalError } =
+    state;
 
   ///////// Fetching Data
   const fetch = async () => {
@@ -92,14 +81,15 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
     fetch
   );
 
+  const initialDetails = {
+    tender_datasheet_id: data?.tender_datasheet_id || tenderFormId,
+    cover_no: data?.cover_no,
+    content: data?.content,
+    files: data?.files.length ? data?.files : [],
+  };
+
   useEffect(() => {
     if (data) {
-      setInitialDetails({
-        tender_datasheet_id: data?.tender_datasheet_id || tenderFormId,
-        cover_no: data?.cover_no,
-        content: data?.content,
-        files: data?.files,
-      });
       setState({ ...state, files: data?.files, coverNo: data?.cover_no });
     }
   }, [data]);
@@ -154,7 +144,6 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
 
   ////// Find Current File Tab Name
   const findCurrentTabFiles = (files: any[]) => {
-    
     const currentTab = coverList?.options?.find(
       (cover: any) => cover.value === coverNo
     )?.list[tabNo - 1];
@@ -212,7 +201,7 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
         data: values,
       },
     });
-    
+
     if (!res.data.status) throw "Something Went Wrong!!!";
   };
 
@@ -236,12 +225,10 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
     },
   });
 
-
   /////// Handle Submit //////
   const onSubmit = (values: FormikValues) => {
     mutate(removeEmptyField(values));
   };
-
 
   return (
     <>

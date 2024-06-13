@@ -138,7 +138,7 @@ export const sidebarLinks: SidebarLinksProps = {
             <Image src={tenderIcon} alt="tender" width={100} height={100} />
           ),
           path: "/tender-datasheet",
-          roles: [ROLES.JUNIOR_ENGINEER]
+          roles: [ROLES.JUNIOR_ENGINEER, ROLES.EXE_OFFICER]
         },
       ],
     },

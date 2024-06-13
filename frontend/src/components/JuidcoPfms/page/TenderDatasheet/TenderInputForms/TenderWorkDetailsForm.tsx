@@ -10,7 +10,7 @@ import Button from "@/components/global/atoms/buttons/Button";
 import goBack, { removeEmptyField } from "@/utils/helper";
 import { Formik, FormikValues } from "formik";
 import { tenderWorkDetailsSchema } from "pfmslib";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   bg_color,
   bid_validity,
@@ -62,28 +62,6 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (props) => {
     triggerFun: null,
     showFinalError: false,
   });
-  const [initialDetails, setInitialDetails] = useState({
-    tender_datasheet_id: tenderFormId,
-    work_title: "",
-    description: "",
-    pre_qualification_details: "",
-    product_categories: [],
-    product_sub_category: "",
-    contract_type: "",
-    tender_value: "",
-    bid_validity: "",
-    completion_period: "",
-    work_location: "",
-    pin_code: "",
-    pre_bid_meeting: true,
-    bid_opening_place: "",
-    pre_bid_meeting_place: "",
-    pre_bid_meeting_address: "",
-    tenderer_class: [],
-    inviting_officer_name: "",
-    inviting_officer_address: "",
-    inviting_officer_contact: "",
-  });
 
   const { showWarning, triggerFun, showFinalError } = state;
 
@@ -104,33 +82,28 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (props) => {
     fetch
   );
 
-  useEffect(() => {
-    if (data) {
-    
-      setInitialDetails({
-        tender_datasheet_id: data?.tender_datasheet_id || tenderFormId,
-        work_title: data?.work_title || "",
-        description: data?.description || "",
-        pre_qualification_details: data?.pre_qualification_details || "",
-        product_categories: data?.product_categories || [],
-        product_sub_category: data?.product_sub_category || "",
-        contract_type: data?.contract_type || "",
-        tender_value: data?.tender_value || "",
-        bid_validity: data?.bid_validity || "",
-        completion_period: data?.completion_period || "",
-        work_location: data?.work_location || "",
-        pin_code: data?.pin_code || "",
-        pre_bid_meeting: data?.pre_bid_meeting,
-        bid_opening_place: data?.bid_opening_place || "",
-        pre_bid_meeting_place: data?.pre_bid_meeting_place || "",
-        pre_bid_meeting_address: data?.pre_bid_meeting_address || "",
-        tenderer_class: data?.tenderer_class || [],
-        inviting_officer_name: data?.inviting_officer_name || "",
-        inviting_officer_address: data?.inviting_officer_address || "",
-        inviting_officer_contact: data?.inviting_officer_contact || "",
-      });
-    }
-  }, [data]);
+  const initialDetails = {
+    tender_datasheet_id: data?.tender_datasheet_id || tenderFormId,
+    work_title: data?.work_title || "",
+    description: data?.description || "",
+    pre_qualification_details: data?.pre_qualification_details || "",
+    product_categories: data?.product_categories || [],
+    product_sub_category: data?.product_sub_category || "",
+    contract_type: data?.contract_type || "",
+    tender_value: data?.tender_value || "",
+    bid_validity: data?.bid_validity || "",
+    completion_period: data?.completion_period || "",
+    work_location: data?.work_location || "",
+    pin_code: data?.pin_code || "",
+    pre_bid_meeting: data?.pre_bid_meeting,
+    bid_opening_place: data?.bid_opening_place || "",
+    pre_bid_meeting_place: data?.pre_bid_meeting_place || "",
+    pre_bid_meeting_address: data?.pre_bid_meeting_address || "",
+    tenderer_class: data?.tenderer_class || [],
+    inviting_officer_name: data?.inviting_officer_name || "",
+    inviting_officer_address: data?.inviting_officer_address || "",
+    inviting_officer_contact: data?.inviting_officer_contact || "",
+  }
 
   ///// handlBackAndReset
   const handleBackAndReset = (trigger?: () => void) => {

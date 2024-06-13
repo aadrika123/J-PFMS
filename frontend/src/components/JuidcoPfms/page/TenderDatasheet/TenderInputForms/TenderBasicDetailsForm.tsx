@@ -10,7 +10,7 @@ import Input from "@/components/global/atoms/Input";
 import goBack, { removeEmptyField } from "@/utils/helper";
 import { Formik, FormikValues } from "formik";
 import { tenderBasicDetailsSchema } from "pfmslib";
-import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, useRef, useState } from "react";
 import CheckboxComponent from "../molecules/CheckboxComponent";
 import {
   bg_color,
@@ -73,25 +73,6 @@ const TenderBasicDetailsForm: React.FC<TenderBasicDetailsFormProps> = (
     currentFile:""
   });
 
-  const [initialDetails, setInitialDetails] = useState({
-    tender_datasheet_id: tenderFormId,
-    reference_no: "",
-    tender_type: "",
-    contract_forms: [],
-    tender_categories: [],
-    allow_resubmission: undefined,
-    allow_withdrawal: undefined,
-    allow_offline_submission: undefined,
-    payment_mode: "online",
-    bank_id: "",
-    instrument: "",
-    file: {
-      file_name: "",
-      size: "",
-      path: "",
-    },
-  });
-
   const {
     showPopup,
     validationError,
@@ -119,28 +100,24 @@ const TenderBasicDetailsForm: React.FC<TenderBasicDetailsFormProps> = (
     fetch
   );
 
-  useEffect(() => {
-    if (data) {
-      setInitialDetails({
-        tender_datasheet_id: data?.tender_datasheet_id || tenderFormId,
-        reference_no: data?.reference_no || "",
-        tender_type: data?.tender_type || "",
-        contract_forms: data?.contract_forms || [],
-        tender_categories: data?.tender_categories || [],
-        allow_resubmission: data?.allow_resubmission,
-        allow_withdrawal: data?.allow_withdrawal,
-        allow_offline_submission: data?.allow_offline_submission,
-        payment_mode: data?.payment_mode || "online",
-        bank_id: data?.bank?.id || "",
-        instrument: data?.instrument || "",
-        file: {
-          file_name: data?.file?.file_name || "",
-          size: data?.file?.size || "",
-          path: data?.file?.path || "",
-        },
-      });
-    }
-  }, [data]);
+  const initialDetails = {
+    tender_datasheet_id: data?.tender_datasheet_id || tenderFormId,
+    reference_no: data?.reference_no || "",
+    tender_type: data?.tender_type || "",
+    contract_forms: data?.contract_forms || [],
+    tender_categories: data?.tender_categories || [],
+    allow_resubmission: data?.allow_resubmission,
+    allow_withdrawal: data?.allow_withdrawal,
+    allow_offline_submission: data?.allow_offline_submission,
+    payment_mode: data?.payment_mode || "online",
+    bank_id: data?.bank?.id || "",
+    instrument: data?.instrument || "",
+    file: {
+      file_name: data?.file?.file_name || "",
+      size: data?.file?.size || "",
+      path: data?.file?.path || "",
+    },
+  }
 
   ///////////// Checking File Type
   const validateFileType = (file: any) => {

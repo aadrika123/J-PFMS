@@ -10,7 +10,7 @@ import Button from "@/components/global/atoms/buttons/Button";
 import goBack, { removeEmptyField } from "@/utils/helper";
 import { Formik, FormikValues } from "formik";
 import { tenderFeeDetailsSchema } from "pfmslib";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { bg_color, emd_fee_type } from "../molecules/checkList";
 import RadioComponent from "../molecules/RadioComponent";
 import Image from "next/image";
@@ -62,23 +62,6 @@ const TenderFeeDetailsForm: React.FC<TenderFeeDetailsFormProps> = (props) => {
     showFinalError,
   } = state;
 
-  const [initialDetails, setInitialDetails] = useState({
-    tender_datasheet_id: tenderFormId,
-    tender_fee_examption_allowed: false,
-    tender_fee: "",
-    processing_fee: "",
-    tender_fee_payable_to: "",
-    tender_fee_payable_at: "",
-    surcharges: "",
-    other_charges: "",
-    emd_examption_allowed: false,
-    emd_fee_type: "",
-    fixed_emd_fee: "",
-    percentage_emd_fee: "",
-    emd_fee_payable_to: "",
-    emd_fee_payable_at: "",
-  });
-
   ///////// Fetching Data
   const fetch = async () => {
     const res = await axios({
@@ -96,27 +79,22 @@ const TenderFeeDetailsForm: React.FC<TenderFeeDetailsFormProps> = (props) => {
     fetch
   );
 
-  useEffect(() => {
-    if (data) {
-
-      setInitialDetails({
-        tender_datasheet_id: data?.tender_datasheet_id || tenderFormId,
-        tender_fee_examption_allowed: data?.tender_fee_examption_allowed,
-        tender_fee: data?.tender_fee || "",
-        processing_fee: data?.processing_fee || "",
-        tender_fee_payable_to: data?.tender_fee_payable_to || "",
-        tender_fee_payable_at: data?.tender_fee_payable_at || "",
-        surcharges: data?.surcharges || "",
-        other_charges: data?.other_charges || "",
-        emd_examption_allowed: data?.emd_examption_allowed,
-        emd_fee_type: data?.emd_fee_type || "",
-        fixed_emd_fee: data?.fixed_emd_fee || "",
-        percentage_emd_fee: data?.percentage_emd_fee || "",
-        emd_fee_payable_to: data?.emd_fee_payable_to || "",
-        emd_fee_payable_at: data?.emd_fee_payable_at || "",
-      });
-    }
-  }, [data]);
+ const initialDetails = {
+  tender_datasheet_id: data?.tender_datasheet_id || tenderFormId,
+  tender_fee_examption_allowed: data?.tender_fee_examption_allowed,
+  tender_fee: data?.tender_fee || "",
+  processing_fee: data?.processing_fee || "",
+  tender_fee_payable_to: data?.tender_fee_payable_to || "",
+  tender_fee_payable_at: data?.tender_fee_payable_at || "",
+  surcharges: data?.surcharges || "",
+  other_charges: data?.other_charges || "",
+  emd_examption_allowed: data?.emd_examption_allowed,
+  emd_fee_type: data?.emd_fee_type || "",
+  fixed_emd_fee: data?.fixed_emd_fee || "",
+  percentage_emd_fee: data?.percentage_emd_fee || "",
+  emd_fee_payable_to: data?.emd_fee_payable_to || "",
+  emd_fee_payable_at: data?.emd_fee_payable_at || "",
+}
 
   ///// handlBackAndReset
   const handleBackAndReset = (trigger?: () => void) => {

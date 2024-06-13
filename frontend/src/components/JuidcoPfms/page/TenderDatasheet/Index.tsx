@@ -6,7 +6,6 @@
  * | Status- open
  */
 
-import { Icons } from "@/assets/svg/icons";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import list from "@/assets/svg/list.svg";
@@ -15,17 +14,15 @@ import { usePathname, useRouter } from "next/navigation";
 
 import SimpleTable from "@/components/global/atoms/SimpleTable";
 
-import { useProjectProposalList11 } from "@/hooks/data/ProjectProposalsHooks";
 import { FilterButton } from "@/components/global/atoms/FilterButton";
 import qs from "qs";
 import { usePagination } from "@/hooks/Pagination";
 import LoaderSkeleton from "@/components/global/atoms/LoaderSkeleton";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 import SearchPanel from "@/components/global/molecules/SearchPanel";
-import goBack from "@/utils/helper";
-import Button from "@/components/global/atoms/buttons/Button";
+import { TenderDatasheetLayout } from "./TenderDatasheetLayout";
 
-const HeroTenderDatasheet = () => {
+const HeroTenderDatasheet = ({useProjectProposalList}: {useProjectProposalList:any}) => {
   const router = useRouter();
   const [, activateWorkingAnimation] = useWorkingAnimation();
 
@@ -39,7 +36,7 @@ const HeroTenderDatasheet = () => {
     isFetching,
     isLoading,
     data: projectProposalData,
-  } = useProjectProposalList11(searchQuery, limit, page);
+  } = useProjectProposalList(searchQuery, limit, page);
 
   const [projectProposals, setProjectProposals] = useState<[]>();
 
@@ -118,71 +115,57 @@ const HeroTenderDatasheet = () => {
   };
 
   return (
-    <>
-      <div className="w-full mt-4 flex gap-2 justify-center">
-        <div
-          hidden={!isFilterPanelOpen}
-          className="w-[25%] h-[75vh] overflow-y-auto overflow-x-hidden hide-scrollbar"
-        >
-          <SearchPanel
-            onClose={toggleFilterPanel}
-            items={searchPanelItems}
-            values={searchPanelItemValues}
-            onFilterChange={onFilterChange}
-            onNoFilter={onRemoveFilter}
-          />
-        </div>
-        <div className={isFilterPanelOpen ? "w-[75%]" : "w-[98%]"}>
-          <section className="border bg-white shadow-xl p-6 px-10">
-            <div className="flex justify-between items-center">
-              <Button
-                variant="cancel"
-                className="border-none shadow-none text-primary_bg_indigo hover:text-primary_bg_indigo hover:bg-inherit"
-                onClick={goBack}
-              >
-                {Icons.back}
-                <b>Back</b>
-              </Button>
-              <b>Project Lists</b>
-            </div>
-            <hr className="my-3" />
-            <div className="flex items-center mb-4 justify-between">
-              <div className="flex">
-                <div
-                  className={`flex items-center  mr-3 pb-1 w-20 justify-center border-b-2 border-b-black`}
-                >
-                  <Image src={list} height={20} width={20} alt="pro-1" />
-                  <span className="ml-2 text-gray-500">List</span>
-                </div>
-                <div className={`flex items-center  pb-1 w-28 justify-center`}>
-                  <Image src={details} height={20} width={20} alt="pro-1" />
-                  <span className="ml-2 text-gray-500">Details</span>
-                </div>
-              </div>
-
-              <div className="flex flex-col justify-center">
-                <FilterButton
-                  onClick={toggleFilterPanel}
-                  active={isFilterPanelOpen}
-                />
-              </div>
-            </div>
-            Total Results: {totalResults}
-            {isFetching || isLoading ? (
-              <LoaderSkeleton rowCount={limit} />
-            ) : (
-              <SimpleTable
-                columns={columns}
-                data={projectProposals}
-                onViewButtonClick={onViewButtonClick}
-                rowIndexStart={(page - 1) * limit + 1}
-              />
-            )}
-            {paginator}
-          </section>
-        </div>
+    <TenderDatasheetLayout>
+      <div
+        hidden={!isFilterPanelOpen}
+        className="w-[25%] h-[75vh] overflow-y-auto overflow-x-hidden hide-scrollbar"
+      >
+        <SearchPanel
+          onClose={toggleFilterPanel}
+          items={searchPanelItems}
+          values={searchPanelItemValues}
+          onFilterChange={onFilterChange}
+          onNoFilter={onRemoveFilter}
+        />
       </div>
-    </>
+      <div className={isFilterPanelOpen ? "w-[75%]" : "w-[100%]"}>
+        <section className="border bg-white shadow-xl p-6">
+          <div className="flex items-center mb-4 justify-between">
+            <div className="flex">
+              <div
+                className={`flex items-center  mr-3 pb-1 w-20 justify-center border-b-2 border-b-black`}
+              >
+                <Image src={list} height={20} width={20} alt="pro-1" />
+                <span className="ml-2 text-gray-500">List</span>
+              </div>
+              <div className={`flex items-center  pb-1 w-28 justify-center`}>
+                <Image src={details} height={20} width={20} alt="pro-1" />
+                <span className="ml-2 text-gray-500">Details</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col justify-center">
+              <FilterButton
+                onClick={toggleFilterPanel}
+                active={isFilterPanelOpen}
+              />
+            </div>
+          </div>
+          Total Results: {totalResults}
+          {isFetching || isLoading ? (
+            <LoaderSkeleton rowCount={limit} />
+          ) : (
+            <SimpleTable
+              columns={columns}
+              data={projectProposals}
+              onViewButtonClick={onViewButtonClick}
+              rowIndexStart={(page - 1) * limit + 1}
+            />
+          )}
+          {paginator}
+        </section>
+      </div>
+    </TenderDatasheetLayout>
   );
 };
 

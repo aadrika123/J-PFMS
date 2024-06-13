@@ -16,8 +16,8 @@ type ProjectProposalApprovalStepperProps = {
   inActiveBgColor?: string;
   stepWidth?: 36 | 32 | 48;
   level: number;
-  subLevel: number;
-  budget: number;
+  subLevel?: number;
+  budget?: number;
 };
 
 const ProjectProposalApprovalStepper: React.FC<ProjectProposalApprovalStepperProps> = (props) => {
@@ -25,8 +25,8 @@ const ProjectProposalApprovalStepper: React.FC<ProjectProposalApprovalStepperPro
     items,
     activeBgColor = "primary_bg_indigo",
     level,
-    subLevel,
-    budget,
+    subLevel = 0,
+    budget = 0,
   } = props;
   const [state, setState] = useState({
     data: items,

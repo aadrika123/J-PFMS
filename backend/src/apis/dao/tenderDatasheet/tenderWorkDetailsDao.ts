@@ -52,7 +52,7 @@ class TenderWorkDetailsDao {
         },
       });
 
-      return await prisma.tender_work_details.upsert({
+      return await tx.tender_work_details.upsert({
         where: {
           tender_datasheet_id: data.tender_datasheet_id,
         },

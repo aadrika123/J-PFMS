@@ -10,7 +10,7 @@ import Button from "@/components/global/atoms/buttons/Button";
 import goBack, { removeEmptyField } from "@/utils/helper";
 import { Formik, FormikValues } from "formik";
 import { tenderCriticalDateSchema } from "pfmslib";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { bg_color } from "../molecules/checkList";
 import Image from "next/image";
 // const RunningAnimation = dynamic(
@@ -56,24 +56,7 @@ const TenderCriticalDatesForm: React.FC<TenderCriticalDatesFormProps> = (
     showConfirmation: false,
   });
 
-  const {
-    showWarning,
-    triggerFun,
-    showFinalError,
-  } = state;
-
-  const [initialDetails, setInitialDetails] = useState({
-    tender_datasheet_id: tenderFormId,
-    publishing_date: "",
-    bid_opening_date: "",
-    document_sale_start_date: "",
-    document_sale_end_date: "",
-    seek_clarification_start_date: "",
-    seek_clarification_end_date: "",
-    bid_submission_start_date: "",
-    bid_submission_end_date: "",
-    pre_bid_meeting_date: "",
-  });
+  const { showWarning, triggerFun, showFinalError } = state;
 
   ///////// Fetching Data
   const fetch = async () => {
@@ -92,24 +75,18 @@ const TenderCriticalDatesForm: React.FC<TenderCriticalDatesFormProps> = (
     fetch
   );
 
-  useEffect(() => {
-    if (data) {
-     
-      setInitialDetails({
-        tender_datasheet_id: data?.tender_datasheet_id || tenderFormId,
-        publishing_date: data?.publishing_date || "",
-        bid_opening_date: data?.bid_opening_date || "",
-        document_sale_start_date: data?.document_sale_start_date || "",
-        document_sale_end_date: data?.document_sale_end_date || "",
-        seek_clarification_start_date:
-          data?.seek_clarification_start_date || "",
-        seek_clarification_end_date: data?.seek_clarification_end_date || "",
-        bid_submission_start_date: data?.bid_submission_start_date || "",
-        bid_submission_end_date: data?.bid_submission_end_date || "",
-        pre_bid_meeting_date: data?.pre_bid_meeting_date || "",
-      });
-    }
-  }, [data]);
+  const initialDetails = {
+    tender_datasheet_id: data?.tender_datasheet_id || tenderFormId,
+    publishing_date: data?.publishing_date || "",
+    bid_opening_date: data?.bid_opening_date || "",
+    document_sale_start_date: data?.document_sale_start_date || "",
+    document_sale_end_date: data?.document_sale_end_date || "",
+    seek_clarification_start_date: data?.seek_clarification_start_date || "",
+    seek_clarification_end_date: data?.seek_clarification_end_date || "",
+    bid_submission_start_date: data?.bid_submission_start_date || "",
+    bid_submission_end_date: data?.bid_submission_end_date || "",
+    pre_bid_meeting_date: data?.pre_bid_meeting_date || "",
+  };
 
   ///// handlBackAndReset
   const handleBackAndReset = (trigger?: () => void) => {
@@ -137,14 +114,17 @@ const TenderCriticalDatesForm: React.FC<TenderCriticalDatesFormProps> = (
         data: values,
       },
     });
-    
+
     if (!res.data.status) throw "Something Went Wrong!!!";
   };
 
   const { mutate } = useMutation(handleSave, {
     onSuccess: () => {
       Promise.all([
-        queryClient.invalidateQueries(["tender-critical-openers", tenderFormId]),
+        queryClient.invalidateQueries([
+          "tender-critical-openers",
+          tenderFormId,
+        ]),
         queryClient.invalidateQueries(["tender-all-details", tenderFormId]),
       ]);
       toast.success("Details Saved Successfully");

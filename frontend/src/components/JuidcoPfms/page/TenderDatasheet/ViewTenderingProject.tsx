@@ -24,9 +24,13 @@ import goBack from "@/utils/helper";
 import { Icons } from "@/assets/svg/icons";
 import { usePathname, useRouter } from "next/navigation";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
+import ProjectProposalApprovalStepper from "../../projectProposalMolecules/ProjectProposalApprovalStepper";
+import admi from "@/assets/svg/admi.svg";
+import { useUser } from "@/components/global/molecules/general/useUser";
 
 const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
   const router = useRouter();
+  const user = useUser();
   const queryClient = useQueryClient();
   const [, activateWorkingAnimation] = useWorkingAnimation();
 
@@ -83,9 +87,15 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
   ////////////// handleOpenTenderInputForm //////////
   const handleOpenTenderInputForm = () => {
     activateWorkingAnimation();
-    router.push(
-      `${pathName.split("/view")[0]}/add/${data.tender_datasheet_id}?pageNo=1`
-    );
+    if (user?.isJuniorEngineer()) {
+      router.push(
+        `${pathName.split("/view")[0]}/add/${data.tender_datasheet_id}?pageNo=1`
+      );
+    } else {
+      router.push(
+        `${pathName.split("/view")[0]}/verification/${data.tender_datasheet_id}`
+      );
+    }
   };
 
   ///////////// Handling step click ///////////
@@ -110,10 +120,9 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
       if (!res.data.status) throw "Someting Went Wrong!!";
 
       queryClient.invalidateQueries(["project-proposals-11"]),
-
-      router.push(
-        `${pathName.split("/view")[0]}/add/${res.data.data.id}?pageNo=1`
-      );
+        router.push(
+          `${pathName.split("/view")[0]}/add/${res.data.data.id}?pageNo=1`
+        );
     } catch (error) {
       console.log(error);
     }
@@ -139,6 +148,24 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
       caption: "Remarks",
     },
   ];
+
+  const items = [
+    {
+      info: "JUNIOR ENGINEER",
+      img: admi,
+      level: 0,
+    },
+    {
+      info: "EXECUTIVE ENGINEER",
+      img: admi,
+      level: 1,
+    },
+    {
+      info: "EXECUTIVE OFFICER",
+      img: admi,
+      level: 2,
+    },
+  ];
   return (
     <>
       {showPopup && (
@@ -158,12 +185,12 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
           </div>
         </Popup>
       )}
-      <div className="shadow-lg bg-white p-4 border">
+      <>
         {!data ? (
           <Loader />
         ) : (
           <>
-            <div className="flex justify-between items-center">
+            <div className="shadow-lg bg-white p-4 border mb-4 flex justify-between items-center">
               <Button
                 variant="cancel"
                 className="border-none shadow-none text-primary_bg_indigo hover:text-primary_bg_indigo hover:bg-inherit"
@@ -172,7 +199,7 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
                 {Icons.back}
                 <b>Back</b>
               </Button>
-              {!data.tender_datasheet_id ? (
+              {!data.tender_datasheet_id && user?.isJuniorEngineer() ? (
                 <Button
                   variant="primary"
                   className="border-none"
@@ -193,24 +220,27 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
                 </Button>
               )}
             </div>
-            <BoxContainer projectDetails={data} />
-            <Steps
-              handleClick={handleStepClick}
-              activeStep={activeStep}
-              className="mt-4"
-            />
-            {activeStep === 0 ? (
-              <ViewDetails projectDetails={data} />
-            ) : (
-              activeStep === 1 && (
-                <div className="mt-4">
-                  <Table columns={columns} data={data?.files} center />
-                </div>
-              )
-            )}
+            <div className="shadow-lg bg-white p-4 border">
+              <ProjectProposalApprovalStepper level={1} items={items} />
+              <BoxContainer projectDetails={data} />
+              <Steps
+                handleClick={handleStepClick}
+                activeStep={activeStep}
+                className="mt-4"
+              />
+              {activeStep === 0 ? (
+                <ViewDetails projectDetails={data} />
+              ) : (
+                activeStep === 1 && (
+                  <div className="mt-4">
+                    <Table columns={columns} data={data?.files} center />
+                  </div>
+                )
+              )}
+            </div>
           </>
         )}
-      </div>
+      </>
     </>
   );
 };

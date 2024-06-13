@@ -15,6 +15,5 @@ export function useUser(): User | null {
     }
   }, [userData]);
   
-
   return user;
 }
