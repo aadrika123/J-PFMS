@@ -2,7 +2,7 @@ import express from "express";
 import ProjectVerificationController from "./ProjectVerificationController";
 import { APIv1_New } from "../APIv1_New";
 
-class ProjectVerificationRoute extends APIv1_New{
+class ProjectVerificationRoute extends APIv1_New {
   private controller: ProjectVerificationController;
 
   constructor(routeId: string, routeName: string, app: express.Application) {
@@ -27,9 +27,9 @@ class ProjectVerificationRoute extends APIv1_New{
     this.addGetRoute(`returned-back`, this.controller.getReturnedBackItems);
     this.addGetRoute(`returned-back/count`, this.controller.getReturnedBackItemCount);
 
-    
+
     this.addGetRoute(`archive`, this.controller.getArchive);
-    
+
 
     // mutable routes: use post
     this.addPostRoute(`acknowledge/:proposalId`, this.controller.acknowledge);
@@ -41,12 +41,18 @@ class ProjectVerificationRoute extends APIv1_New{
 
     this.addGetRoute('schedule-of-rates/get', this.controller.getScheduleOfRates);
 
-    
+
     this.addGetRoute('comments/get/:proposalId', this.controller.getComments);
-    
+
     // this.addGetRoute(`document/get/:billId`, this.controller.getDocuments);
     // this.addPostRoute(`document/approve`, this.controller.approveDocument);
     // this.addPostRoute(`document/reject`, this.controller.rejectDocument);
+
+    this.addFormDataPostRoute('measurements/ref-doc-upload', this.controller.referenceDocUpload, [
+      { name: 'doc', maxCount: 1},
+      
+    ]);
+
   }
 }
 

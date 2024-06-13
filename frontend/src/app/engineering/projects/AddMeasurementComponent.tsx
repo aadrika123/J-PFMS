@@ -1,5 +1,5 @@
 import Button from "@/components/global/atoms/buttons/Button";
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, { ChangeEvent, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Formik, FormikProps } from "formik";
 
 import { MeasurementRecordValidation } from "pfmslib";
@@ -9,6 +9,10 @@ import { useSORList } from "@/hooks/data/ProjectProposalsHooks";
 
 import toast, { Toaster } from "react-hot-toast";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
+import DocumentInputSingle from "./document-input-single";
+
+
+
 
 interface InputProps {
     name?: string;
@@ -343,7 +347,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                                 }}
 
                                 onFocus={() => setSorListVisible(true)}
-                                
+
                                 value={values.description}
                                 error={errors.description}
                                 touched={touched.description}
@@ -357,7 +361,7 @@ const MeasurementRecord = forwardRef<CanProvideData, MeasurementRecordProps>((pr
                             />
 
                             {sorListVisible && (<ul onMouseLeave={() => setSorListVisible(false)} className="p-2 shadow bg-base-100 w-52 fixed">
-                                <li><input type="text" placeholder="search" onChange={(event) => setSearchText(event.target.value)} className="my-2 border border-1 w-full text-xl px-2"/></li>
+                                <li><input type="text" placeholder="search" onChange={(event) => setSearchText(event.target.value)} className="my-2 border border-1 w-full text-xl px-2" /></li>
 
                                 {(isLoading || isFetching) ? (
                                     <span>Loading ...</span>
@@ -659,7 +663,7 @@ const MeasurementTable = forwardRef<CanProvideData, SORTableProps>((props: SORTa
                         <div className="table-caption" title="Double click to change the title">
                             <div className="flex justify-between bg-primary_bg_indigo p-2">
                                 <div></div>
-                                <div className="flex justify-center text-2xl">
+                                <div className="flex justify-center text-2xl text-white">
                                     Add Measurements/Labours/Materials
                                 </div>
 
@@ -735,28 +739,6 @@ const MeasurementTable = forwardRef<CanProvideData, SORTableProps>((props: SORTa
 MeasurementTable.displayName = "SORTable";
 
 
-// interface DocumentsState {
-//     items: []
-// }
-
-// class Documents extends React.Component {
-//     state: DocumentSte1
-//     constructor(props: any) {
-//         super(props);
-//         this.state = {
-//             items: [1,3,4]
-//         };
-//     }
-
-//     render() {
-//         const {items} = this.state;
-//       return (
-//         {items.length}
-//       );
-//     }
-//   }
-
-
 interface AddMeasurementComponentProps {
     proposal_id: number,
     onBack: () => void,
@@ -764,6 +746,11 @@ interface AddMeasurementComponentProps {
 }
 
 export const AddMeasurementComponent = ({ proposal_id, onUpdate, onBack }: AddMeasurementComponentProps) => {
+    // document input form
+    const documentInputForm = new DocumentInputSingle({
+        caption: "Reference Doc"
+    });
+
     const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] = useWorkingAnimation();
 
 
@@ -802,12 +789,19 @@ export const AddMeasurementComponent = ({ proposal_id, onUpdate, onBack }: AddMe
 
 
     const onSubmit = async () => {
+
+        const token = documentInputForm.getDocToken();
+        console.log("Token: ", token);
+        return;
+
         const table = tableRefs[0];
         const data = await table.getData();
         console.log(data);
         if (data != null)
             recordMeasurements(data);
     }
+
+
 
     return (
         <>
@@ -816,6 +810,11 @@ export const AddMeasurementComponent = ({ proposal_id, onUpdate, onBack }: AddMe
             <Toaster />
             <div>
                 <MeasurementTable tableIndex={0} ref={(element: any) => { addTableRef(0, element) }} proposal_id={proposal_id} />
+
+                <div className="w-[50%] mt-20 border border-1 p-4">
+                    {documentInputForm.render()}
+                </div>
+
             </div>
 
             {/* {documents.render()} */}

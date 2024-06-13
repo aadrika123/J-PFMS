@@ -11,7 +11,7 @@ model measurements {
   breadth       Float?
   height        Float?
   quantity      Float
-  unit          String
+  unit          Strings
   rate          Float
   amount        Float
   remarks       String?

@@ -3,6 +3,7 @@ import { Request } from "express";
 import ProjectVerificationDao from "./ProjectVerificationDao";
 import * as Yup from "yup";
 import { MeasurementRecordValidation, ProjectProposalStages, } from "pfmslib";
+import { encryptV1 } from "../../util/cryptographyV1";
 
 
 /*
@@ -740,6 +741,40 @@ class ProjectVerificationController {
     });
   }
 
+
+
+  referenceDocUpload = async (req: Request): Promise<APIv1Response> => {
+    return new Promise((resolve, reject) => {
+
+      try {
+        // console.log(req.headers);
+        console.log(req.files);
+        // validate
+
+        if (!req.files) throw new Error("Could not find the document.");
+
+        const files: any = req.files as any;
+        if (!files['doc' as keyof typeof files]) throw new Error("Required document not found.");
+
+        const pdfFile = files['doc'][0];
+        console.log(pdfFile);
+
+        const details = {
+          path: pdfFile.path,
+          originalName: pdfFile.originalName,
+          fileName: pdfFile.filename
+        };
+        
+        const result = { status: true, code: 200, message: "OK", data: { "file_token": encryptV1(JSON.stringify(details)) } };
+        resolve(result);
+
+
+      } catch (error: any){
+        reject(error);
+      }
+  });
+
+}
 
 
 }
