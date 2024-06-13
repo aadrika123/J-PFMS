@@ -87,7 +87,7 @@ const TableRow: React.FC<{ rowIndex: number }> = ({ rowIndex }) => {
   console.log(sessionData?.rows[0]?.description);
   useEffect(() => {
     // Function to fetch session data
-setSessionData(JSON.parse(sessionStorage.getItem("key") || "null"));
+    setSessionData(JSON.parse(sessionStorage.getItem("key") || "null"));
   }, []);
 
   return (
@@ -439,7 +439,7 @@ const PreparedCost: React.FC<TableProps> = ({ heading }) => {
     >
       {({ values }) => (
         <Form>
-          <div className="flex flex-1 w-full justify-center p-2 font-semibold ">
+          <div className="flex flex-1 w-full justify-center p-2  ">
             <div className="flex flex-1 flex-col">
               <Accordion defaultExpanded>
                 <AccordionSummary
@@ -492,126 +492,142 @@ const PreparedCost: React.FC<TableProps> = ({ heading }) => {
                                     placeholder="Row.."
                                     value={noRows}
                                   />
-                                  <div className="flex gap-2">
-                                    <Button
-                                      onClick={() => {
-                                        const rowCount = parseInt(noRows);
-                                        if (!isNaN(rowCount) && rowCount > 0) {
-                                          for (let i = 0; i < rowCount; i++) {
-                                            push({
-                                              id: Date.now(),
-                                              srNo: values.rows.length + 1 + i,
-                                              description: "ddddd",
-                                              no: "",
-                                              length: "",
-                                              breadth: "",
-                                              height: "",
-                                              quantity: "",
-                                              unit: "",
-                                              bidAmount: "",
-                                              amount: "",
-                                              remarks: "",
-                                              edit: "",
-                                            });
+                                  <div className="flex flex-1 justify-between items-center gap-2">
+                                    <div className="flex flex-row gap-4">
+                                      <Button
+                                        onClick={() => {
+                                          const rowCount = parseInt(noRows);
+                                          if (
+                                            !isNaN(rowCount) &&
+                                            rowCount > 0
+                                          ) {
+                                            for (let i = 0; i < rowCount; i++) {
+                                              push({
+                                                id: Date.now(),
+                                                srNo:
+                                                  values.rows.length + 1 + i,
+                                                description: "ddddd",
+                                                no: "",
+                                                length: "",
+                                                breadth: "",
+                                                height: "",
+                                                quantity: "",
+                                                unit: "",
+                                                bidAmount: "",
+                                                amount: "",
+                                                remarks: "",
+                                                edit: "",
+                                              });
+                                            }
                                           }
-                                        }
-                                      }}
-                                      className="flex justify-center text-center rounded-md text-white bg-indigo-700  hover:bg-indigo-800 h-[41] w-[180px]"
-                                    >
-                                      Manage Rows
-                                    </Button>
-                                    <Button
-                                      onClick={() => {
-                                        const rowCount = parseInt(noRows);
-                                        if (!isNaN(rowCount) && rowCount > 0) {
-                                          for (let i = 0; i < rowCount; i++) {
-                                            push({
-                                              id: Date.now(),
-                                              srNo: values.rows.length + 1 + i,
-                                              description: "",
-                                              no: "",
-                                              length: "",
-                                              breadth: "",
-                                              quantity: "",
-                                              unit: "",
-                                              bidAmount: "",
-                                              amount: "",
-                                              remarks: "",
-                                              edit: "",
-                                            });
-                                          }
-                                        }
-                                      }}
-                                      className="flex justify-center text-center rounded-md text-white bg-indigo-700  hover:bg-indigo-800"
-                                    >
-                                      <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="42"
-                                        height="41"
-                                        viewBox="0 0 42 41"
-                                        fill="none"
+                                        }}
+                                        className="flex justify-center text-center rounded-md text-white bg-indigo-700  hover:bg-indigo-800 h-[41] w-[180px]"
                                       >
-                                        <rect
+                                        Manage Rows
+                                      </Button>
+
+                                      <Button
+                                        onClick={() => {
+                                          const rowCount = parseInt(noRows);
+                                          if (
+                                            !isNaN(rowCount) &&
+                                            rowCount > 0
+                                          ) {
+                                            for (let i = 0; i < rowCount; i++) {
+                                              push({
+                                                id: Date.now(),
+                                                srNo:
+                                                  values.rows.length + 1 + i,
+                                                description: "",
+                                                no: "",
+                                                length: "",
+                                                breadth: "",
+                                                quantity: "",
+                                                unit: "",
+                                                bidAmount: "",
+                                                amount: "",
+                                                remarks: "",
+                                                edit: "",
+                                              });
+                                            }
+                                          }
+                                        }}
+                                        className="flex justify-center text-center rounded-md text-white bg-indigo-700  hover:bg-indigo-800"
+                                      >
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
                                           width="42"
                                           height="41"
-                                          rx="4.52059"
-                                          fill="#4338CA"
-                                        />
-                                        <path
-                                          d="M20 28.3459V13"
-                                          stroke="white"
-                                          strokeWidth="1.79855"
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                        />
-                                        <path
-                                          d="M12 20.6729H28"
-                                          stroke="white"
-                                          strokeWidth="1.79855"
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                        />
-                                      </svg>
-                                    </Button>
-                                    <Button
-                                      onClick={() => {
-                                        const rowCount = parseInt(noRows);
-                                        if (!isNaN(rowCount) && rowCount > 0) {
-                                          for (let i = 0; i < rowCount; i++) {
-                                            pop();
+                                          viewBox="0 0 42 41"
+                                          fill="none"
+                                        >
+                                          <rect
+                                            width="42"
+                                            height="41"
+                                            rx="4.52059"
+                                            fill="#4338CA"
+                                          />
+                                          <path
+                                            d="M20 28.3459V13"
+                                            stroke="white"
+                                            strokeWidth="1.79855"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                          />
+                                          <path
+                                            d="M12 20.6729H28"
+                                            stroke="white"
+                                            strokeWidth="1.79855"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                          />
+                                        </svg>
+                                      </Button>
+                                      <Button
+                                        onClick={() => {
+                                          const rowCount = parseInt(noRows);
+                                          if (
+                                            !isNaN(rowCount) &&
+                                            rowCount > 0
+                                          ) {
+                                            for (let i = 0; i < rowCount; i++) {
+                                              pop();
+                                            }
                                           }
-                                        }
-                                      }}
-                                      className="flex justify-center text-center rounded-md text-white bg-indigo-700 hover:bg-indigo-800 "
-                                    >
-                                      <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="42"
-                                        height="41"
-                                        viewBox="0 0 42 41"
-                                        fill="none"
+                                        }}
+                                        className="flex justify-center text-center rounded-md text-white bg-indigo-700 hover:bg-indigo-800 "
                                       >
-                                        <rect
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
                                           width="42"
                                           height="41"
-                                          rx="4.52059"
-                                          fill="#4338CA"
-                                        />
-                                        <path
-                                          d="M13 20H29"
-                                          stroke="white"
-                                          strokeWidth="2.12046"
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                        />
-                                      </svg>
-                                    </Button>
-                                    <Button
-                                      className="rounded-md ml-[985px] text-white bg-indigo-700  hover:bg-indigo-800 "
-                                      onClick={mesurmentFunc}
-                                    >
-                                      ADD MEASUREMENT
-                                    </Button>
+                                          viewBox="0 0 42 41"
+                                          fill="none"
+                                        >
+                                          <rect
+                                            width="42"
+                                            height="41"
+                                            rx="4.52059"
+                                            fill="#4338CA"
+                                          />
+                                          <path
+                                            d="M13 20H29"
+                                            stroke="white"
+                                            strokeWidth="2.12046"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                          />
+                                        </svg>
+                                      </Button>
+                                    </div>
+                                    <div className="flex flex-row mr-4">
+                                      <Button
+                                        className="rounded-md  flex   text-white bg-indigo-700  hover:bg-indigo-800 "
+                                        onClick={mesurmentFunc}
+                                      >
+                                        ADD MEASUREMENT
+                                      </Button>
+                                    </div>
                                   </div>
                                 </div>
                               </td>

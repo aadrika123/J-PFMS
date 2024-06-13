@@ -18,6 +18,7 @@ import PdfModal from "./PdfModal";
 import ImageModal from "./imageModal";
 import Image from "next/image";
 import pdfIcon from "../../../../../assets/svg/pdf-file-2_svgrepo.com.svg";
+import axios from "axios";
 
 const MBRecord: React.FC = () => {
   const [preview, setPreview] = useState<string | null>(null);
@@ -113,13 +114,23 @@ const MBRecord: React.FC = () => {
         remarks: "",
       }}
       validationSchema={validationSchema}
-      onSubmit={(values) => {
-        console.log(values);
+      onSubmit={(values, { setSubmitting }) => {
+        axios
+          .post("http://localhost:2001/api/components", values) // Assuming your backend server is running on localhost:3001
+          .then((response) => {
+            console.log("Response:", response.data);
+            alert("submit");
+            setSubmitting(false);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            setSubmitting(false);
+          });
       }}
     >
-      {({ values, handleChange, setFieldValue }) => (
+      {({ values, handleChange, setFieldValue, isSubmitting }) => (
         <Form>
-          <div className="m-2 font-semibold">
+          <div className="m-2 ">
             <Accordion defaultExpanded>
               <AccordionSummary
                 aria-controls="panel1-content"
@@ -388,9 +399,9 @@ const MBRecord: React.FC = () => {
                         <Button
                           variant="contained"
                           className="rounded-md bg-indigo-700 h-[41px] w-[99px]"
-                          type="submit"
+                          disabled={isSubmitting}
                         >
-                          Save
+                          {isSubmitting ? "Submitting..." : "Save"}
                         </Button>
                       </div>
                     </div>

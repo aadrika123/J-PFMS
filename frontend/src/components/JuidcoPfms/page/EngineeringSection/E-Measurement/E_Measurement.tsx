@@ -11,6 +11,8 @@ import MBRecordBillForm from "./MBRecord";
 // import EstimatedCost from "../E-Measurement-View/EstimatedCost";
 // import PreparedCost from "./EstimatedCost";
 import PreparedCost from "./EstimatedCost";
+// import Runnining_Form from "./Runnining_Form";
+import RunningBill_Form from "./RunningBill_Form";
 // import Table from "./Table";
 // import Button from "@mui/material/Button";
 
@@ -56,7 +58,9 @@ const AddMeasurementComponent: React.FC = () => {
       <div>
         <MBRecordBillForm />
       </div>
-    
+      <div>
+        <RunningBill_Form/>
+      </div>
     </>
   );
 };

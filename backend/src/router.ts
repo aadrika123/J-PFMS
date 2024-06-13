@@ -16,6 +16,7 @@ import TenderFeeDetailsRoute from "./apis/route/tenderDatasheet/tenderFeeDetails
 import TenderCriticalDatesRoute from "./apis/route/tenderDatasheet/tenderCriticalDatesRoute";
 import TenderBidOpenersRoute from "./apis/route/tenderDatasheet/tenderBidOpenersRoute";
 import DMSFileHandlerRoute from "./apis/route/dmsFileHandlerRoute";
+import PreparedEstimatedRoute from "./apis/prepared-estimated/PreparedEstimatedRoute";
 
 /*
 |--------------------------------------------------------------------------
@@ -68,6 +69,7 @@ class PFMSRoute {
     // (new BillVerificationRoute("54", app).configure());
 
     new DashboardRoute("55", app).configure();
+    new PreparedEstimatedRoute("56", app).configure();
   }
 }
 
