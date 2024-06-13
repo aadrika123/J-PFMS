@@ -6,7 +6,7 @@
  * | Status- open
  */
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import TenderBasicDetailsForm from "./TenderInputForms/TenderBasicDetailsForm";
 import Image from "next/image";
 import TenderIcon from "@/assets/svg/tender_form.svg";
@@ -34,6 +34,14 @@ const TenderInputForm = ({ tenderFormId }: { tenderFormId: number }) => {
     useWorkingAnimation();
 
   const pageNo: number = Number(searchParams.get("pageNo"));
+  const [state, setState] = useState({
+    readonly: false,
+    project_proposal: {
+      title: "",
+      description: ""
+    }
+  });
+  const {readonly, project_proposal} = state;
 
   ////// Checking TenderFormId is valid or not ////
   useEffect(() => {
@@ -46,6 +54,8 @@ const TenderInputForm = ({ tenderFormId }: { tenderFormId: number }) => {
 
       if (!res.data.data) goBack();
 
+      const data = res.data.data;
+      setState({...state, readonly: data.status === "submitted", project_proposal: data.project_proposal});
       hideWorkingAnimation();
     })();
   }, [tenderFormId]);
@@ -120,31 +130,38 @@ const TenderInputForm = ({ tenderFormId }: { tenderFormId: number }) => {
           <TenderBasicDetailsForm
             handleTabChange={handleTabChange}
             tenderFormId={tenderFormId}
+            readonly={readonly}
           />
         ) : pageNo === 2 ? (
           <TenderCoverDetailsForm
             handleTabChange={handleTabChange}
             tenderFormId={tenderFormId}
+            readonly={readonly}
           />
         ) : pageNo === 3 ? (
           <TenderWorkDetailsForm
             handleTabChange={handleTabChange}
             tenderFormId={tenderFormId}
+            readonly={readonly}
+            project_proposal={project_proposal}
           />
         ) : pageNo === 4 ? (
           <TenderFeeDetailsForm
             handleTabChange={handleTabChange}
             tenderFormId={tenderFormId}
+            readonly={readonly}
           />
         ) : pageNo === 5 ? (
           <TenderCriticalDatesForm
             handleTabChange={handleTabChange}
             tenderFormId={tenderFormId}
+            readonly={readonly}
           />
         ) : pageNo === 6 ? (
           <TenderBidOpenerForm
             handleTabChange={handleTabChange}
             tenderFormId={tenderFormId}
+            readonly={readonly}
           />
         ) : (
           pageNo === 7 && (

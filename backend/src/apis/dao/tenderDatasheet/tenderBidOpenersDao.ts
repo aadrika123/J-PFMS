@@ -16,14 +16,14 @@ class TenderBidOpenersDao {
   async create(data: tenderBidOpenersType) {
     const res = await prisma.$transaction(async (tx) => {
       /* Changing tender datasheet status */
-      await tx.tender_datasheets.update({
-        where: {
-          id: data.tender_datasheet_id,
-        },
-        data: {
-          status: "draft",
-        },
-      });
+      // await tx.tender_datasheets.update({
+      //   where: {
+      //     id: data.tender_datasheet_id,
+      //   },
+      //   data: {
+      //     status: "draft",
+      //   },
+      // });
 
       /* Deleting tender openers */
       await tx.tender_bid_openers.deleteMany({

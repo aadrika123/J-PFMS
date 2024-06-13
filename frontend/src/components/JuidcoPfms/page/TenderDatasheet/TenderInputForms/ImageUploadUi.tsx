@@ -11,10 +11,11 @@ type ImageUploadUiPropType = {
   handleUpload: (file: any) => void;
   handleDeleteFile: (file_id: number) => void;
   files: any;
+  readonly: boolean;
 };
 
 const ImageUploadUi: React.FC<ImageUploadUiPropType> = (props) => {
-  const { handleUpload, handleDeleteFile, files } = props;
+  const { handleUpload, handleDeleteFile, files, readonly } = props;
   const inputFileRef = useRef<any>();
   const [state, setState] = useState({
     inProgress: false,
@@ -27,7 +28,9 @@ const ImageUploadUi: React.FC<ImageUploadUiPropType> = (props) => {
   const { inProgress, error, showPopup, currentFile } = state;
 
   const handleUploadDoc = () => {
-    inputFileRef.current.click();
+    if (!readonly) {
+      inputFileRef.current.click();
+    }
   };
 
   ///////////// Checking File Type
@@ -39,49 +42,51 @@ const ImageUploadUi: React.FC<ImageUploadUiPropType> = (props) => {
 
   ////// Handle Upload
   const interalHandleUpload = async (e: ChangeEvent<HTMLInputElement>) => {
-    let fileData: any = {
-      file: null,
-      file_name: "",
-      size: 0,
-    };
-    setState((prev: any) => {
-      return { ...prev, inProgress: true };
-    });
-    try {
-      if (e.target.files?.length) {
-        const file = e.target.files[0];
-        if (file.size > 2 * 1024 * 1024 || file.size! < 9 * 1024) {
-          throw Error(`file size should be between 10 kb to 2 mb`);
-        }
-        if (!validateFileType(file)) {
-          throw Error(`'${file.type.split("/")[1]}' file not allowed`);
-        }
-        fileData = {
-          ...fileData,
-          size: String(file.size),
-          file_name: file.name,
-          file: file,
-        };
+    if (!readonly) {
+      let fileData: any = {
+        file: null,
+        file_name: "",
+        size: 0,
+      };
+      setState((prev: any) => {
+        return { ...prev, inProgress: true };
+      });
+      try {
+        if (e.target.files?.length) {
+          const file = e.target.files[0];
+          if (file.size > 2 * 1024 * 1024 || file.size! < 9 * 1024) {
+            throw Error(`file size should be between 10 kb to 2 mb`);
+          }
+          if (!validateFileType(file)) {
+            throw Error(`'${file.type.split("/")[1]}' file not allowed`);
+          }
+          fileData = {
+            ...fileData,
+            size: String(file.size),
+            file_name: file.name,
+            file: file,
+          };
 
-        setState((prev) => ({
+          setState((prev) => ({
+            ...prev,
+            fileType: file?.type?.includes("pdf") ? "pdf" : "",
+            fileUrl: URL.createObjectURL(file),
+          }));
+
+          handleUpload(fileData);
+        }
+      } catch (error: any) {
+        fileData.error = error.message;
+        console.log(error);
+      } finally {
+        setState((prev: any) => ({
           ...prev,
-          fileType: file?.type?.includes("pdf") ? "pdf" : "",
-          fileUrl: URL.createObjectURL(file),
+          inProgress: false,
+          error: fileData.error,
         }));
-
-        handleUpload(fileData);
+        delete fileData.error;
+        e.target.value = "";
       }
-    } catch (error: any) {
-      fileData.error = error.message;
-      console.log(error);
-    } finally {
-      setState((prev: any) => ({
-        ...prev,
-        inProgress: false,
-        error: fileData.error,
-      }));
-      delete fileData.error;
-      e.target.value = "";
     }
   };
 
@@ -137,7 +142,8 @@ const ImageUploadUi: React.FC<ImageUploadUiPropType> = (props) => {
 
           <div className="flex justify-center">
             <button
-              className={`bg-white border-gray-300 border text-gray-150 text-sm px-14 py-1 mt-2 hover:bg-gray-200 hover:text-gray-500  rounded leading-5 shadow-lg`}
+              type="button"
+              className={`border-gray-300 border text-gray-150 text-sm px-14 py-1 mt-2 hover:bg-gray-200 hover:text-gray-500  rounded leading-5 shadow-lg ${readonly ? "bg-gray-200 cursor-not-allowed" : "bg-white"}`}
               onClick={handleUploadDoc}
             >
               Browse File
@@ -172,10 +178,12 @@ const ImageUploadUi: React.FC<ImageUploadUiPropType> = (props) => {
                   </div>
                 </div>
               </div>
-              <ImBin
-                className="cursor-pointer"
-                onClick={() => handleDeleteFile(file?.file_id)}
-              />
+              {!readonly && (
+                <ImBin
+                  className="cursor-pointer"
+                  onClick={() => handleDeleteFile(file?.file_id)}
+                />
+              )}
             </div>
           ))}
       </div>

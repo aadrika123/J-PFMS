@@ -39,6 +39,7 @@ import toast, { Toaster } from "react-hot-toast";
 type TenderCoverDetailsFormProps = {
   handleTabChange: (type: string) => void;
   tenderFormId: number;
+  readonly: boolean;
 };
 
 const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
@@ -47,10 +48,8 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
   const queryClient = useQueryClient();
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
     useWorkingAnimation();
-  const { handleTabChange, tenderFormId } = props;
+  const { handleTabChange, tenderFormId, readonly } = props;
   // const formRef = useRef<HTMLFormElement>(null);
-
-  const readonly = false;
 
   const [state, setState] = useState<any>({
     tabNo: 1,
@@ -286,6 +285,7 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
                 error={errors.cover_no}
                 touched={touched.cover_no}
                 required
+                readonly={readonly}
                 name="cover_no"
               />
 
@@ -312,6 +312,7 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
                   handleDeleteFile(file_id, setFieldValue)
                 }
                 files={findCurrentTabFiles(files)}
+                readonly={readonly}
               />
 
               <Input
@@ -335,7 +336,7 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
               </span>
             )}
             <div className="mt-4 w-full">
-              {!readonly && !dirty && (
+              {!dirty && (
                 <div className="flex justify-between items-center">
                   <Button
                     onClick={() => handleTabChange("prev")}

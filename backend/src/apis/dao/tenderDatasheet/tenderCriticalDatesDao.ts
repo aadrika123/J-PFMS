@@ -29,14 +29,14 @@ class TenderCriticalDatesDao {
 
     const res = await prisma.$transaction(async (tx) => {
       /* Changing tender datasheet status */
-      await tx.tender_datasheets.update({
-        where: {
-          id: data.tender_datasheet_id,
-        },
-        data: {
-          status: "draft",
-        },
-      });
+      // await tx.tender_datasheets.update({
+      //   where: {
+      //     id: data.tender_datasheet_id,
+      //   },
+      //   data: {
+      //     status: "draft",
+      //   },
+      // });
 
       return await tx.tender_critical_dates.upsert({
         where: {

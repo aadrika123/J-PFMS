@@ -40,16 +40,16 @@ import { Icons } from "@/assets/svg/icons";
 type TenderBidOpenerFormProps = {
   handleTabChange: (type: string) => void;
   tenderFormId: number;
+  readonly: boolean;
 };
 
 const TenderBidOpenerForm: React.FC<TenderBidOpenerFormProps> = (props) => {
   const queryClient = useQueryClient();
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
     useWorkingAnimation();
-  const { handleTabChange, tenderFormId } = props;
+  const { handleTabChange, tenderFormId, readonly } = props;
   const formRef = useRef<HTMLFormElement>(null);
 
-  const readonly = false;
   const [state, setState] = useState<any>({
     showWarning: false,
     triggerFun: null,
@@ -468,7 +468,7 @@ const TenderBidOpenerForm: React.FC<TenderBidOpenerFormProps> = (props) => {
               </span>
             )}
             <div className="mt-4 w-full">
-              {!readonly && !dirty && (
+              {!dirty && (
                 <div className="flex justify-between items-center">
                   <Button
                     onClick={() => handleTabChange("prev")}

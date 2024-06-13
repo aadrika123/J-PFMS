@@ -38,16 +38,16 @@ import axios from "@/lib/axiosConfig";
 type TenderFeeDetailsFormProps = {
   handleTabChange: (type: string) => void;
   tenderFormId: number;
+  readonly: boolean;
 };
 
 const TenderFeeDetailsForm: React.FC<TenderFeeDetailsFormProps> = (props) => {
   const queryClient = useQueryClient();
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
     useWorkingAnimation();
-  const { handleTabChange, tenderFormId } = props;
+  const { handleTabChange, tenderFormId, readonly } = props;
   const formRef = useRef<HTMLFormElement>(null);
 
-  const readonly = false;
   const [state, setState] = useState<any>({
     showWarning: false,
     triggerFun: null,
@@ -215,6 +215,7 @@ const TenderFeeDetailsForm: React.FC<TenderFeeDetailsFormProps> = (props) => {
                   error={errors.tender_fee_examption_allowed}
                   touched={touched.tender_fee_examption_allowed}
                   required
+                  readonly={readonly}
                   name="tender_fee_examption_allowed"
                 />
               </div>
@@ -326,6 +327,7 @@ const TenderFeeDetailsForm: React.FC<TenderFeeDetailsFormProps> = (props) => {
                   error={errors.emd_examption_allowed}
                   touched={touched.emd_examption_allowed}
                   required
+                  readonly={readonly}
                   name="emd_examption_allowed"
                 />
               </div>
@@ -414,7 +416,7 @@ const TenderFeeDetailsForm: React.FC<TenderFeeDetailsFormProps> = (props) => {
               </span>
             )}
             <div className="mt-4 w-full">
-              {!readonly && !dirty && (
+              {!dirty && (
                 <div className="flex justify-between items-center">
                   <Button
                     onClick={() => handleTabChange("prev")}

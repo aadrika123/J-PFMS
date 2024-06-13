@@ -29,14 +29,14 @@ class TenderBasicDetailsDao {
     };
 
     const res = await prisma.$transaction(async (tx) => {
-      await tx.tender_datasheets.update({
-        where: {
-          id: data.tender_datasheet_id,
-        },
-        data: {
-          status: "draft",
-        },
-      });
+      // await tx.tender_datasheets.update({
+      //   where: {
+      //     id: data.tender_datasheet_id,
+      //   },
+      //   data: {
+      //     status: "draft",
+      //   },
+      // });
       const res = await tx.tender_basic_details.upsert({
         where: {
           tender_datasheet_id: data.tender_datasheet_id,

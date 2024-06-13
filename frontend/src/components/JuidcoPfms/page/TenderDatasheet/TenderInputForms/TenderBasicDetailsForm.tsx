@@ -51,17 +51,17 @@ import { Icons } from "@/assets/svg/icons";
 type TenderBasicDetailsFormProps = {
   handleTabChange: (type: string) => void;
   tenderFormId: number;
+  readonly: boolean;
 };
 
 const TenderBasicDetailsForm: React.FC<TenderBasicDetailsFormProps> = (
   props
 ) => {
   const queryClient = useQueryClient();
-  const { handleTabChange, tenderFormId } = props;
+  const { handleTabChange, tenderFormId, readonly } = props;
   const formRef = useRef<HTMLFormElement>(null);
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
     useWorkingAnimation();
-  const readonly = false;
   const [state, setState] = useState<any>({
     file: "",
     showPopup: false,
@@ -380,6 +380,7 @@ const TenderBasicDetailsForm: React.FC<TenderBasicDetailsFormProps> = (
                   error={errors.contract_forms}
                   touched={touched.contract_forms}
                   required
+                  readonly={readonly}
                   name="contract_forms"
                 />
               </div>
@@ -393,6 +394,7 @@ const TenderBasicDetailsForm: React.FC<TenderBasicDetailsFormProps> = (
                   error={errors.tender_type}
                   touched={touched.tender_type}
                   required
+                  readonly={readonly}
                   name="tender_type"
                 />
                 <CheckboxComponent
@@ -402,6 +404,7 @@ const TenderBasicDetailsForm: React.FC<TenderBasicDetailsFormProps> = (
                   error={errors.tender_categories}
                   touched={touched.tender_categories}
                   required
+                  readonly={readonly}
                   name="tender_categories"
                 />
               </div>
@@ -415,6 +418,7 @@ const TenderBasicDetailsForm: React.FC<TenderBasicDetailsFormProps> = (
                   error={errors.allow_resubmission}
                   touched={touched.allow_resubmission}
                   required
+                  readonly={readonly}
                   name="allow_resubmission"
                 />
                 <RadioYesNoComponent
@@ -424,6 +428,7 @@ const TenderBasicDetailsForm: React.FC<TenderBasicDetailsFormProps> = (
                   error={errors.allow_withdrawal}
                   touched={touched.allow_withdrawal}
                   required
+                  readonly={readonly}
                   name="allow_withdrawal"
                 />
                 <RadioYesNoComponent
@@ -433,6 +438,7 @@ const TenderBasicDetailsForm: React.FC<TenderBasicDetailsFormProps> = (
                   error={errors.allow_offline_submission}
                   touched={touched.allow_offline_submission}
                   required
+                  readonly={readonly}
                   name="allow_offline_submission"
                 />
               </div>
@@ -553,6 +559,7 @@ const TenderBasicDetailsForm: React.FC<TenderBasicDetailsFormProps> = (
                   error={errors.payment_mode}
                   touched={touched.payment_mode}
                   required
+                  readonly={readonly}
                   name="payment_mode"
                 />
 
@@ -578,6 +585,7 @@ const TenderBasicDetailsForm: React.FC<TenderBasicDetailsFormProps> = (
                       error={errors.instrument}
                       touched={touched.instrument}
                       required
+                      readonly={readonly}
                       name="instrument"
                     />
                   )
@@ -590,7 +598,7 @@ const TenderBasicDetailsForm: React.FC<TenderBasicDetailsFormProps> = (
               </span>
             )}
             <div className="mt-4 w-full">
-              {!readonly && !dirty && (
+              {!dirty && (
                 <div className="flex justify-between items-center">
                   <Button
                     onClick={() => handleTabChange("prev")}

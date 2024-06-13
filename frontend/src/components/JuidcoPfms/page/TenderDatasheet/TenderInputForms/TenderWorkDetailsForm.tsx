@@ -47,16 +47,20 @@ import toast, { Toaster } from "react-hot-toast";
 type TenderWorkDetailsFormProps = {
   handleTabChange: (type: string) => void;
   tenderFormId: number;
+  readonly: boolean;
+  project_proposal: {
+    title: string;
+    description: string;
+  }
 };
 
 const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (props) => {
   const queryClient = useQueryClient();
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
     useWorkingAnimation();
-  const { handleTabChange, tenderFormId } = props;
+  const { handleTabChange, tenderFormId, readonly, project_proposal } = props;
   const formRef = useRef<HTMLFormElement>(null);
 
-  const readonly = false;
   const [state, setState] = useState<any>({
     showWarning: false,
     triggerFun: null,
@@ -84,8 +88,8 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (props) => {
 
   const initialDetails = {
     tender_datasheet_id: data?.tender_datasheet_id || tenderFormId,
-    work_title: data?.work_title || "",
-    description: data?.description || "",
+    work_title: data?.work_title || project_proposal.title,
+    description: data?.description || project_proposal.description,
     pre_qualification_details: data?.pre_qualification_details || "",
     product_categories: data?.product_categories || [],
     product_sub_category: data?.product_sub_category || "",
@@ -216,7 +220,7 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (props) => {
                   name="work_title"
                   placeholder="Enter Work Item Title"
                   required
-                  readonly={readonly}
+                  readonly={true}
                   labelColor="black font-medium"
                 />
                 <TextArea
@@ -231,7 +235,7 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (props) => {
                   className="min-h-20 max-h-32"
                   maxlength={250}
                   required
-                  readonly={readonly}
+                  readonly={true}
                   labelColor="black font-medium"
                 />
                 <Input
@@ -259,6 +263,7 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (props) => {
                   error={errors.product_categories}
                   touched={touched.product_categories}
                   required
+                  readonly={readonly}
                   gridClass="grid-cols-4"
                   name="product_categories"
                 />
@@ -290,6 +295,7 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (props) => {
                     error={errors.contract_type}
                     touched={touched.contract_type}
                     required
+                    readonly={readonly}
                     name="contract_type"
                   />
                   <RadioComponent
@@ -299,6 +305,7 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (props) => {
                     error={errors.tender_value}
                     touched={touched.tender_value}
                     required
+                    readonly={readonly}
                     name="tender_value"
                   />
                   <RadioComponent
@@ -308,6 +315,7 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (props) => {
                     error={errors.bid_validity}
                     touched={touched.bid_validity}
                     required
+                    readonly={readonly}
                     name="bid_validity"
                   />
                 </div>
@@ -371,6 +379,7 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (props) => {
                   error={errors.pre_bid_meeting}
                   touched={touched.pre_bid_meeting}
                   required
+                  readonly={readonly}
                   name="pre_bid_meeting"
                 />
                 <div className="grid grid-cols-2 gap-4">
@@ -429,6 +438,7 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (props) => {
                   error={errors.tenderer_class}
                   touched={touched.tenderer_class}
                   required
+                  readonly={readonly}
                   gridClass="grid-cols-5"
                   name="tenderer_class"
                 />
@@ -490,7 +500,7 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (props) => {
               </span>
             )}
             <div className="mt-4 w-full">
-              {!readonly && !dirty && (
+              {!dirty && (
                 <div className="flex justify-between items-center">
                   <Button
                     onClick={() => handleTabChange("prev")}

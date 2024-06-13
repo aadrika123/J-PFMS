@@ -12,7 +12,7 @@ type RadioYesNoComponentType = {
   title: string;
   changeHandler?: (isChecked: boolean) => void;
   name: string;
-  readonly?: boolean;
+  readonly: boolean;
   value: boolean;
   error: string | undefined;
   touched: boolean;

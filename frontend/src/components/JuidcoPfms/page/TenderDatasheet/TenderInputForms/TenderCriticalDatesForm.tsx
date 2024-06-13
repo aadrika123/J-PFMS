@@ -36,6 +36,7 @@ import { useWorkingAnimation } from "@/components/global/molecules/general/useWo
 type TenderCriticalDatesFormProps = {
   handleTabChange: (type: string) => void;
   tenderFormId: number;
+  readonly: boolean;
 };
 
 const TenderCriticalDatesForm: React.FC<TenderCriticalDatesFormProps> = (
@@ -44,10 +45,9 @@ const TenderCriticalDatesForm: React.FC<TenderCriticalDatesFormProps> = (
   const queryClient = useQueryClient();
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
     useWorkingAnimation();
-  const { handleTabChange, tenderFormId } = props;
+  const { handleTabChange, tenderFormId, readonly } = props;
   const formRef = useRef<HTMLFormElement>(null);
 
-  const readonly = false;
   const [state, setState] = useState<any>({
     showWarning: false,
     triggerFun: null,
@@ -305,7 +305,7 @@ const TenderCriticalDatesForm: React.FC<TenderCriticalDatesFormProps> = (
               </span>
             )}
             <div className="mt-4 w-full">
-              {!readonly && !dirty && (
+              {!dirty && (
                 <div className="flex justify-between items-center">
                   <Button
                     onClick={() => handleTabChange("prev")}

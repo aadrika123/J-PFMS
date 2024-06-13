@@ -22,13 +22,20 @@ class TenderDatasheetsDao {
   ///// Get Tender Datasheet By Id ////
   async getById(id: number) {
     const res = await prisma.tender_datasheets.findFirst({
-      where:{
-        id
+      where: {
+        id,
       },
       select: {
-        id: true
-      }
-    })
+        id: true,
+        status: true,
+        project_proposal: {
+          select: {
+            title: true,
+            description: true,
+          },
+        },
+      },
+    });
 
     return generateRes(res);
   }

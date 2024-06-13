@@ -12,7 +12,7 @@ type CheckboxComponentType = {
   checkList: any;
   changeHandler?: (newItem: string[]) => void;
   name: string;
-  readonly?: boolean;
+  readonly: boolean;
   value: string[];
   error: string | undefined;
   touched: boolean[];
