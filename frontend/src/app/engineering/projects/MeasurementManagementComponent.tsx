@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Formik } from "formik";
-import { MeasurementRecordValidation } from "pfmslib";
+import { fc, MeasurementRecordValidation } from "pfmslib";
 import { usePagination } from "@/hooks/Pagination";
 import { useMeasurementList, useSORList } from "@/hooks/data/ProjectProposalsHooks";
 import LoaderSkeleton from "@/components/global/atoms/LoaderSkeleton";
@@ -127,13 +127,14 @@ const DDL: React.FC<DDLProps> = (props) => {
 
 interface MeasurementRecordProps {
     measurement: any
+    readOnly: boolean;
 }
 
 
 const MeasurementRecord = (props: MeasurementRecordProps) => {
     const [measurement, setMeasurement] = useState<any>(props.measurement);
     const [searchText, setSearchText] = useState<string>("");
-    const { isFetching: isFetching, isLoading: isLoading, data: sorQueryResponseData  } = useSORList(searchText);
+    const { isFetching: isFetching, isLoading: isLoading, data: sorQueryResponseData } = useSORList(searchText);
     const [sorListVisible, setSorListVisible] = useState<boolean>(false);
 
     const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] = useWorkingAnimation();
@@ -215,7 +216,7 @@ const MeasurementRecord = (props: MeasurementRecordProps) => {
     return (
 
         <>
-        {workingAnimation}
+            {workingAnimation}
             <Formik
                 initialValues={measurement}
                 enableReinitialize
@@ -385,7 +386,7 @@ const MeasurementRecord = (props: MeasurementRecordProps) => {
                                 required
                                 type="number"
                                 readonly={!editable}
-                            /> : values.amount}
+                            /> : fc(values.amount)}
                         </div>
 
                         <div className="table-cell text-color-secondary pt-2 border p-2">
@@ -417,14 +418,21 @@ const MeasurementRecord = (props: MeasurementRecordProps) => {
                 )}
             </Formik >
 
-            {!editable && (
+            {!props.readOnly && (
+                <>
 
-                <div
-                    onClick={() => setEditable(!editable)}
-                    className="mx-2 border p-1 bg-primary_green rounded text-white text-center cursor-pointer">
-                    Edit
-                </div>
+                    {!editable && (
+
+                        <div
+                            onClick={() => setEditable(!editable)}
+                            className="mx-2 border p-1 bg-primary_green rounded text-white text-center cursor-pointer">
+                            Edit
+                        </div>
+                    )}
+
+                </>
             )}
+
         </>
 
     )
@@ -433,10 +441,11 @@ const MeasurementRecord = (props: MeasurementRecordProps) => {
 
 interface MeasurementTableProps {
     measurements: any;
+    readOnly: boolean;
 }
 
 
-const MeasurementTable = ({ measurements }: MeasurementTableProps) => {
+const MeasurementTable = ({ measurements, readOnly }: MeasurementTableProps) => {
     return (
         <div className="text-xs table border-2">
             <div className="table-caption" title="Double click to change the title">
@@ -476,7 +485,7 @@ const MeasurementTable = ({ measurements }: MeasurementTableProps) => {
                 return (
                     <form className="table-row border" key={index}>
                         <div className="table-cell text-color-secondary text-center">{index + 1}</div>
-                        <MeasurementRecord measurement={row} />
+                        <MeasurementRecord measurement={row} readOnly={readOnly} />
                     </form>
 
                 );
@@ -490,6 +499,8 @@ const MeasurementTable = ({ measurements }: MeasurementTableProps) => {
 
 interface MeasurementManagementComponentProps {
     proposal_id: number;
+    readOnly: boolean;
+    onNewMeasurementEntries: () => void
 }
 
 export const MeasurementManagementComponent = (props: MeasurementManagementComponentProps) => {
@@ -501,12 +512,14 @@ export const MeasurementManagementComponent = (props: MeasurementManagementCompo
     const { isFetching: isFetching, isLoading: isLoading, data: measurementQueryResponseData, refetch: refetchMeasurementList } = useMeasurementList(props.proposal_id, "", limit, page);
     const [measurements, setMeasurements] = useState<[]>();
     const [totalResults, setTotalResults] = useState<number>();
+    const [totalAmount, setTotalAmount] = useState<number>(0);
 
 
     useEffect(() => {
         console.log(measurementQueryResponseData);
         setMeasurements(measurementQueryResponseData?.records);
         setTotalResults(measurementQueryResponseData?.count);
+        setTotalAmount(measurementQueryResponseData?.totalAmount);
     }, [measurementQueryResponseData]);
 
     return (
@@ -520,27 +533,42 @@ export const MeasurementManagementComponent = (props: MeasurementManagementCompo
 
                     {(isLoading || isFetching) ? (<LoaderSkeleton rowCount={limit} />) : (
                         <>
-                            <MeasurementTable measurements={measurements} />
+                            <MeasurementTable measurements={measurements} readOnly={props.readOnly} />
+
+                            <div className="flex justify-end">
+                                <div>Total Amount: {fc(totalAmount)}</div>
+                            </div>
                             {paginator}
+
+
                         </>
 
                     )}
 
                 </div>
 
+
+
                 {measurementFormVisible && (
                     <PopupEx>
                         <AddMeasurementComponent onBack={() => setMeasurementFormVisible(false)} proposal_id={props.proposal_id} onUpdate={() => {
                             setMeasurementFormVisible(false);
                             refetchMeasurementList();
+                            props.onNewMeasurementEntries();
                         }} />
                     </PopupEx>
 
                 )}
-                <div className="flex justify-end">
-                    <Button variant="primary" onClick={() => setMeasurementFormVisible(true)}>Add New Measurement(s)</Button>
-                </div>
 
+                {!props.readOnly && (
+                    <>
+                        <div className="flex justify-end">
+                            <Button variant="primary" onClick={() => setMeasurementFormVisible(true)}>Add New Measurement(s)</Button>
+                        </div>
+
+
+                    </>
+                )}
 
             </div>
 

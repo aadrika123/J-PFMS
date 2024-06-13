@@ -40,7 +40,7 @@ const measurementRecordValidationSchemaFrontend = Yup.object({
   unit: Yup.string().oneOf(measurementUnitList),
   rate: Yup.number().required().notOneOf([0]),
   amount: Yup.number().required().notOneOf[0],
-  remarks: Yup.string().required(),
+  remarks: Yup.string().nullable(),
 });
 
 
@@ -80,7 +80,7 @@ const measurementRecordValidationSchema = Yup.object({
   unit: Yup.string().oneOf(measurementUnitList),
   rate: Yup.number().required().notOneOf([0]),
   amount: Yup.number().required().notOneOf[0],
-  remarks: Yup.string().required(),
+  remarks: Yup.string().nullable(),
 });
 
 const measurementRecordUpdateValidationSchema = Yup.object({
@@ -95,7 +95,7 @@ const measurementRecordUpdateValidationSchema = Yup.object({
   unit: Yup.string().oneOf(measurementUnitList),
   rate: Yup.number().required().moreThan(0),
   amount: Yup.number().required().moreThan(0),
-  remarks: Yup.string().required(),
+  remarks: Yup.string().nullable(),
 });
 
 

@@ -125,68 +125,199 @@ class ProjectVerificationController {
   };
 
 
+  // getInbox = async (req: Request): Promise<APIv1Response> => {
+
+
+  //   console.log("Inbox");
+  //   return new Promise((resolve, reject) => {
+
+  //     const user = req.body.user;
+
+  //     if (user.isJuniorEngineer()) {
+  //       console.log(user.getRole() + " Inbox");
+
+  //       this.commonCallFunction(
+  //         req,
+  //         ProjectProposalStages.ApprovedByBackOffice,
+  //         this.dao.getLevel0JuniorEngineerInbox
+  //       ).then((data: any) => {
+  //         resolve(data);
+  //       }).catch((error) => {
+  //         reject(error);
+  //       })
+
+  //     } else if (user.isAssistantEngineer()) {
+  //       // reject("Assistant Engineer inbox Not supported Yet!");
+
+  //       this.commonCallFunction(
+  //         req,
+  //         ProjectProposalStages.ApprovedByJuniorEngineer,
+  //         this.dao.getHigherLevelInbox
+  //       ).then((data: any) => {
+  //         resolve(data);
+  //       }).catch((error) => {
+  //         reject(error);
+  //       })
+
+  //     } else {
+  //       console.log(user.getRole());
+  //       reject(`${user.getRole()} inbox is not supported yet`);
+  //     }
+  //   });
+  // }
+
+
+
   getInbox = async (req: Request): Promise<APIv1Response> => {
-
-
-    console.log("Inbox");
     return new Promise((resolve, reject) => {
+      const { data, user } = req.body;
 
-      const user = req.body.user;
+      const query = req.query;
 
-      if (user.isJuniorEngineer()) {
-        console.log(user.getRole() + " Inbox");
+      // validate
+      Yup.object({
+        page: Yup.number().required("page is required."),
+        limit: Yup.number().required("limit is required."),
+        order: Yup.number().required("order is required.").oneOf([1, -1])
+      }).validate(req.query).then(() => {
 
-        this.commonCallFunction(
-          req,
-          ProjectProposalStages.ApprovedByBackOffice,
-          this.dao.getLevel0JuniorEngineerInbox
-        ).then((data: any) => {
-          resolve(data);
+        //collect data
+        const page: number = Number(req.query.page);
+        const limit: number = Number(req.query.limit);
+        const order: number = Number(req.query.order);
+        const ulbId = user.getUlbId();
+
+        const roles = user.getRoles();
+
+
+
+        this.dao.getInbox(query, ulbId, page, limit, order, roles).then((data) => {
+
+          const result = { status: true, code: 200, message: "Found", data: data };
+          resolve(result);
+
         }).catch((error) => {
           reject(error);
-        })
+        });
 
-      } else if (user.isAssistantEngineer()) {
-        // reject("Assistant Engineer inbox Not supported Yet!");
 
-        this.commonCallFunction(
-          req,
-          ProjectProposalStages.ApprovedByJuniorEngineer,
-          this.dao.getHigherLevelInbox
-        ).then((data: any) => {
-          resolve(data);
-        }).catch((error) => {
-          reject(error);
-        })
 
-      } else {
-        console.log(user.getRole());
-        reject(`${user.getRole()} inbox is not supported yet`);
-      }
+      }).catch((error) => {
+        reject(error);
+      })
+
     });
   }
+
+
+
+  getReturnedBackItems = async (req: Request): Promise<APIv1Response> => {
+    return new Promise((resolve, reject) => {
+      const { data, user } = req.body;
+
+      const query = req.query;
+
+      // validate
+      Yup.object({
+        page: Yup.number().required("page is required."),
+        limit: Yup.number().required("limit is required."),
+        order: Yup.number().required("order is required.").oneOf([1, -1])
+      }).validate(req.query).then(() => {
+
+        //collect data
+        const page: number = Number(req.query.page);
+        const limit: number = Number(req.query.limit);
+        const order: number = Number(req.query.order);
+        const ulbId = user.getUlbId();
+
+        const roles = user.getRoles();
+
+
+
+        this.dao.getReturnedProposals(query, ulbId, page, limit, order, roles).then((data) => {
+
+          const result = { status: true, code: 200, message: "Found", data: data };
+          resolve(result);
+
+        }).catch((error) => {
+          reject(error);
+        });
+
+
+
+      }).catch((error) => {
+        reject(error);
+      })
+
+    });
+  }
+
 
   getOutbox = async (req: Request): Promise<APIv1Response> => {
-    return new Promise((resolve, reject) => {
-      const user = req.body.user;
-      if (user.isJuniorEngineer()) {
-        console.log("Junior Engineer Output");
-        this.commonCallFunction(req, ProjectProposalStages.ApprovedByJuniorEngineer, this.dao.getHigherLevelOutbox)
-          .then((data: any) => {
-            resolve(data);
-          }).catch((error) => {
-            reject(error);
-          })
 
-      } else if (user.isCityManager()) {
-        console.log("City Manager");
-        reject("City Manager Outbox Not supported Yet!");
-      } else {
-        console.log(user.getRole());
-        reject(`${user.getRole()} outbox is not supported yet`);
-      }
+    return new Promise((resolve, reject) => {
+      const { data, user } = req.body;
+      const query = req.query;
+
+      // validate
+      Yup.object({
+        page: Yup.number().required("page is required."),
+        limit: Yup.number().required("limit is required."),
+        order: Yup.number().required("order is required.").oneOf([1, -1])
+      }).validate(req.query).then(() => {
+
+        //collect data
+        const page: number = Number(req.query.page);
+        const limit: number = Number(req.query.limit);
+        const order: number = Number(req.query.order);
+        const ulbId = user.getUlbId();
+
+        const roles = user.getRoles();
+
+
+
+        this.dao.getOutbox(query, ulbId, page, limit, order, roles).then((data) => {
+
+          const result = { status: true, code: 200, message: "Found", data: data };
+          resolve(result);
+
+        }).catch((error) => {
+          reject(error);
+        });
+
+
+
+      }).catch((error) => {
+        reject(error);
+      })
+
     });
   }
+
+
+
+
+  // getOutbox = async (req: Request): Promise<APIv1Response> => {
+  //   return new Promise((resolve, reject) => {
+  //     const user = req.body.user;
+  //     if (user.isJuniorEngineer()) {
+  //       console.log("Junior Engineer Output");
+  //       this.commonCallFunction(req, ProjectProposalStages.ApprovedByJuniorEngineer, this.dao.getHigherLevelOutbox)
+  //         .then((data: any) => {
+  //           resolve(data);
+  //         }).catch((error) => {
+  //           reject(error);
+  //         })
+
+  //     } else if (user.isCityManager()) {
+  //       console.log("City Manager");
+  //       reject("City Manager Outbox Not supported Yet!");
+  //     } else {
+  //       console.log(user.getRole());
+  //       reject(`${user.getRole()} outbox is not supported yet`);
+  //     }
+  //   });
+  // }
 
 
   getArchive = async (req: Request): Promise<APIv1Response> => {
@@ -226,47 +357,71 @@ class ProjectVerificationController {
     });
   }
 
-  approveProposal = (req: Request): Promise<APIv1Response> => {
+  // approveProposal = (req: Request): Promise<APIv1Response> => {
+  //   return new Promise((resolve, reject) => {
+  //     // validate
+  //     const { data, user } = req.body;
+  //     let approval_stage_id: number = ProjectProposalStages.ApprovedByJuniorEngineer;
+
+  //     Yup.object({
+  //       proposalId: Yup.number().required("proposalId is required"),
+  //     }).validate(data).then(() => {
+
+  //       this.dao.getLastProposalCheckingRecordByProposalId(
+  //         data?.proposalId
+  //       ).then((lastRecord) => {
+
+  //         if (!lastRecord && !user.isJuniorEngineer()) {
+  //           reject(new Error("You are not allowed to approve the project."));
+  //         } else {
+  //           if (user.isAssistantEngineer())
+  //             approval_stage_id = ProjectProposalStages.ApprovedByAssistantEngineer;
+
+  //           const reqData = {
+  //             project_proposal_id: data?.proposalId,
+  //             checker_id: user?.getUserId(),
+  //             comment: data?.comment,
+  //             approval_stage_id: approval_stage_id,
+  //           };
+
+  //           this.dao.approveProposal(reqData).then((result) => {
+  //             const d = { status: true, code: 200, message: "Success", data: result };
+  //             resolve(d);
+  //           }).catch((error) => {
+  //             reject(error);
+  //           });
+  //         }
+
+  //       }).catch((error) => {
+  //         reject(error);
+  //       });
+
+
+
+  //     }).catch((error) => {
+  //       reject(error);
+  //     });
+
+
+  //   });
+  // }
+
+
+
+  forwardProposal = (req: Request): Promise<APIv1Response> => {
     return new Promise((resolve, reject) => {
       // validate
       const { data, user } = req.body;
-      let approval_stage_id: number = ProjectProposalStages.ApprovedByJuniorEngineer;
-
       Yup.object({
         proposalId: Yup.number().required("proposalId is required"),
-      }).validate(data).then((xx) => {
+      }).validate(data).then(() => {
 
-        this.dao.getLastProposalCheckingRecordByProposalId(
-          data?.proposalId
-        ).then((lastRecord) => {
-
-          if (!lastRecord && !user.isJuniorEngineer()) {
-            reject(new Error("You are not allowed."));
-          } else {
-            if (user.isAssistantEngineer())
-              approval_stage_id = ProjectProposalStages.ApprovedByAssistantEngineer;
-
-            const reqData = {
-              project_proposal_id: data?.proposalId,
-              checker_id: user?.getUserId(),
-              comment: data?.comment,
-              approval_stage_id: approval_stage_id,
-            };
-
-            this.dao.approveProposal(reqData).then((result) => {
-              const d = { status: true, code: 200, message: "Success", data: result };
-              resolve(d);
-            }).catch((error) => {
-              reject(error);
-            });
-          }
-
+        this.dao.forwardProposal(user, data).then((result) => {
+          const d = { status: true, code: 200, message: "Success", data: result };
+          resolve(d);
         }).catch((error) => {
           reject(error);
         });
-
-
-
       }).catch((error) => {
         reject(error);
       });
@@ -276,14 +431,97 @@ class ProjectVerificationController {
   }
 
 
+  sendBackProposal = (req: Request): Promise<APIv1Response> => {
+    return new Promise((resolve, reject) => {
+      // validate
+      const { data, user } = req.body;
+      Yup.object({
+        proposalId: Yup.number().required("proposalId is required"),
+      }).validate(data).then(() => {
+        this.dao.sendBackProposal(user, data).then((result) => {
+          const d = { status: true, code: 200, message: "Success", data: result };
+          resolve(d);
+        }).catch((error) => {
+          reject(error);
+        });
+      }).catch((error) => {
+        reject(error);
+      });
+
+
+    });
+  }
+
+
+
+  // sendBackProposal = (req: Request): Promise<APIv1Response> => {
+
+  //   console.log("====================================================");
+  //   return new Promise((resolve, reject) => {
+  //     // validate
+  //     const { data, user } = req.body;
+  //     console.log("user =======================================", user);
+  //     console.log(data);
+
+  //     let approval_stage_id: number = ProjectProposalStages.ApprovedByJuniorEngineer;
+
+  //     Yup.object({
+  //       proposalId: Yup.number().required("proposalId is required"),
+  //     }).validate(data).then(() => {
+
+  //       this.dao.getLastProposalCheckingRecordByProposalId(
+  //         data?.proposalId
+  //       ).then((lastRecord) => {
+
+  //         console.log("lastrecord", lastRecord);
+
+  //         if (!lastRecord && !user.isJuniorEngineer()) {
+  //           reject(new Error("You are not allowed to to send back the proposal"));
+  //         } else {
+  //           if (user.isJuniorEngineer())
+  //             approval_stage_id = ProjectProposalStages.ApprovedByBackOffice;
+  //           else if (user.isAssistantEngineer())
+  //             approval_stage_id = ProjectProposalStages.ApprovedByAssistantEngineer;
+
+  //           const reqData = {
+  //             project_proposal_id: data?.proposalId,
+  //             checker_id: user?.getUserId(),
+  //             comment: data?.comment,
+  //             approval_stage_id: approval_stage_id,
+  //           };
+
+  //           console.log("reqData", reqData);
+
+  //           this.dao.sendBackProposal(reqData).then((result) => {
+  //             const d = { status: true, code: 200, message: "Success", data: result };
+  //             resolve(d);
+  //           }).catch((error) => {
+  //             reject(error);
+  //           });
+  //         }
+
+  //       }).catch((error) => {
+  //         reject(error);
+  //       });
+
+
+
+  //     }).catch((error) => {
+  //       reject(error);
+  //     });
+
+
+  //   });
+  // }
+
+
+
   getOutboxItemCount = (req: Request): Promise<APIv1Response> => {
     return new Promise((resolve, reject) => {
       const { user } = req.body;
-      let level = -1;
       const ulbId = user.getUlbId();
 
-      if (user.isJuniorEngineer()) level = ProjectProposalStages.ApprovedByJuniorEngineer;
-      this.dao.getOutboxItemCount(ulbId, level).then((count: any) => {
+      this.dao.getOutboxItemCount(ulbId, user.getRoles()).then((count: any) => {
         const result = { status: true, code: 200, message: "Not Found", data: { count: count } };
         resolve(result);
       }).catch((error) => {
@@ -295,13 +533,9 @@ class ProjectVerificationController {
   getInboxItemCount = (req: Request): Promise<APIv1Response> => {
     return new Promise((resolve, reject) => {
       const { user } = req.body;
-      let level = -1;
       const ulbId = user.getUlbId();
 
-      if (user.isJuniorEngineer()) level = ProjectProposalStages.ApprovedByBackOffice;
-      else if (user.isAssistantEngineer()) level = ProjectProposalStages.ApprovedByJuniorEngineer;
-
-      this.dao.getHigherLevelInboxItemCount(ulbId, level).then((count: any) => {
+      this.dao.getInboxItemCount(ulbId, user.getRoles()).then((count: any) => {
         const result = { status: true, code: 200, message: "Not Found", data: { count: count } };
         resolve(result);
       }).catch((error) => {
@@ -309,6 +543,22 @@ class ProjectVerificationController {
       });
     });
   }
+
+
+  getReturnedBackItemCount = (req: Request): Promise<APIv1Response> => {
+    return new Promise((resolve, reject) => {
+      const { user } = req.body;
+      const ulbId = user.getUlbId();
+
+      this.dao.getReturnedBackItemCount(ulbId, user.getRoles()).then((count: any) => {
+        const result = { status: true, code: 200, message: "Not Found", data: { count: count } };
+        resolve(result);
+      }).catch((error) => {
+        reject(error);
+      });
+    });
+  }
+
 
   recordMeasurements = (req: Request): Promise<APIv1Response> => {
     return new Promise((resolve, reject) => {
@@ -325,7 +575,7 @@ class ProjectVerificationController {
             const result = { status: true, code: 200, message: "OK", data: daoResult };
             resolve(result);
           }).catch((error) => {
-            
+
             reject(error);
           })
 
@@ -487,7 +737,7 @@ class ProjectVerificationController {
             reject(error);
           })
 
-        }).catch((error:any) => {
+        }).catch((error: any) => {
           reject(error);
         });
 
@@ -500,6 +750,37 @@ class ProjectVerificationController {
 
     });
   }
+
+
+
+  getComments = (req: Request): Promise<APIv1Response> => {
+    return new Promise((resolve, reject) => {
+
+      //validate
+      Yup.object({
+        proposalId: Yup.number().required("proposal id is required")
+      }).validate(req.params).then(() => {
+
+        const p = req.params;
+        this.dao.getComments(Number(p.proposalId)).then((data) => {
+          if (!data) {
+            const result = { status: true, code: 200, message: "Failure", data: data };
+            resolve(result);
+          } else {
+            const result = { status: true, code: 200, message: "Success", data: data };
+            resolve(result);
+          }
+        }).catch((error) => {
+          reject(error);
+        });
+
+      }).catch((error) => {
+        reject(error);
+      });
+    });
+  }
+
+
 
 }
 

@@ -11,27 +11,40 @@ class ProjectVerificationRoute extends APIv1_New{
   }
 
   configure(): void {
+
+
+
     this.addGetRoute(`get/:proposalId`, this.controller.get);
     this.addGetRoute(`get-all`, this.controller.getAll);
+
     this.addGetRoute(`get-all-11`, this.controller.getAll11);
     this.addGetRoute(`inbox`, this.controller.getInbox);
-    this.addGetRoute(`outbox`, this.controller.getOutbox);
-    this.addGetRoute(`archive`, this.controller.getArchive);
-    this.addGetRoute('get-outbox-item-count', this.controller.getOutboxItemCount);
     this.addGetRoute('get-inbox-item-count', this.controller.getInboxItemCount);
 
 
+    this.addGetRoute(`outbox`, this.controller.getOutbox);
+    this.addGetRoute('get-outbox-item-count', this.controller.getOutboxItemCount);
+
+    this.addGetRoute(`returned-back`, this.controller.getReturnedBackItems);
+    this.addGetRoute(`returned-back/count`, this.controller.getReturnedBackItemCount);
+
+    
+    this.addGetRoute(`archive`, this.controller.getArchive);
+    
+
     // mutable routes: use post
     this.addPostRoute(`acknowledge/:proposalId`, this.controller.acknowledge);
-    this.addPostRoute(`approve`, this.controller.approveProposal);
+    this.addPostRoute(`approve`, this.controller.forwardProposal);
+    this.addPostRoute(`send-back`, this.controller.sendBackProposal);
     this.addPostRoute('measurements/create', this.controller.recordMeasurements);
     this.addGetRoute('measurements/get', this.controller.getMeasurements);
     this.addPostRoute('measurements/update', this.controller.updateMeasurement);
 
     this.addGetRoute('schedule-of-rates/get', this.controller.getScheduleOfRates);
 
-    // this.addPostRoute(`send-back`, this.controller.sendBackProposal);
-
+    
+    this.addGetRoute('comments/get/:proposalId', this.controller.getComments);
+    
     // this.addGetRoute(`document/get/:billId`, this.controller.getDocuments);
     // this.addPostRoute(`document/approve`, this.controller.approveDocument);
     // this.addPostRoute(`document/reject`, this.controller.rejectDocument);

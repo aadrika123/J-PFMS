@@ -6,12 +6,17 @@ function formatString(inputString: string) {
 
 export const ROLES = Object.freeze({
   BACK_OFFICE: "BACK OFFICE",
-  JUNIOR_ENGINEER: "JUNIOR ENGINEER",
-  ASSISTANT_ENGINEER: "ASSISTANT ENGINEER",
-  EXE_OFFICER: "EXECUTIVE OFFICER",
-  CITY_MANAGER: "City Manager",
+    JUNIOR_ENGINEER: "JUNIOR ENGINEER",
+    ASSISTANT_ENGINEER: "ASSISTANT ENGINEER",
+    EXECUTIVE_ENGINEER: "EXECUTIVE ENGINEER",
+    EXECUTIVE_OFFICER: "EXECUTIVE OFFICER",
+    SUPERINTENDENT_ENGINEER: "SUPERINTENDENT ENGINEER",
+    CHIEF_ENGINEER: "CHIEF ENGINEER",
+    DEPUTY_MUNICIPAL_COMMISSIONER: "DEPUTY MUNICIPAL COMMISSIONER",
+    ASSISTANT_MUNICIPAL_COMMISSIONER: "ASSISTANT MUNICIPAL COMMISSIONER",
+    MUNICIPAL_COMMISSIONER: "MUNICIPAL COMMISSIONER"
 });
-
+  
 class User {
   private user: any
   constructor(userData: any) {
@@ -30,20 +35,19 @@ class User {
     return this.user?.role?.includes(ROLES.ASSISTANT_ENGINEER);
   }
 
-
   isExecutiveOfficer = () => {
-    return this.user?.role?.includes(ROLES.EXE_OFFICER);
+    return this.user?.role?.includes(ROLES.EXECUTIVE_OFFICER);
   }
 
-  isCityManager = () => {
-    return this.user?.role?.includes(ROLES.CITY_MANAGER);
-  }
+  // isCityManager = () => {
+  //   return this.user?.role?.includes(ROLES.CITY_MANAGER);
+  // }
 
-  getUserLevel = () => {
-    if (this.user?.role?.includes(ROLES.BACK_OFFICE)) return 1;
-    if (this.user?.role?.includes(ROLES.EXE_OFFICER)) return 2;
-    if (this.user?.role?.includes(ROLES.CITY_MANAGER)) return 3;
-  };
+  // getUserLevel = () => {
+  //   if (this.user?.role?.includes(ROLES.BACK_OFFICE)) return 1;
+  //   if (this.user?.role?.includes(ROLES.EXE_OFFICER)) return 2;
+  //   if (this.user?.role?.includes(ROLES.CITY_MANAGER)) return 3;
+  // };
 
   getUserId = () => {
     return this.user.id;
@@ -52,6 +56,11 @@ class User {
   getRole = () => {
     return this.user?.role; 
   }
+
+  getRoles = () => {
+    return this.user?.role; 
+  }
+
 
   getProjectProposalStage = (stageId: number) => {
     return formatString(Object.keys(ProjectProposalStages).find(key => ProjectProposalStages[key] === stageId))?.split("By ")[1]

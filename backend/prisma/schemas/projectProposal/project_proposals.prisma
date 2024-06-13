@@ -19,13 +19,18 @@ model project_proposals {
   user_id             Int
   execution_body      Int
 
+  remarks String?
+
   acknowledged Boolean @default(false)
 
   project_proposal_checkings project_proposal_checkings[]
   project_proposal_documents project_proposal_documents[]
   project_propo_ward_maps    project_propo_ward_maps[]
-  measurements               measurements[]
+  measurements                      measurements[]
   tender_datasheets          tender_datasheets[]
+
+  checklist String    @default("[\"BACK OFFICE\", \"JUNIOR ENGINEER\", \"DEPUTY MUNICIPAL COMMISSIONER\", \"READY FOR RENDERING\"]")
+  department_wise_checklist String @default("{\"BACK OFFICE\": [\"BACK OFFICE\"],\"TECHNICAL APPROVAL\": [\"JUNIOR ENGINEER\"],\"ADMINISTRATIVE APPROVAL\": [\"DEPUTY MUNICIPAL COMMISSIONER\"],\"FINISHED\": [\"READY FOR TENDERING\"]}")
 
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @default(now()) @updatedAt @map("updated_at")

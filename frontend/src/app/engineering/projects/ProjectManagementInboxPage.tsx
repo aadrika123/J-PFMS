@@ -1,56 +1,63 @@
-"use client"
-import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
-import { usePagination } from "@/hooks/Pagination";
-import { usePathname, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
 
-import qs from "qs";
-import SearchPanel from "@/components/global/molecules/SearchPanel";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import list from "@/assets/svg/list.svg";
 import details from "@/assets/svg/details.svg";
-import { FilterButton } from "@/components/global/atoms/FilterButton";
-import LoaderSkeleton from "@/components/global/atoms/LoaderSkeleton";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
 import SimpleTable from "@/components/global/atoms/SimpleTable";
-import { useProjectProposalsOutboxList } from "@/hooks/data/ProjectProposalsHooks";
-import { ProjectManagementLayout } from "../ProjectManagementLayout";
+
+import { useProjectProposalsInboxList } from "@/hooks/data/ProjectProposalsHooks";
+import { FilterButton } from "@/components/global/atoms/FilterButton";
+
+import SearchPanel from "../../../components/global/molecules/SearchPanel";
+import qs from "qs";
+import { usePagination } from "@/hooks/Pagination";
+import LoaderSkeleton from "@/components/global/atoms/LoaderSkeleton";
+import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
+import { ProjectManagementLayout } from "./ProjectManagementLayout";
 
 
-const ProjectManagementOutboxPage = () => {
+
+const ProjectManagementInboxPage = () => {
   const router = useRouter();
-  const [workingAnimation, activateWorkingAnimation] = useWorkingAnimation();
-
   const pathName = usePathname();
+  const searchParams = useSearchParams();
+
+  const [currentView, setCurrentView] = useState<string>("list");
+
 
   const [searchQuery, setSearchQuery] = useState<string>("");
-
   const [limit, page, paginator, resetPaginator] = usePagination();
+  const { isFetching, isLoading, data: projectProposalData } = useProjectProposalsInboxList(searchQuery, limit, page);
 
-  const { isFetching, isLoading, data: projectProposalData } = useProjectProposalsOutboxList(searchQuery, limit, page);
 
   const [projectProposals, setProjectProposals] = useState<[]>();
+  const [searchPanelItemValues, setSearchPanelItemValues] = useState<any>({});
+  const [totalResults, setTotalResults] = useState<number>();
+
+
+  const [workingAnimation, activateWorkingAnimation] = useWorkingAnimation();
+
 
   const searchPanelItems = [
     { name: "project_proposal_no", caption: "Project Proposal Number" },
     { name: "ulb_name", caption: 'Ulb Name' }
   ];
-  const [searchPanelItemValues, setSearchPanelItemValues] = useState<any>({});
-
-  const [totalResults, setTotalResults] = useState<number>();
-
-
 
   const columns = [
-    { name: "id", caption: "Sr. No.", width: "w-[5%]" },
-    { name: "date", caption: "Date", width: "w-[20%]", type: "date" },
+    // { name: "id", caption: "Sr. No.", width: "w-[5%]" },
+    // { name: "date", caption: "Date", width: "w-[20%]", type: "date" },
+    // { name: "ulb_name", caption: "Ulb Name", width: "w-[20%]" },
+    // { name: "summary", caption: "Summary", width: "w-[20%]", align: "left" }
+    { name: "id", caption: "Sr. No." },
     { name: "project_proposal_no", caption: "Project Proposal No.", width: "w-[20%]" },
-    { name: "ulb_name", caption: "Ulb Name", width: "w-[20%]" }
+    { name: "title", caption: "Project Title"},
+    { name: "type", caption: "Project Type" },
+    { name: "proposed_date", caption: "Proposed Date", type: "date" },
+    { name: "ward_name", caption: "Ward No" },
   ];
 
-  const onViewButtonClick = (id: number) => {
-    activateWorkingAnimation();
-    router.push(`${pathName}/view/${id}?mode=view`);
-  };
 
 
   useEffect(() => {
@@ -76,9 +83,6 @@ const ProjectManagementOutboxPage = () => {
 
   }, [projectProposalData]);
 
-
-
-
   const [isFilterPanelOpen, setFilterPanelOpen] = useState(false);
   const toggleFilterPanel = () => {
     setFilterPanelOpen((prevState) => !prevState);
@@ -98,11 +102,17 @@ const ProjectManagementOutboxPage = () => {
     resetPaginator();
   }
 
+  const onViewButtonClick = (id: number) => {
+    activateWorkingAnimation();
+    router.push(`${pathName}/view/${id}?mode=view`);
+  };
+
+
   return (
     <>
       {workingAnimation}
 
-      <ProjectManagementLayout>
+      <ProjectManagementLayout inboxComponent={<>
         <div hidden={!isFilterPanelOpen} className="w-[25%] h-[75vh] overflow-y-auto overflow-x-hidden hide-scrollbar">
           <SearchPanel onClose={toggleFilterPanel} items={searchPanelItems} values={searchPanelItemValues} onFilterChange={onFilterChange} onNoFilter={onRemoveFilter} />
         </div>
@@ -130,6 +140,7 @@ const ProjectManagementOutboxPage = () => {
 
             Total Results: {totalResults}
 
+
             {
               (isFetching || isLoading) ?
                 <LoaderSkeleton rowCount={limit} /> :
@@ -137,12 +148,16 @@ const ProjectManagementOutboxPage = () => {
             }
 
             {paginator}
-          </section>
-        </div>
 
-      </ProjectManagementLayout>
+          </section>
+        </div>      
+      </>} outboxComponent={<>
+      Outbox
+      </>}/>
+
+
     </>
   )
 }
 
-export default ProjectManagementOutboxPage;
+export default ProjectManagementInboxPage;

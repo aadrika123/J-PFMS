@@ -2,12 +2,12 @@
 
 import PageLayout from "@/components/Layouts/PageLayout";
 import React from "react";
-import ProjectManagementInboxPage from "./ProjectManagementInboxPage";
+import { ProjectManagementPage } from "./ProjectManagementPage";
 
 const Page = () => {
   return (
     <PageLayout>
-      <ProjectManagementInboxPage />
+      <ProjectManagementPage />
     </PageLayout>
   );
 };
