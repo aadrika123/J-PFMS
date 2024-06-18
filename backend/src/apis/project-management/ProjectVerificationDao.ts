@@ -601,7 +601,7 @@ class ProjectVerificationDao {
 
         console.log({currentTablesRoleIndex, "length: ": checkList.length}, "goo");
         if (currentTablesRoleIndex == checkList.length - 2)
-          tx.project_proposals.update({
+          await tx.project_proposals.update({
             where: {
               id: data?.proposalId
             },
