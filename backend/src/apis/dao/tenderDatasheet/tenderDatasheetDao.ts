@@ -413,7 +413,7 @@ class TenderDatasheetsDao {
           ) as ppwml on ppwml.project_proposal_id = p.id
           left join tender_datasheets as td on td.project_proposal_id = p.id
           left join tender_form_approvals as tfa on tfa.tender_datasheet_id = td.id
-          where td.status != 'submitted' and td.status != 'rejected'
+          where p.fully_approved = true and td.status != 'submitted' and td.status != 'rejected'
       `;
 
     const grouping = "group by p.id, um.ulb_name, pt.name, td.status";

@@ -11,9 +11,9 @@ import FormData from "form-data";
 import { Request } from "express";
 import { APIv1Response } from "../APIv1";
 
-const dmsUrl = "https://aadrikainfomedia.com/dms/backend/document/upload";
+const dmsUrl = "https://jharkhandegovernance.com/dms/backend/document/upload";
 const DMS_GET =
-  "https://aadrikainfomedia.com/dms/backend/document/view-by-reference";
+  "https://jharkhandegovernance.com/dms/backend/document/view-by-reference";
 
 class DMSFileHandlerController {
   constructor() {}
