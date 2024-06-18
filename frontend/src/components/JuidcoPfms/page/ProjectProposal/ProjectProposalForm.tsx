@@ -183,7 +183,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
         setState({
           ...state,
           validationError: null,
-          file: URL.createObjectURL(file),
+          file: file ? URL.createObjectURL(file) : "",
           // fileType: file?.type?.includes("pdf") ? "pdf" : "",
         });
       }
@@ -243,7 +243,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
         ...state,
         showPopup: !showPopup,
         currentFile: !String(path).includes("https")
-          ? URL.createObjectURL(path)
+          ? path ? URL.createObjectURL(path) : ""
           : path,
       });
     };
@@ -255,7 +255,7 @@ export const ProjectProposalForm = (props: AddNewProjectProposalProps) => {
           Icons.pdf
         ) : (
           <img
-            src={URL.createObjectURL(path)}
+            src={path ? URL.createObjectURL(path) : ""}
             height={50}
             width={50}
             alt="t"

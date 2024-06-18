@@ -19,8 +19,6 @@ class TenderDatasheetsController {
   create = async (req: Request): Promise<APIv1Response> => {
     const requestData = req.body.data;
 
-    await tenderDatasheetSchema.validate(requestData);
-
     const data = await this.dao.create(requestData);
 
     return { status: true, code: 200, message: "Created", data: data };
