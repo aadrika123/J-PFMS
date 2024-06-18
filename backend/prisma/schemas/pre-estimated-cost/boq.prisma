@@ -1,0 +1,10 @@
+model boq {
+  id              Int      @id @default(autoincrement())
+  itemNo          String
+  description     String
+  unit            String
+  bidrate         Float
+  descriptionType String
+  created_at    DateTime @default(now()) @map("created_at")
+  updated_at    DateTime @default(now()) @updatedAt @map("updated_at")
+}

@@ -69,7 +69,7 @@ export class APIv1_New {
     return new Promise((resolve) => {
       console.log(`api call (${req.path})`);
 
-      console.log(req.body.auth);
+      // console.log(req.body.auth);
       const user = new User(req.body.auth);
       req.body.user = user;
 

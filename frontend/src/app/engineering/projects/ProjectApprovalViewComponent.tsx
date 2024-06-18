@@ -27,6 +27,7 @@ import SuperStepper, { GroupDict } from "../../../components/global/molecules/su
 import { useQuery, useQueryClient } from "react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import admi from "@/assets/svg/admi.svg";
+import MeasurementReferenceDocs from "./measurement-reference-docs";
 
 
 
@@ -283,8 +284,6 @@ const ProjectApprovalViewComponent = ({ ProProposalId, readOnly }: ProjectApprov
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] = useWorkingAnimation();
   const [stepperItems, setStepperItems] = useState<GroupDict>();
   const [stepperCurrentStep, setStepperCurrentStep] = useState<number>(0);
-
-  console.log(projectProposalDetails);
 
   useEffect(() => {
     if (projectProposalDetails?.department_wise_checklist) {
@@ -607,35 +606,7 @@ const ProjectApprovalViewComponent = ({ ProProposalId, readOnly }: ProjectApprov
                       }} />
                     </div>
 
-                    {/* <div>
-                      <div className="pt-10 border-b">
-                        Reference Docs
-                      </div>
-                      <div>
-                        <div className="flex gap-10">
-                          <div>Doc1</div>
-                          <div>View</div>
-                          <div>Download</div>
-                        </div>
-
-                        <div className="flex gap-10">
-                          <div>Doc2</div>
-                          <div>View</div>
-                          <div>Download</div>
-                        </div>
-
-
-                        <div className="flex gap-10">
-                          <div>Doc3</div>
-                          <div>View</div>
-                          <div>Download</div>
-                        </div>
-
-                      </div>
-                      <div>
-                        <Button variant="primary"> Upload New</Button>
-                      </div>
-                    </div> */}
+                    <MeasurementReferenceDocs proposalId={projectProposalDetails.id}/>
 
                   </>
                 ) : (

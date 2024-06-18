@@ -42,18 +42,13 @@ class ProjectVerificationRoute extends APIv1_New {
 
     this.addGetRoute('schedule-of-rates/get', this.controller.getScheduleOfRates);
 
-
     this.addGetRoute('comments/get/:proposalId', this.controller.getComments);
 
-    // this.addGetRoute(`document/get/:billId`, this.controller.getDocuments);
-    // this.addPostRoute(`document/approve`, this.controller.approveDocument);
-    // this.addPostRoute(`document/reject`, this.controller.rejectDocument);
 
     this.addFormDataPostRoute('measurements/ref-doc-upload', this.controller.referenceDocUpload, [
       { name: 'doc', maxCount: 1},
-      
     ]);
-
+    this.addGetRoute('measurements/ref-doc-list', this.controller.getReferenceDocList);
   }
 }
 

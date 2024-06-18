@@ -1,12 +1,8 @@
 import { Authorization, baseURL } from "@/lib/axiosConfig";
 import axios from "axios";
-import React, { ChangeEvent, createRef } from "react";
-import toast from "react-hot-toast";
-import * as Yup from "yup";
+import React, { ChangeEvent, forwardRef, useImperativeHandle, useRef, useState } from "react";
+import { MeasurementRecordValidation } from "pfmslib";
 
-
-const MIN_FILE_SIZE = 1024 * 10 ;
-const MAX_FILE_SIZE = 1024 * 1024 * 5;
 
 
 interface DocumentInputSingleProps {
@@ -14,113 +10,63 @@ interface DocumentInputSingleProps {
 }
 
 
-
-
-const fileValidation = Yup.object({
-    size: Yup.number().required().min(MIN_FILE_SIZE, "File size below lower limit. (10kb)").max(MAX_FILE_SIZE, "File size above max limit (2MB)"),
-    type: Yup.string().required().oneOf([
-        "application/pdf",
-    ], "This file format is not supported."),
-    name: Yup.string().required()
-});
-
-
-interface DocumentInputSingleState {
-    errorMessage: string;
-    isUploading: boolean;
-    progressValue: number;
-    isUploaded: boolean;
-    docToken: string;
+export interface CanProvideFileToken {
+    getFileToken(): Promise<any>;
 }
 
 
+const DocumentInputSingle = forwardRef<CanProvideFileToken, DocumentInputSingleProps>((props: DocumentInputSingleProps, ref) => {
+
+    const fileInputElementRef = useRef<HTMLInputElement>(null);
+    const formRef = useRef<HTMLFormElement>(null);
+    const [isUploading, setIsUploading] = useState<boolean>(false);
+    const [isUploaded, setIsUploaded] = useState<boolean>(false);
+    const [progressValue, setProgressValue] = useState<number>(0);
+    const [errorMessage, setErrorMessage] = useState<string>("");
+
+    const [docToken, setDocToken] = useState<string | null>(null);
 
 
+    useImperativeHandle(ref, () => ({
+        async getFileToken() {
+            return docToken;
+        }
+    }));
 
 
-export default class DocumentInputSingle extends React.Component<DocumentInputSingleProps> {
-    private fileInputElementRef = createRef<HTMLInputElement>();
-    private formRef = createRef<HTMLFormElement>();
-    
-
-    public state: DocumentInputSingleState;
-    constructor(props: DocumentInputSingleProps) {
-        super(props);
-        this.state = {
-            errorMessage: "",
-            isUploading: false,
-            progressValue: 0,
-            isUploaded: false,
-            docToken: "",
-        };
-
-        this.onChange = this.onChange.bind(this);
-        this.setProgressValue = this.setProgressValue.bind(this);
-        this.setIsUploaded = this.setIsUploaded.bind(this);
-        this.setIsUploading = this.setIsUploading.bind(this);
-        this.setErrorMessage = this.setErrorMessage.bind(this);
-        this.setDocToken = this.setDocToken.bind(this);
-
-        this.getDocToken = this.getDocToken.bind(this);
-    }
-
-    getDocToken() {
-        const {docToken} = this.state;
-        return docToken;
-    }
+    const axiosWithMultipartFormdata = axios.create({
+        baseURL: baseURL,
+        headers: {
+            "Authorization": Authorization,
+            "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (progressEvent) => {
+            console.log(progressEvent);
+            if (progressEvent.total)
+                setProgressValue(progressEvent.loaded / progressEvent.total);
+        },
+    });
 
 
-
-    setProgressValue(value: number) {
-        this.setState({ progresValue: value });
-    }
-
-    setIsUploading(value: boolean) {
-        this.setState({ isUploading: value });
-    }
-
-    setIsUploaded(value: boolean) {
-        this.setState({ isUploaded: value });
-    }
-
-    setErrorMessage(msg: string) {
-        this.setState({ errorMessage: msg });
-    }
+    // getDocToken() {
+    //     return this.docToken;
+    // }
 
 
-    setDocToken(token: string){
-        this.setState({docToken: token});
-    }
-
-
-    async onChange(el: ChangeEvent<HTMLInputElement>) {
+    const onChange = async (el: ChangeEvent<HTMLInputElement>) => {
+        setErrorMessage("");
         console.log("Change", el);
 
 
-        const axiosWithMultipartFormdata = axios.create({
-            baseURL: baseURL,
-            headers: {
-                "Authorization": Authorization,
-                "Content-Type": "multipart/form-data",
-            },
-            onUploadProgress: (progressEvent) => {
-                console.log(progressEvent);
-                if (progressEvent.total)
-                    this.setProgressValue(progressEvent.loaded / progressEvent.total);
-            },
-        });
-
-
-
         try {
-            const files = this.fileInputElementRef.current?.files;
+            const files = fileInputElementRef.current?.files;
             if (files) {
 
                 const file = files[0];
 
 
                 // validate
-                await fileValidation.validate({
+                await MeasurementRecordValidation.MeasurementReferenceDocValidation.validate({
                     name: file.name,
                     type: file.type,
                     size: file.size
@@ -129,11 +75,11 @@ export default class DocumentInputSingle extends React.Component<DocumentInputSi
 
                 // upload to backend
 
-                if (this.formRef?.current) {
-                    const formData = new FormData(this.formRef.current);
+                if (formRef?.current) {
+                    const formData = new FormData(formRef.current);
 
-                    this.setIsUploading(true);
-                    this.setIsUploaded(false);
+                    setIsUploading(true);
+                    setIsUploaded(false);
 
                     axiosWithMultipartFormdata({
                         method: "post",
@@ -143,17 +89,18 @@ export default class DocumentInputSingle extends React.Component<DocumentInputSi
                         .then((response) => {
                             console.log("Response: ", response);
                             const data = response.data;
-                            if(!data.status) throw new Error(data?.data);
+                            if (!data.status) throw new Error(data?.data);
                             const token = response.data?.data?.file_token;
                             // props.onFileUploaded(props.name, token);
-                            // console.log("Token: " , token);
-                            this.setDocToken(token);
-                            this.setIsUploading(false);
-                            this.setIsUploaded(true);
+                            console.log("Token: ", token);
+                            // docToken = token;
+                            setDocToken(token);
+                            setIsUploading(false);
+                            setIsUploaded(true);
                         })
                         .catch((error) => {
                             // toast.error(error.toString());
-                            this.setErrorMessage(error.toString());
+                            setErrorMessage(error.toString());
                             console.log(error);
                         });
 
@@ -166,22 +113,20 @@ export default class DocumentInputSingle extends React.Component<DocumentInputSi
 
 
         } catch (error: any) {
-            this.setErrorMessage(error.toString());
+            setErrorMessage(error.toString());
         }
     }
 
-    render() {
-        const { errorMessage, isUploading, progressValue, isUploaded } = this.state;
-        return (
-            <>
 
-                <form ref={this.formRef}>
-                    <div className="flex justify-between">
-                        <div className="mx-2 flex items-center text-blue-800">
-                            {this.props.caption}
-                        </div>
+    return (
+        <>
+            <form ref={formRef}>
+                <div className="flex justify-between">
+                    <div className="mx-2 flex items-center text-blue-800">
+                        {props.caption}
+                    </div>
 
-                        {isUploading && (
+                    {isUploading && (
                             <div className="mx-2 flex items-center">
                                 <div>
                                     <progress value={progressValue} />
@@ -189,42 +134,47 @@ export default class DocumentInputSingle extends React.Component<DocumentInputSi
                             </div>
                         )}
 
-                        {isUploaded && (
-                            <div className="mx-2 flex items-center text-green-800">Uploaded</div>
-                        )}
+
+                    {isUploaded && (
+                        <div className="mx-2 flex items-center text-green-800">Uploaded</div>
+                    )}
 
 
-                        <div>
-                            <button
-                                className="rounded-2xl bg-primary_bg_indigo hover:text-grey text-white p-2"
-                                onClick={(event) => {
-                                    if (this.fileInputElementRef) {
-                                        (this.fileInputElementRef.current as HTMLInputElement).click();
-                                    }
-                                    event.preventDefault();
-                                }}
-                            >
-                                Upload
-                            </button>
-                            <input
-                                type="file"
-                                name='doc'
-                                className="hidden"
-                                ref={this.fileInputElementRef}
-                                onChange={this.onChange}
-                            />
-
-                            
-                        </div>
-                        <div className="text-red-500 ml-10" >{errorMessage}</div>
+                    <div>
+                        <button
+                            className="rounded-2xl bg-primary_bg_indigo hover:text-grey text-white p-2"
+                            onClick={(event) => {
+                                if (fileInputElementRef) {
+                                    (fileInputElementRef.current as HTMLInputElement).click();
+                                }
+                                event.preventDefault();
+                            }}
+                        >
+                            Upload
+                        </button>
+                        <input
+                            type="file"
+                            name='doc'
+                            className="hidden"
+                            ref={fileInputElementRef}
+                            onChange={onChange}
+                        />
 
 
                     </div>
-                </form>
+                    <div className="text-red-500 ml-10" >{errorMessage}</div>
+
+
+                </div>
+            </form>
 
 
 
-            </>
-        );
-    }
-}
+        </>
+    );
+});
+
+DocumentInputSingle.displayName = "DocumentInputSingle";
+
+
+export default DocumentInputSingle;

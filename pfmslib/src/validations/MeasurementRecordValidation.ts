@@ -99,11 +99,23 @@ const measurementRecordUpdateValidationSchema = Yup.object({
 });
 
 
+const MIN_FILE_SIZE = 1024 * 10;
+const MAX_FILE_SIZE = 1024 * 1024 * 2;
+const MeasurementReferenceDocValidation = Yup.object({
+  size: Yup.number().required().min(MIN_FILE_SIZE, "File size below lower limit. (10kb)").max(MAX_FILE_SIZE, "File size above max limit (2MB)"),
+  type: Yup.string().required().oneOf([
+      "application/pdf",
+  ], "This file format is not supported."),
+  name: Yup.string().required()
+});
+
+
 
 
 export default {
   measurementUnitList,
   measurementRecordValidationSchema,
   measurementRecordValidationSchemaFrontend,
-  measurementRecordUpdateValidationSchema
+  measurementRecordUpdateValidationSchema,
+  MeasurementReferenceDocValidation
 };

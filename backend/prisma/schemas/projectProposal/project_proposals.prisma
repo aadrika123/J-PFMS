@@ -21,15 +21,17 @@ model project_proposals {
 
   remarks String?
 
-  acknowledged Boolean @default(false)
+  acknowledged   Boolean @default(false)
+  fully_approved Boolean @default(false)
 
   project_proposal_checkings project_proposal_checkings[]
   project_proposal_documents project_proposal_documents[]
   project_propo_ward_maps    project_propo_ward_maps[]
-  measurements                      measurements[]
+  measurements               measurements[]
   tender_datasheets          tender_datasheets[]
+  measurement_ref_docs       measurement_ref_docs[]
 
-  checklist String    @default("[\"BACK OFFICE\", \"JUNIOR ENGINEER\", \"DEPUTY MUNICIPAL COMMISSIONER\", \"READY FOR RENDERING\"]")
+  checklist                 String @default("[\"BACK OFFICE\", \"JUNIOR ENGINEER\", \"DEPUTY MUNICIPAL COMMISSIONER\", \"READY FOR RENDERING\"]")
   department_wise_checklist String @default("{\"BACK OFFICE\": [\"BACK OFFICE\"],\"TECHNICAL APPROVAL\": [\"JUNIOR ENGINEER\"],\"ADMINISTRATIVE APPROVAL\": [\"DEPUTY MUNICIPAL COMMISSIONER\"],\"FINISHED\": [\"READY FOR TENDERING\"]}")
 
   created_at DateTime @default(now()) @map("created_at")

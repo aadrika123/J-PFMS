@@ -30,7 +30,13 @@ const roles_in_order_seeder = async () => {
     ["assistant municipal commissioner", 8],
 
     ["MUNICIPAL COMMISSIONER", 9],
-    ["municipal commissioner", 9]
+    ["municipal commissioner", 9],
+
+
+    ["READY FOR TENDERING", 1000],
+    ["ready for tendering", 1000],
+
+
 
   ];
 

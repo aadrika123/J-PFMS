@@ -745,14 +745,13 @@ interface AddMeasurementComponentProps {
     onUpdate: () => void;
 }
 
+
+
 export const AddMeasurementComponent = ({ proposal_id, onUpdate, onBack }: AddMeasurementComponentProps) => {
     // document input form
-    const documentInputForm = new DocumentInputSingle({
-        caption: "Reference Doc"
-    });
+    
 
     const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] = useWorkingAnimation();
-
 
     // const documents = new Documents(10);
 
@@ -763,6 +762,13 @@ export const AddMeasurementComponent = ({ proposal_id, onUpdate, onBack }: AddMe
         }
     })
 
+    const [documentSelectionFormRef] = useState<any | null>({});
+    const setDocumentSelectionFormRef = (element: any) => {
+        documentSelectionFormRef[0] = element;
+    }
+
+
+
 
     const recordMeasurements = async (data: any) => {
         activateWorkingAnimation();
@@ -771,7 +777,7 @@ export const AddMeasurementComponent = ({ proposal_id, onUpdate, onBack }: AddMe
                 url: `${baseURL}/project-verification/measurements/create`,
                 method: "POST",
                 data: {
-                    data: data.records,
+                    data: data,
                 },
             }).then((res) => {
                 console.log(res);
@@ -789,16 +795,20 @@ export const AddMeasurementComponent = ({ proposal_id, onUpdate, onBack }: AddMe
 
 
     const onSubmit = async () => {
-
-        const token = documentInputForm.getDocToken();
-        console.log("Token: ", token);
-        return;
-
+        // collect the table data
         const table = tableRefs[0];
         const data = await table.getData();
+
+        // collect the reference documen tokens/token
+        const token = await documentSelectionFormRef[0]?.getFileToken();
+        console.log("Final Token", token);
+        if (token) data['ref_docs'] = [token];
+
         console.log(data);
+
         if (data != null)
             recordMeasurements(data);
+
     }
 
 
@@ -812,7 +822,7 @@ export const AddMeasurementComponent = ({ proposal_id, onUpdate, onBack }: AddMe
                 <MeasurementTable tableIndex={0} ref={(element: any) => { addTableRef(0, element) }} proposal_id={proposal_id} />
 
                 <div className="w-[50%] mt-20 border border-1 p-4">
-                    {documentInputForm.render()}
+                    <DocumentInputSingle caption="Upload Reference Doc" ref={(element: any) => { setDocumentSelectionFormRef(element) }}/>
                 </div>
 
             </div>
