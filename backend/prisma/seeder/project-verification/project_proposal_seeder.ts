@@ -38,6 +38,10 @@ const roles_in_order_seeder = async () => {
 
 
 
+    ["SENT FOR TENDERING", 2000],
+    ["sent for tendering", 2000],
+
+
   ];
 
   for (let i = 0; i < records.length; i++) {
