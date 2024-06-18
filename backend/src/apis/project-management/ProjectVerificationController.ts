@@ -3,6 +3,14 @@ import { Request } from "express";
 import ProjectVerificationDao from "./ProjectVerificationDao";
 import * as Yup from "yup";
 import { MeasurementRecordValidation, ProjectProposalStages, } from "pfmslib";
+import { decryptV1, encryptV1 } from "../../util/cryptographyV1";
+
+
+
+import fs from "fs";
+import crypto from 'crypto';
+import axios from 'axios';
+import FormData from 'form-data';
 
 
 /*
@@ -560,40 +568,111 @@ class ProjectVerificationController {
   }
 
 
-  recordMeasurements = (req: Request): Promise<APIv1Response> => {
-    return new Promise((resolve, reject) => {
+  measurementRecordingTask = async (req: Request) => {
+    const { data, user } = req.body;
 
-      const { data, user } = req.body;
-      if (user.isJuniorEngineer()) {
+    console.log("data", data);
 
-        console.log("data", data);
+    if (!user.isJuniorEngineer()) throw new Error("Measurements can be added by Junior Engineer only.");
 
-        // validate measurement records
-        Yup.array(MeasurementRecordValidation.measurementRecordValidationSchema).validate(data).then(() => {
+    // validate measurement records
+    await Yup.array(MeasurementRecordValidation.measurementRecordValidationSchema).validate(data.records);
 
-          this.dao.recordMeasurements(data).then((daoResult) => {
-            const result = { status: true, code: 200, message: "OK", data: daoResult };
-            resolve(result);
-          }).catch((error) => {
+    // decrypt the file tokens
+    const ref_docs: string[] = [];
+    if (data?.ref_docs) {
+      console.log("ref docs", data.ref_docs);
+      data.ref_docs.forEach((doc_token: string) => {
 
-            reject(error);
-          })
+        const details = decryptV1(doc_token);
+        if (details.length == 0)
+          throw new Error("Invalid File Token");
 
-        }).catch((error) => {
-          console.log("=====================================================================================");
+        ref_docs.push(JSON.parse(details));
+      });
+    }
 
-          console.log(error);
-          reject(error);
+    // upload the files to dms and prepare document records for the database
+    const ref_doc_records: any[] = [];
+    if (ref_docs.length > 0) {
+      console.log(ref_docs);
+      // send the documents to the dms
+      console.log("Has documents.");
+
+      for (let i = 0; i < ref_docs.length; i++) {
+        const doc: any = ref_docs[i];
+
+
+        // compute file hash
+        console.log(doc?.path);
+        const buffer = fs.readFileSync(doc?.path)
+        console.log("File size: ", buffer.length);
+        const hashed = crypto.createHash('SHA256').update(buffer).digest('hex');
+        console.log(hashed);
+
+
+        // send the file to DMS
+        const formData = new FormData();
+        formData.append('file', buffer, doc?.mimeType);
+        formData.append('tags', doc?.originalName.substring(0, 7));
+
+        const headers = {
+          "x-digest": hashed,
+          "token": "8Ufn6Jio6Obv9V7VXeP7gbzHSyRJcKluQOGorAD58qA1IQKYE0",
+          "folderPathId": 1,
+          ...formData.getHeaders(),
+        }
+
+        const dmsResponse = await axios.post(process.env.DMS_UPLOAD || '', formData, { headers });
+        console.log(dmsResponse.data, "dms Response data");
+
+        const dmsResponseData = dmsResponse.data;
+        if (!dmsResponseData.status) throw new Error("Error uploading document.");
+
+        const d = dmsResponseData.data;
+
+        // also fetch the full URL of the file
+
+        const headers2 = {
+          "token": "8Ufn6Jio6Obv9V7VXeP7gbzHSyRJcKluQOGorAD58qA1IQKYE0",
+        }
+        const dmsDocDetailResponse = await axios.post(process.env.DMS_DOC_DETAILS || '', { referenceNo: d.ReferenceNo }, { headers: headers2, params: { referenceNo: d.ReferenceNo } });
+        console.log(dmsDocDetailResponse.data, "dmsDocDetailReponse");
+
+        const dmsDocDetailResponseData = dmsDocDetailResponse.data;
+        if(! dmsDocDetailResponseData.status) throw new Error("Error getting document details from DMS");
+
+        const docD = dmsDocDetailResponseData.data;
+
+        
+
+        ref_doc_records.push({
+          proposal_id: data.records[0].proposal_id,
+          doc_ref_no: d.ReferenceNo,
+          doc_unique_id: d.uniqueId,
+          doc_url: docD.fullPath
         });
 
-
-
-      } else {
-        reject(new Error("Measurements can be added by Junior Engineer only."));
       }
+    }
+
+    console.log(ref_doc_records, "ref doc records");
+
+    const daoResult = await this.dao.recordMeasurements(data.records, ref_doc_records);
+    return daoResult;
+  }
+
+
+
+  recordMeasurements = (req: Request): Promise<APIv1Response> => {
+    return new Promise((resolve, reject) => {
+      this.measurementRecordingTask(req).then((data) => {
+        resolve({ status: false, code: 200, message: "OK", data: data });
+      }).catch((error) => {
+        reject(error);
+      });
+
     });
-
-
   }
 
 
@@ -781,7 +860,74 @@ class ProjectVerificationController {
   }
 
 
+  referenceDocUploadTask = async (req: Request) => {
+    // console.log(req.headers);
+    console.log(req.files);
 
+    if (!req.files) throw new Error("Could not find the document.");
+
+    const files: any = req.files as any;
+    if (!files['doc' as keyof typeof files]) throw new Error("Required document not found.");
+
+    const pdfFile = files['doc'][0];
+    console.log(pdfFile);
+
+    // validate
+    await MeasurementRecordValidation.MeasurementReferenceDocValidation.validate({
+      name: pdfFile.originalname,
+      type: pdfFile.mimetype,
+      size: pdfFile.size
+    });
+
+    const details = {
+      path: pdfFile.path,
+      originalName: pdfFile.originalname,
+      fileName: pdfFile.filename,
+      mimeType: pdfFile.mimetype
+    };
+
+    const result = { status: true, code: 200, message: "OK", data: { "file_token": encryptV1(JSON.stringify(details)) } };
+    return result;
+
+  }
+
+
+  referenceDocUpload = async (req: Request): Promise<APIv1Response> => {
+    return new Promise((resolve, reject) => {
+      this.referenceDocUploadTask(req).then((data) => {
+        resolve(data);
+      }).catch((error) => {
+        console.log(error);
+        reject(error);
+      });
+    });
+  }
+
+
+  getReferenceDocListTask = async (req: Request) => {
+    await Yup.object({
+      proposalId: Yup.number().required("proposal_id is required"),
+    }).validate(req.query);
+
+    const { proposalId } = req.query;
+
+    const data = await this.dao.getReferenceDocList(
+      Number(proposalId)
+    );
+
+
+    return { status: true, code: 200, message: "OK", data: data };
+  }
+
+  getReferenceDocList = async (req: Request): Promise<APIv1Response> => {
+    return new Promise((resolve, reject) => {
+      this.getReferenceDocListTask((req)).then((data) => {
+        resolve(data);
+      }).catch((error) => {
+        reject(error);
+      });
+    });
+  }
 }
 
 export default ProjectVerificationController;

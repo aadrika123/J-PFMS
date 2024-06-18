@@ -8,6 +8,7 @@ import project_type_seeder from "./seeder/masters/project_type_seeder";
 import roles_in_order_seeder from "./seeder/project-verification/project_proposal_seeder";
 import { sorSeeder } from "./seeder/project-verification/sor-seeder";
 import bank_seeder from "./seeder/masters/bank_seeder";
+import Boq_Table_detail from "./seeder/Boq/Boq_Table_detaill";
 
 const prisma = new PrismaClient();
 
@@ -35,6 +36,9 @@ async function main() {
 
   setTimeout(async () => {
     await foreign_wrapper();
+  }, 9000);
+  setTimeout(async () => {
+    await Boq_Table_detail();
   }, 9000);
 }
 main()

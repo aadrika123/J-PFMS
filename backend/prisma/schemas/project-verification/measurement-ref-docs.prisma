@@ -1,0 +1,14 @@
+//// OTPs
+model measurement_ref_docs {
+  id            Int         @id   @default(autoincrement())
+  
+  proposal_id   Int
+  proposal      project_proposals  @relation(fields: [proposal_id], references: [id])
+
+  doc_ref_no    String
+  doc_unique_id String
+  doc_url       String
+  
+  created_at    DateTime @default(now()) @map("created_at")
+  updated_at    DateTime @default(now()) @updatedAt @map("updated_at")
+}

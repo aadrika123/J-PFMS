@@ -2,7 +2,7 @@
 "use client";
 import React, { useState } from "react";
 import { GoTriangleUp } from "react-icons/go";
-import CardDetails from "./CardDetails";
+import CardDetails from "./RunningBillView";
 import EstimatedCost from "./EstimatedCost";
 import MBRecordBill from "./MBRecordBill";
 import ViewDocuments from "./ViewDocuments";
@@ -48,28 +48,36 @@ const DetailsPage = () => {
 
       <hr className="w-full border-indigo-700 border-[2px] text-blue-800" />
 
-      <div className="mt-4">
+      <div className="mt-2">
         {activeTab === "viewDetails" && (
             <div>
               <GoTriangleUp />
             </div>
           ) && (
             <div>
-            <CardDetails />
-            <EstimatedCost />
-            <MBRecordBill/>
+              <EstimatedCost />
+              <MBRecordBill />
+              <CardDetails />
             </div>
           )}
         {activeTab === "viewDoc" && (
             <div>
               <GoTriangleUp />
             </div>
-          ) && <div><ViewDocuments/></div>}
+          ) && (
+            <div>
+              <ViewDocuments />
+            </div>
+          )}
         {activeTab === "action" && (
             <div>
               <GoTriangleUp />
             </div>
-          ) && <div><Action/></div>}
+          ) && (
+            <div>
+              <Action />
+            </div>
+          )}
       </div>
     </div>
   );

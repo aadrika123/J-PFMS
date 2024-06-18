@@ -53,7 +53,7 @@ class ProjectVerificationDao {
       ])
         .then(([records, lastCheckingDetails, c]) => {
 
-          console.log("lastCheckingDetails", lastCheckingDetails);
+          // console.log("lastCheckingDetails", lastCheckingDetails);
           const count = Number(c[0]?.count);
 
           if (records.length == 0)
@@ -556,7 +556,7 @@ class ProjectVerificationDao {
         const checkList = JSON.parse(checkListJson);
         // console.log(checkList);
 
-        
+
 
         // obtain authority level names and power value
         const authorityLevels = await tx.$queryRawUnsafe<AuthorityLevelResponse[]>(`select name, authority_level from roles_in_order where name in (${checkList.map(function (p: string) { return '\'' + p + '\''; }).join(',')})`);
@@ -586,7 +586,7 @@ class ProjectVerificationDao {
 
         const nextTablesRoleId = authorityLevelDict1[nextTablesRole];
 
-         // create a new proposal checkings record with the new role id
+        // create a new proposal checkings record with the new role id
         const checkingRecord = {
           project_proposal_id: data?.proposalId,
           checker_id: user?.getUserId(),
@@ -598,6 +598,18 @@ class ProjectVerificationDao {
         const result = await tx.project_proposal_checkings.create({
           data: checkingRecord,
         });
+
+        console.log({currentTablesRoleIndex, "length: ": checkList.length}, "goo");
+        if (currentTablesRoleIndex == checkList.length - 2)
+          tx.project_proposals.update({
+            where: {
+              id: data?.proposalId
+            },
+            data: {
+              fully_approved: true,
+            }
+          });
+
 
         return result;
 
@@ -632,7 +644,7 @@ class ProjectVerificationDao {
         const checkList = JSON.parse(checkListJson);
         // console.log(checkList);
 
-        
+
 
         // obtain authority level names and power value
         const authorityLevels = await tx.$queryRawUnsafe<AuthorityLevelResponse[]>(`select name, authority_level from roles_in_order where name in (${checkList.map(function (p: string) { return '\'' + p + '\''; }).join(',')})`);
@@ -662,7 +674,7 @@ class ProjectVerificationDao {
 
         const prevTableRoleId = authorityLevelDict1[prevTableRole];
 
-         // create a new proposal checkings record with the new role id
+        // create a new proposal checkings record with the new role id
         const checkingRecord = {
           project_proposal_id: data?.proposalId,
           checker_id: user?.getUserId(),
@@ -790,11 +802,16 @@ class ProjectVerificationDao {
   }
 
 
-  recordMeasurements = async (data: measurements[]) => {
+  recordMeasurements = async (data: measurements[], ref_doc_records: any[]) => {
     const proposalId = data[0].proposal_id;
     return new Promise((resolve, reject) => {
 
       prisma.$transaction(async (tx) => {
+
+        // insert the reference doc records
+        const refDocCreateQueryResult = await tx.measurement_ref_docs.createMany({
+          data: ref_doc_records
+        });
 
         // Record the new measurements
         const new_mes = await tx.measurements.createMany({ data: data });
@@ -868,7 +885,7 @@ class ProjectVerificationDao {
         }
 
 
-        newCheckList.push("SENT FOR TENDERING");
+        newCheckList.push("READY FOR TENDERING");
 
         const newCheckListDepartmentWise = {
           "Back Office": ["BACK OFFICE"],
@@ -1299,6 +1316,13 @@ class ProjectVerificationDao {
 
     });
 
+  }
+
+
+  getReferenceDocList = async (proposalId: number) => {
+    return await prisma.$queryRaw`
+    select * from measurement_ref_docs where proposal_id=${proposalId}
+    `;
   }
 
 }

@@ -42,8 +42,7 @@ const commentListAPI = `${baseURL}/project-verification/comments/get`;
 
 
 export const useProjectProposalList = (searchQuery: string, limit: number, page: number) => {
-  const pathName = usePathname();
-  return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.INBOX_LIST, searchQuery, limit, page, pathName], (): Promise<any> => {
+  return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.INBOX_LIST, searchQuery, limit, page], (): Promise<any> => {
     return new Promise((resolve, reject) => {
       axios.get(`${projectProposalsApi}?limit=${limit}&page=${page}&order=-1&${searchQuery && searchQuery.length > 0 ? `&${searchQuery}` : ''}`).then(resp => {
         console.log(resp.data.message);
@@ -60,8 +59,7 @@ export const useProjectProposalList = (searchQuery: string, limit: number, page:
 }
 
 export const useProjectProposalList11 = (searchQuery: string, limit: number, page: number) => {
-  const pathName = usePathname();
-  return useQuery(["project-proposals-11", searchQuery, limit, page, pathName], (): Promise<any> => {
+  return useQuery(["project-proposals-11", searchQuery, limit, page], (): Promise<any> => {
     return new Promise((resolve, reject) => {
       axios.get(`${projectProposalsApi11}?limit=${limit}&page=${page}&order=-1&${searchQuery && searchQuery.length > 0 ? `&${searchQuery}` : ''}`).then(resp => {
         console.log(resp.data.message);
@@ -79,9 +77,8 @@ export const useProjectProposalList11 = (searchQuery: string, limit: number, pag
 
 
 export const useProjectProposalsInboxList = (searchQuery: string, limit: number, page: number) => {
-  const pathName = usePathname();
 
-  return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.INBOX_LIST, searchQuery, limit, page, pathName], (): Promise<any> => {
+  return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.INBOX_LIST, searchQuery, limit, page], (): Promise<any> => {
     return new Promise((resolve, reject) => {
       axios.get(`${projectProposalsInboxApi}?limit=${limit}&page=${page}&order=-1&${searchQuery && searchQuery.length > 0 ? `&${searchQuery}` : ''}`).then(resp => {
         console.log(resp.data.message);
@@ -99,8 +96,7 @@ export const useProjectProposalsInboxList = (searchQuery: string, limit: number,
 
 
 export const useProjectProposalsReturnedList = (searchQuery: string, limit: number, page: number) => {
-  const pathName = usePathname();
-  return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.RETURNED_BACK_LIST, searchQuery, limit, page, pathName], (): Promise<any> => {
+  return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.RETURNED_BACK_LIST, searchQuery, limit, page], (): Promise<any> => {
     return new Promise((resolve, reject) => {
       axios.get(`${projectProposalsReturnedBackAPI}?limit=${limit}&page=${page}&order=-1&${searchQuery && searchQuery.length > 0 ? `&${searchQuery}` : ''}`).then(resp => {
         console.log(resp.data.message);
@@ -120,9 +116,8 @@ export const useProjectProposalsReturnedList = (searchQuery: string, limit: numb
 
 
 export const useProjectProposalsOutboxList = (searchQuery: string, limit: number, page: number) => {
-  const pathName = usePathname();
-
-  return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.OUTBOX_LIST, searchQuery, limit, page, pathName], (): Promise<any> => {
+  
+  return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.OUTBOX_LIST, searchQuery, limit, page], (): Promise<any> => {
     return new Promise((resolve, reject) => {
       axios.get(`${projectProposalsOutboxApi}?limit=${limit}&page=${page}&order=-1&${searchQuery && searchQuery.length > 0 ? `&${searchQuery}` : ''}`).then(resp => {
         console.log(resp.data.message);
@@ -139,8 +134,7 @@ export const useProjectProposalsOutboxList = (searchQuery: string, limit: number
 }
 
 export const useProjectProposalDetails = (proposalId: number) => {
-  const pathName = usePathname();
-  return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.PROPOSAL, proposalId, pathName], (): Promise<any> => {
+  return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.PROPOSAL, proposalId], (): Promise<any> => {
     return new Promise((resolve, reject) => {
       axios.get(`${projectProposalApi}/${proposalId}`).then(resp => {
         console.log(resp.data.message);
@@ -163,8 +157,7 @@ interface ItemCountAPIResponse {
 }
 
 export const useProjectProposalOutboxItemCount = () => {
-  const pathName = usePathname();
-  return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.OUTBOX_ITEM_COUNT, pathName], (): Promise<ItemCountAPIResponse> => {
+  return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.OUTBOX_ITEM_COUNT], (): Promise<ItemCountAPIResponse> => {
     return new Promise((resolve, reject) => {
       axios.get(`${projectProposalOutboxItemCountApi}`).then(resp => {
         console.log(resp.data.message);
@@ -182,8 +175,7 @@ export const useProjectProposalOutboxItemCount = () => {
 
 
 export const useProjectProposalInboxItemCount = () => {
-  const pathName = usePathname();
-  return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.INBOX_ITEM_COUNT, pathName], (): Promise<ItemCountAPIResponse> => {
+  return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.INBOX_ITEM_COUNT], (): Promise<ItemCountAPIResponse> => {
     return new Promise((resolve, reject) => {
       axios.get(`${projectProposalInboxItemCountApi}`).then(resp => {
         console.log(resp.data.message);
@@ -201,8 +193,7 @@ export const useProjectProposalInboxItemCount = () => {
 
 
 export const useProjectProposalReturnedBackItemCount = () => {
-  const pathName = usePathname();
-  return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.RETURNED_BACK_ITEM_COUNT, pathName], (): Promise<ItemCountAPIResponse> => {
+  return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.RETURNED_BACK_ITEM_COUNT], (): Promise<ItemCountAPIResponse> => {
     return new Promise((resolve, reject) => {
       axios.get(`${projectProposalsReturnedBackItemCountAPI}`).then(resp => {
         console.log(resp.data.message);
