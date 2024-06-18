@@ -9,7 +9,7 @@ import Button from "@/components/global/atoms/buttons/Button";
 
 type ImageUploadUiPropType = {
   handleUpload: (file: any) => void;
-  handleDeleteFile: (file_id: number) => void;
+  handleDeleteFile: (file: any) => void;
   files: any;
   readonly: boolean;
 };
@@ -157,10 +157,12 @@ const ImageUploadUi: React.FC<ImageUploadUiPropType> = (props) => {
           files?.map((file: any, index: number) => (
             <div
               key={index}
-              onClick={() => handleShowFileInFullScreen(file.path)}
               className="bg-gray-100 px-4 py-1 flex items-center justify-between rounded-lg"
             >
-              <div className="flex items-center">
+              <div
+                onClick={() => handleShowFileInFullScreen(file.path)}
+                className="flex items-center cursor-pointer"
+              >
                 <Image
                   src={CoverIcon}
                   height={30}
@@ -181,7 +183,7 @@ const ImageUploadUi: React.FC<ImageUploadUiPropType> = (props) => {
               {!readonly && (
                 <ImBin
                   className="cursor-pointer"
-                  onClick={() => handleDeleteFile(file?.file_id)}
+                  onClick={() => handleDeleteFile(file)}
                 />
               )}
             </div>

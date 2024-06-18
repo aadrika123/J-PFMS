@@ -5,23 +5,26 @@ import Button from "@/components/global/atoms/buttons/Button";
 import { PFMS_URL } from "@/utils/api/urls";
 import axios from "@/lib/axiosConfig";
 import { useQuery } from "react-query";
-import ConfirmationPopup from "@/components/global/molecules/ConfirmationPopup";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 import { useRouter } from "next/navigation";
 import { getLocalTime } from "@/utils/helper";
 import toast, { Toaster } from "react-hot-toast";
 import { tenderDatasheetSchema } from "pfmslib";
 import { useReactToPrint } from "react-to-print";
+import { useUser } from "@/components/global/molecules/general/useUser";
+import Input from "@/components/global/atoms/Input";
+import ConfirmationPopupWithInput from "../molecules/ConfirmationPopupWithInputField";
 
 type ViewTenderFormDetailsProps = {
   handleTabChange: (type: string) => void;
   tenderFormId: number;
-  componentRef?: any;
+  componentRef: any;
 };
 
 const ViewTenderFormDetails: React.FC<ViewTenderFormDetailsProps> = (props) => {
   const { handleTabChange, tenderFormId, componentRef } = props;
   const router = useRouter();
+  const user = useUser();
   // const componentRef = useRef<any>();
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
     useWorkingAnimation();
@@ -31,6 +34,7 @@ const ViewTenderFormDetails: React.FC<ViewTenderFormDetailsProps> = (props) => {
     showPopup: false,
     docData: null,
     showConfirmation: false,
+    comment: "",
   });
 
   const { showPopup, docData, showConfirmation } = state;
@@ -82,11 +86,14 @@ const ViewTenderFormDetails: React.FC<ViewTenderFormDetailsProps> = (props) => {
       const res = await axios({
         url: `${PFMS_URL.TENDER_FORM.submit}/${tenderFormId}`,
         method: "POST",
+        data: {
+          data: { comment: state.comment },
+        },
       });
 
       if (!res.data.status) throw "Something Went Wrong!!!";
 
-      router.push("/tender-datasheet");
+      router.push("/tender-datasheet/outbox");
     } catch (error: any) {
       toast.error(error.message, {
         duration: 6000,
@@ -98,16 +105,20 @@ const ViewTenderFormDetails: React.FC<ViewTenderFormDetailsProps> = (props) => {
 
   ////////////// handle cancle /////////////
   const handleCancel = () => {
-    setState({ ...state, showConfirmation: false });
+    state.comment !== "" && setState({ ...state, showConfirmation: false });
   };
 
   ////////////// handle cancle /////////////
   const handleContinue = () => {
-    handleSubmit();
+    if (state.comment === "") {
+      toast.error("Kindly enter some comments");
+    } else {
+      handleSubmit();
+    }
   };
 
   const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
+    content: () => componentRef?.current,
   });
 
   return (
@@ -117,8 +128,18 @@ const ViewTenderFormDetails: React.FC<ViewTenderFormDetailsProps> = (props) => {
         <>
           <Toaster />
           {showConfirmation && (
-            <ConfirmationPopup
-              message="Are you sure? want to submit?"
+            <ConfirmationPopupWithInput
+              inputComment={
+                <Input
+                  type="text"
+                  placeholder="Enter Comment"
+                  name="comment"
+                  onChange={(e) =>
+                    setState({ ...state, comment: e.target.value })
+                  }
+                />
+              }
+              message="Are you sure? want to forward?"
               cancel={handleCancel}
               continue={handleContinue}
             />
@@ -605,12 +626,13 @@ const ViewTenderFormDetails: React.FC<ViewTenderFormDetailsProps> = (props) => {
             <Button variant="cancel" onClick={() => handleTabChange("prev")}>
               Back
             </Button>
-            {data?.status !== "submitted" ? (
+            {(data?.status === "draft" || data?.status === "rejected") &&
+            user?.isJuniorEngineer() ? (
               <Button
                 onClick={() => setState({ ...state, showConfirmation: true })}
                 variant="primary"
               >
-                Submit
+                Forward To EE
               </Button>
             ) : (
               <Button onClick={handlePrint} variant="primary">

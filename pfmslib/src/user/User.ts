@@ -39,15 +39,15 @@ class User {
     return this.user?.role?.includes(ROLES.EXECUTIVE_OFFICER);
   }
 
-  // isCityManager = () => {
-  //   return this.user?.role?.includes(ROLES.CITY_MANAGER);
-  // }
+  isExecutiveEngineer = () => {
+    return this.user?.role?.includes(ROLES.EXECUTIVE_ENGINEER);
+  }
 
-  // getUserLevel = () => {
-  //   if (this.user?.role?.includes(ROLES.BACK_OFFICE)) return 1;
-  //   if (this.user?.role?.includes(ROLES.EXE_OFFICER)) return 2;
-  //   if (this.user?.role?.includes(ROLES.CITY_MANAGER)) return 3;
-  // };
+  getUserLevelForTenderApproval = () => {
+    if (this.user?.role?.includes(ROLES.JUNIOR_ENGINEER)) return 1;
+    if (this.user?.role?.includes(ROLES.EXECUTIVE_ENGINEER)) return 2;
+    if (this.user?.role?.includes(ROLES.EXECUTIVE_OFFICER)) return 3;
+  };
 
   getUserId = () => {
     return this.user.id;

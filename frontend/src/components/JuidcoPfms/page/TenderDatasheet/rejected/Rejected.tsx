@@ -2,10 +2,10 @@
 
 import React from "react";
 import HeroTenderDatasheet from "../Index";
-import { useProjectProposalList11 } from "@/hooks/data/ProjectProposalsHooks";
+import { useProjectProposalTenderRejectedList } from "@/hooks/data/tenderDatasheetHooks";
 
 const Rejected = () => {
-  return <HeroTenderDatasheet useProjectProposalList={useProjectProposalList11} />;
+  return <HeroTenderDatasheet useProjectProposalList={useProjectProposalTenderRejectedList} />;
 };
 
 export default Rejected;

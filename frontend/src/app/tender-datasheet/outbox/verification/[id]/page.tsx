@@ -11,9 +11,9 @@ const page = ({ params }: { params: { id: number } }) => {
   return (
     <PageLayout>
       <ViewTenderFormDetails
-        componentRef={componentRef}
         handleTabChange={goBack}
         tenderFormId={id}
+        componentRef={componentRef}
       />
     </PageLayout>
   );

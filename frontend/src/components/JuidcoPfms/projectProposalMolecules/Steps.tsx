@@ -1,3 +1,4 @@
+// import { useUser } from "@/components/global/molecules/general/useUser";
 // import { usePathname } from "next/navigation";
 import React from "react";
 
@@ -5,11 +6,13 @@ type StepPorps = {
   className?: string;
   activeStep: number;
   handleClick: (step: number) => void;
+  level?: number;
 };
 
 const Steps: React.FC<StepPorps> = (props) => {
   // const pathname = usePathname();
-  const { className, activeStep, handleClick } = props;
+  // const user = useUser()
+  const { className, activeStep, handleClick, level } = props;
   const items = [
     {
       info: "VIEW DETAILS",
@@ -19,14 +22,10 @@ const Steps: React.FC<StepPorps> = (props) => {
       info: "VIEW DOCUMENTS",
       isVisible: true,
     },
-    // {
-    //   info: "VERIFY DOCUMENTS",
-    //   isVisible: !pathname.includes('outbox'),
-    // },
-    // {
-    //   info: "ACTION",
-    //   isVisible: !pathname.includes('outbox'),
-    // },
+    {
+      info: "ACTION",
+      isVisible: level && level >= 0 ? true : false,
+    },
   ];
 
   return (

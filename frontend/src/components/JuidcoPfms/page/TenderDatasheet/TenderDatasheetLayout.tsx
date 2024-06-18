@@ -3,6 +3,7 @@
 import { Icons } from "@/assets/svg/icons";
 import Button from "@/components/global/atoms/buttons/Button";
 import { LinkWithLoader } from "@/components/global/atoms/LinkWithLoader";
+import { useUser } from "@/components/global/molecules/general/useUser";
 import goBack from "@/utils/helper";
 import { usePathname } from "next/navigation";
 import React, { ReactNode } from "react";
@@ -15,6 +16,7 @@ export const TenderDatasheetLayout = ({
   children,
 }: TenderDatasheetLayoutProps) => {
   const pathName = usePathname();
+  const user = useUser();
   //   const { data: outboxItemCount } = useProjectProposalOutboxItemCount();
   //   const { data: inboxItemCount } = useProjectProposalInboxItemCount();
 
@@ -52,22 +54,25 @@ export const TenderDatasheetLayout = ({
             className={`${!pathName.includes("outbox") && "bg-gray-200 text-gray-500"}`}
           >
             {Icons.outbox}
-            Outbox
+            {user && user?.getUserLevelForTenderApproval() < 3 ? "Outbox" : "Sent For Tendering"}
             <div className="badge badge-secondary">
               {/* ({outboxItemCount?.count}) */}
             </div>
           </Button>
         </LinkWithLoader>
 
-        <LinkWithLoader href={"/tender-datasheet/rejected"}>
+        {user && user?.getUserLevelForTenderApproval() < 3 && <LinkWithLoader href={"/tender-datasheet/rejected"}>
           <Button
             variant="primary"
             className={`${!pathName.includes("rejected") && "bg-gray-200 text-gray-500"}`}
           >
             {Icons.outbox}
             Rejected
+            <div className="badge badge-secondary">
+              {/* ({outboxItemCount?.count}) */}
+            </div>
           </Button>
-        </LinkWithLoader>
+        </LinkWithLoader>}
       </div>
 
       <div className="w-full mt-4 flex gap-2 ">{children}</div>

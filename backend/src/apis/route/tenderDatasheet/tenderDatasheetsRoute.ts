@@ -21,15 +21,14 @@ class TenderDatasheetsRoute extends APIv1{
     this.addPostRoute('create', this.controller.create);
     this.addGetRoute(`get-by-id/:id`, this.controller.getById);
     this.addGetRoute(`get/:id`, this.controller.get);
+    this.addGetRoute(`project-proposal/get/:id`, this.controller.getProjectProposalById);
     this.addPostRoute(`update/:id`, this.controller.update);
-    
-    // this.addFormDataPostRoute('create', this.controller.create, [
-    //   { name: 'perposals_for_document_backoffice', maxCount: 1 },
-    // ]);
-    // this.addFormDataPostRoute('update/:id', this.controller.update, [
-    //   { name: 'perposals_for_document_backoffice', maxCount: 1 },
-    // ]);
-    // this.addGetRoute('get/:id', this.controller.getById);
+    this.addGetRoute(`inbox`, this.controller.getAllForInbox);
+    this.addGetRoute(`outbox`, this.controller.getAllForOutbox);
+    this.addGetRoute(`rejected`, this.controller.getAllForReject);
+    this.addGetRoute(`comments/:id`, this.controller.getComments);
+    this.addPostRoute(`forward/:id`, this.controller.forwarding);
+    this.addPostRoute(`send-back/:id`, this.controller.sendBack);
   }
 }
 

@@ -15,16 +15,6 @@ class TenderBidOpenersDao {
   /* Create ro Update Tender Bid Openers */
   async create(data: tenderBidOpenersType) {
     const res = await prisma.$transaction(async (tx) => {
-      /* Changing tender datasheet status */
-      // await tx.tender_datasheets.update({
-      //   where: {
-      //     id: data.tender_datasheet_id,
-      //   },
-      //   data: {
-      //     status: "draft",
-      //   },
-      // });
-
       /* Deleting tender openers */
       await tx.tender_bid_openers.deleteMany({
         where: {
@@ -106,7 +96,7 @@ class TenderBidOpenersDao {
       /* Getting conver documents */
       const docs: any = await tx.tender_documents.findMany({
         where: {
-          reference_id: res.id,
+          reference_id: id,
           reference_type: "tender_bid_opener",
         },
         select: {

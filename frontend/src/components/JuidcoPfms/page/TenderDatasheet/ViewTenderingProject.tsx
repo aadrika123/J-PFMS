@@ -27,6 +27,7 @@ import { useWorkingAnimation } from "@/components/global/molecules/general/useWo
 import ProjectProposalApprovalStepper from "../../projectProposalMolecules/ProjectProposalApprovalStepper";
 import admi from "@/assets/svg/admi.svg";
 import { useUser } from "@/components/global/molecules/general/useUser";
+import Action from "../../projectProposalMolecules/Action";
 
 const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
   const router = useRouter();
@@ -47,7 +48,7 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
   ///////// Fetching Data
   const fetch = async () => {
     const res = await axios({
-      url: `${PFMS_URL.PROJ_RPOPOSAL_URL.getById}/${ProProposalId}`,
+      url: `${PFMS_URL.TENDER_FORM.getProjectProposalById}/${ProProposalId}`,
       method: "GET",
     });
 
@@ -87,7 +88,7 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
   ////////////// handleOpenTenderInputForm //////////
   const handleOpenTenderInputForm = () => {
     activateWorkingAnimation();
-    if (user?.isJuniorEngineer()) {
+    if (user?.isJuniorEngineer() && !pathName.includes("outbox")) {
       router.push(
         `${pathName.split("/view")[0]}/add/${data.tender_datasheet_id}?pageNo=1`
       );
@@ -119,7 +120,7 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
 
       if (!res.data.status) throw "Someting Went Wrong!!";
 
-      queryClient.invalidateQueries(["project-proposals-11"]),
+      queryClient.invalidateQueries(["project-proposals-tender"]),
         router.push(
           `${pathName.split("/view")[0]}/add/${res.data.data.id}?pageNo=1`
         );
@@ -164,6 +165,11 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
       info: "EXECUTIVE OFFICER",
       img: admi,
       level: 2,
+    },
+    {
+      info: "SENT FOR TENDERING",
+      img: admi,
+      level: 3,
     },
   ];
   return (
@@ -221,19 +227,36 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
               )}
             </div>
             <div className="shadow-lg bg-white p-4 border">
-              <ProjectProposalApprovalStepper level={1} items={items} />
+              {data.assigned_level - 1 >= 0 && (
+                <ProjectProposalApprovalStepper
+                  level={data.assigned_level - 1}
+                  items={items}
+                />
+              )}
               <BoxContainer projectDetails={data} />
               <Steps
                 handleClick={handleStepClick}
                 activeStep={activeStep}
                 className="mt-4"
+                level={data.assigned_level - 1}
               />
               {activeStep === 0 ? (
                 <ViewDetails projectDetails={data} />
+              ) : activeStep === 1 ? (
+                <div className="mt-4">
+                  <Table columns={columns} data={data?.files} center />
+                </div>
               ) : (
-                activeStep === 1 && (
+                activeStep === 2 && (
                   <div className="mt-4">
-                    <Table columns={columns} data={data?.files} center />
+                    <Action
+                      tenderDatasheetId={Number(data.tender_datasheet_id)}
+                      readOnly={
+                        pathName.includes("outbox") ||
+                        pathName.includes("rejected") ||
+                        user?.isJuniorEngineer()
+                      }
+                    />
                   </div>
                 )
               )}

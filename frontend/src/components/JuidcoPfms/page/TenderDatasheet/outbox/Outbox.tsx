@@ -2,11 +2,11 @@
 
 import React from "react";
 import HeroTenderDatasheet from "../Index";
-import { useProjectProposalList11 } from "@/hooks/data/ProjectProposalsHooks";
+import { useProjectProposalTenderOutboxList } from "@/hooks/data/tenderDatasheetHooks";
 
 const Outbox = () => {
   return (
-    <HeroTenderDatasheet useProjectProposalList={useProjectProposalList11} />
+    <HeroTenderDatasheet useProjectProposalList={useProjectProposalTenderOutboxList} />
   );
 };
 

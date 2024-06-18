@@ -6,7 +6,7 @@
  * | Status- open
  */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import TenderBasicDetailsForm from "./TenderInputForms/TenderBasicDetailsForm";
 import Image from "next/image";
 import TenderIcon from "@/assets/svg/tender_form.svg";
@@ -24,6 +24,7 @@ import goBack from "@/utils/helper";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 import Button from "@/components/global/atoms/buttons/Button";
 import { useReactToPrint } from "react-to-print";
+import { useQuery } from "react-query";
 
 const TenderInputForm = ({ tenderFormId }: { tenderFormId: number }) => {
   const searchParams = useSearchParams();
@@ -34,31 +35,39 @@ const TenderInputForm = ({ tenderFormId }: { tenderFormId: number }) => {
     useWorkingAnimation();
 
   const pageNo: number = Number(searchParams.get("pageNo"));
-  const [state, setState] = useState({
-    readonly: false,
-    project_proposal: {
-      title: "",
-      description: ""
-    }
-  });
-  const {readonly, project_proposal} = state;
 
-  ////// Checking TenderFormId is valid or not ////
-  useEffect(() => {
-    (async function () {
-      activateWorkingAnimation();
-      const res = await axios({
-        url: `${PFMS_URL.TENDER_FORM.getById}/${tenderFormId}`,
-        method: "GET",
-      });
+  ///////// Fetching Data
+  const fetch = async () => {
+    activateWorkingAnimation();
+    const res = await axios({
+      url: `${PFMS_URL.TENDER_FORM.getById}/${tenderFormId}`,
+      method: "GET",
+    });
 
-      if (!res.data.data) goBack();
+    if (!res.data.status) throw "Someting Went Wrong!!";
 
-      const data = res.data.data;
-      setState({...state, readonly: data.status === "submitted", project_proposal: data.project_proposal});
-      hideWorkingAnimation();
-    })();
-  }, [tenderFormId]);
+    hideWorkingAnimation();
+    return res.data.data;
+  };
+
+  const { data: data }: any = useQuery(["tender-form", tenderFormId], fetch);
+
+  // ////// Checking TenderFormId is valid or not ////
+  // useEffect(() => {
+  //   (async function () {
+  //     activateWorkingAnimation();
+  //     const res = await axios({
+  //       url: `${PFMS_URL.TENDER_FORM.getById}/${tenderFormId}`,
+  //       method: "GET",
+  //     });
+
+  //     if (!res.data.data) goBack();
+
+  //     const data = res.data.data;
+  //     setState({...state, readonly: data.status === "submitted", project_proposal: data.project_proposal});
+  //     hideWorkingAnimation();
+  //   })();
+  // }, [tenderFormId]);
 
   //////////// Handle Tab Jump //////////
   const handleTabJump = (tabNo: number) => {
@@ -82,97 +91,113 @@ const TenderInputForm = ({ tenderFormId }: { tenderFormId: number }) => {
 
   return (
     <>
-      {workingAnimation}
-      {/* Header */}
-      <div className="bg-white shadow-lg p-4 flex justify-between items-center rounded mb-6">
-        <div className="flex items-center">
-          <Image src={TenderIcon} height={30} width={30} alt="tender-icon" />
-          <header className="font-bold ml-2">{`Tender Input Form ${pageNo === 7 ? " - Preview Details" : ""}`}</header>
-        </div>
-        {pageNo === 7 ? (
-          <Button onClick={handlePrint} variant="primary">
-            Print
-          </Button>
-        ) : (
-          <div className="flex items-center w-1/4">
-            <progress
-              className="progress progress-primary primary  w-56"
-              value={pageNo * (100 / 6)}
-              max="100"
-            ></progress>
-            <span className="text-xs text-nowrap ml-2">Steps-{pageNo}/6</span>
-          </div>
-        )}
-      </div>
-
-      {/* {!showPreview ? ( */}
-      <>
-        {/* Header Tabs */}
-        <div className="flex items-center gap-4 mb-4">
-          {tabList.map((tab, index) => (
-            <div
-              key={index}
-              className={`px-3 py-2 rounded shadow-lg flex items-center cursor-pointer border ${pageNo === tab.id && "bg-primary_bg_indigo"}`}
-              onClick={() => handleTabJump(tab.id)}
-            >
-              <Image src={tab?.icon} height={30} width={30} alt="tender-icon" />
-              <span
-                className={`text-xs font-medium text-secondary ml-2 text-nowrap ${pageNo === tab.id && "text-white"}`}
-              >
-                {tab?.title}
-              </span>
+      {data && (
+        <>
+          {workingAnimation}
+          {/* Header */}
+          <div className="bg-white shadow-lg p-4 flex justify-between items-center rounded mb-6">
+            <div className="flex items-center">
+              <Image
+                src={TenderIcon}
+                height={30}
+                width={30}
+                alt="tender-icon"
+              />
+              <header className="font-bold ml-2">{`Tender Input Form ${pageNo === 7 ? " - Preview Details" : ""}`}</header>
             </div>
-          ))}
-        </div>
+            {pageNo === 7 ? (
+              <Button onClick={handlePrint} variant="primary">
+                Print
+              </Button>
+            ) : (
+              <div className="flex items-center w-1/4">
+                <progress
+                  className="progress progress-primary primary  w-56"
+                  value={pageNo * (100 / 6)}
+                  max="100"
+                ></progress>
+                <span className="text-xs text-nowrap ml-2">
+                  Steps-{pageNo}/6
+                </span>
+              </div>
+            )}
+          </div>
 
-        {/* Tender Forms */}
-        {pageNo === 1 ? (
-          <TenderBasicDetailsForm
-            handleTabChange={handleTabChange}
-            tenderFormId={tenderFormId}
-            readonly={readonly}
-          />
-        ) : pageNo === 2 ? (
-          <TenderCoverDetailsForm
-            handleTabChange={handleTabChange}
-            tenderFormId={tenderFormId}
-            readonly={readonly}
-          />
-        ) : pageNo === 3 ? (
-          <TenderWorkDetailsForm
-            handleTabChange={handleTabChange}
-            tenderFormId={tenderFormId}
-            readonly={readonly}
-            project_proposal={project_proposal}
-          />
-        ) : pageNo === 4 ? (
-          <TenderFeeDetailsForm
-            handleTabChange={handleTabChange}
-            tenderFormId={tenderFormId}
-            readonly={readonly}
-          />
-        ) : pageNo === 5 ? (
-          <TenderCriticalDatesForm
-            handleTabChange={handleTabChange}
-            tenderFormId={tenderFormId}
-            readonly={readonly}
-          />
-        ) : pageNo === 6 ? (
-          <TenderBidOpenerForm
-            handleTabChange={handleTabChange}
-            tenderFormId={tenderFormId}
-            readonly={readonly}
-          />
-        ) : (
-          pageNo === 7 && (
-            <ViewTenderFormDetails
-              componentRef={componentRef}
-              handleTabChange={handleTabChange}
-              tenderFormId={tenderFormId}
-            />
-          )
-        )}
-      </>
+          {/* {!showPreview ? ( */}
+          <>
+            {/* Header Tabs */}
+            <div className="flex items-center gap-4 mb-4">
+              {tabList.map((tab, index) => (
+                <div
+                  key={index}
+                  className={`px-3 py-2 rounded shadow-lg flex items-center cursor-pointer border ${pageNo === tab.id && "bg-primary_bg_indigo"}`}
+                  onClick={() => handleTabJump(tab.id)}
+                >
+                  <Image
+                    src={tab?.icon}
+                    height={30}
+                    width={30}
+                    alt="tender-icon"
+                  />
+                  <span
+                    className={`text-xs font-medium text-secondary ml-2 text-nowrap ${pageNo === tab.id && "text-white"}`}
+                  >
+                    {tab?.title}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Tender Forms */}
+            {pageNo === 1 ? (
+              <TenderBasicDetailsForm
+                handleTabChange={handleTabChange}
+                tenderFormId={tenderFormId}
+                readonly={data.status === "submitted"}
+              />
+            ) : pageNo === 2 ? (
+              <TenderCoverDetailsForm
+                handleTabChange={handleTabChange}
+                tenderFormId={tenderFormId}
+                readonly={data.status === "submitted"}
+              />
+            ) : pageNo === 3 ? (
+              <TenderWorkDetailsForm
+                handleTabChange={handleTabChange}
+                tenderFormId={tenderFormId}
+                readonly={data.status === "submitted"}
+                project_proposal={data.project_proposal}
+              />
+            ) : pageNo === 4 ? (
+              <TenderFeeDetailsForm
+                handleTabChange={handleTabChange}
+                tenderFormId={tenderFormId}
+                readonly={data.status === "submitted"}
+              />
+            ) : pageNo === 5 ? (
+              <TenderCriticalDatesForm
+                handleTabChange={handleTabChange}
+                tenderFormId={tenderFormId}
+                readonly={data.status === "submitted"}
+              />
+            ) : pageNo === 6 ? (
+              <TenderBidOpenerForm
+                handleTabChange={handleTabChange}
+                tenderFormId={tenderFormId}
+                readonly={data.status === "submitted"}
+              />
+            ) : (
+              pageNo === 7 && (
+                <ViewTenderFormDetails
+                  componentRef={componentRef}
+                  handleTabChange={handleTabChange}
+                  tenderFormId={tenderFormId}
+                />
+              )
+            )}
+          </>
+        </>
+      )}
     </>
   );
 };

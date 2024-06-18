@@ -10,6 +10,23 @@ import { generateRes } from "../../../util/generateRes";
 
 const prisma = new PrismaClient();
 
+type approvalDataType = {
+  user_id: number;
+  checker_level:number;
+  assigned_level: number;
+  comment: string;
+};
+
+interface CountQueryResult {
+  count: string;
+}
+
+const joinStringValues = (items: []) => {
+  const datesWrappedInQuotes = items.map((item) => `'${item}'`);
+  const withCommasInBetween = datesWrappedInQuotes.join(",");
+  return withCommasInBetween;
+};
+
 class TenderDatasheetsDao {
   async create(data: any) {
     const res = await prisma.tender_datasheets.create({
@@ -21,6 +38,25 @@ class TenderDatasheetsDao {
 
   ///// Get Tender Datasheet By Id ////
   async getById(id: number) {
+    // const res = await prisma.$queryRaw`
+    // select
+    // td.id,
+    // td.status,
+    // jsonb_build_object(
+    //   'id', pp.id,
+    //   'title', pp.title,
+    //   'description', pp.description
+    // )
+    // from tender_datasheets as td
+    // left join project_proposals as pp on pp.id = td.project_proposal_id
+    // left join (
+    //   select max(tfa.assigned_level), tfa.tender_datasheet_id from tender_form_approvals as tfa group by tfa.tender_datasheet_id
+    // ) as x on x.tender_datasheet_id = td.id
+    // where td.id = ${id}
+    // `
+
+    // console.log("first", res1)
+
     const res = await prisma.tender_datasheets.findFirst({
       where: {
         id,
@@ -39,6 +75,102 @@ class TenderDatasheetsDao {
 
     return generateRes(res);
   }
+
+  ////// Get Project Propsal By Id ////
+  getProjectProposalById = async (id: number): Promise<[]> => {
+    // case when x.max is null then 1 else x.max end as assigned_level,
+
+    const query = `select 
+    pp.id,
+    pp.title, 
+    pp.description, 
+    pp.address, 
+    pp.proposed_date, 
+    pp.pin_code, 
+    pp.project_proposal_no,
+    pp.proposed_by,
+    pp.type_id,
+    pp.state_id,
+    pp.ulb_id,
+    pp.ward_id,
+    pp.district_id,
+    pt.name as type,
+    ms.name as state_name,
+    tfa.assigned_level,
+    um.ulb_name,
+    uwm.ward_name,
+    dm.department_name as execution_body_name,
+    dm.id as execution_body,
+    td.id as tender_datasheet_id,
+    jsonb_agg(
+      jsonb_build_object(
+        'id', ppwms.id,
+        'ward_id', ppwms.ward_id,
+        'ward_name', ppwms.ward_name
+      )
+    ) as wards
+    from project_proposals as pp
+    left join
+    m_states as ms on ms.id = pp.state_id
+    left join
+    ulb_masters as um on um.id = pp.ulb_id
+    left join
+    ulb_ward_masters as uwm on uwm.id = pp.ward_id
+    left join
+    department_masters as dm on dm.id = pp.execution_body
+    left join
+    project_types as pt on pt.id = pp.type_id
+    left join
+    tender_datasheets as td on td.project_proposal_id = pp.id
+    left join 
+    tender_form_approvals as tfa on tfa.id in (select max(id) from tender_form_approvals where tender_datasheet_id = td.id)
+    left join 
+    (
+      select ppwm.id, ppwm.project_proposal_id, puwm.ward_name, ppwm.ward_id
+      from 
+      project_propo_ward_maps as ppwm
+      left join
+      ulb_ward_masters as puwm on puwm.id = ppwm.ward_id
+    ) as ppwms on ppwms.project_proposal_id = pp.id
+    where pp.id=${id}
+    GROUP BY
+    pp.id, 
+    pp.title, 
+    pp.description, 
+    pp.address, 
+    pp.proposed_date, 
+    pp.pin_code, 
+    pp.project_proposal_no,
+    pp.proposed_by,
+    pp.type_id,
+    pp.state_id,
+    pp.ulb_id,
+    pp.ward_id,
+    pp.district_id,
+    pt.name,
+    ms.name,
+    um.ulb_name,
+    uwm.ward_name,
+    dm.department_name,
+    td.id,
+    tfa.assigned_level,
+    dm.id`;
+    const data: any = await prisma.$queryRawUnsafe<[]>(query);
+    const doc: any = await prisma.$queryRaw`
+    select
+    path,
+    null as file_token,
+    description as file_name
+    from
+    project_proposal_documents
+    where project_proposal_id = ${data[0]?.id}
+    `;
+
+    const newData = data[0];
+    newData.file = doc[0];
+
+    return newData;
+  };
 
   ///// Getting all tender form details by Id
   async get(id: number) {
@@ -238,18 +370,380 @@ class TenderDatasheetsDao {
   }
 
   /////// Updating the status draft to published
-  async update(id: number) {
-    const res = await prisma.tender_datasheets.update({
-      where: {
-        id,
-      },
-      data: {
-        status: "submitted",
-      },
+  async update(id: number, approvalData: approvalDataType) {
+    const data = {
+      tender_datasheet_id: id,
+      checker_id: approvalData.user_id,
+      checker_level: approvalData.checker_level,
+      assigned_level: approvalData.assigned_level,
+      comment: approvalData.comment,
+      status: "pending",
+    };
+    const res = await prisma.$transaction(async (tx) => {
+      await tx.tender_form_approvals.create({
+        data,
+      });
+      /* Updating status */
+      return await tx.tender_datasheets.update({
+        where: {
+          id,
+        },
+        data: {
+          status: "submitted",
+        },
+      });
     });
 
     return generateRes(res);
   }
+
+  ////// Getting Inbox Data For Level One //////////
+  getAllForFirstLevelInbox = async (
+    filters: any,
+    page: number,
+    limit: number,
+    order: number
+  ): Promise<any> => {
+    let query = `from project_proposals p 
+      left join ulb_masters um on p.ulb_id = um.id 
+      left join project_types pt on p.type_id = pt.id 
+      left join (
+        select ppwm.id, ppwm.ward_id, ppwm.project_proposal_id, ppuwm.ward_name from project_propo_ward_maps as ppwm
+        left join ulb_ward_masters as ppuwm on ppwm.ward_id = ppuwm.id
+          ) as ppwml on ppwml.project_proposal_id = p.id
+          left join tender_datasheets as td on td.project_proposal_id = p.id
+          left join tender_form_approvals as tfa on tfa.tender_datasheet_id = td.id
+          where td.status != 'submitted' and td.status != 'rejected'
+      `;
+
+    const grouping = "group by p.id, um.ulb_name, pt.name, td.status";
+
+    // add project proposal no filters to query
+    const project_proposal_no_filters = filters["project_proposal_no"];
+
+    let project_proposal_no_filters_is_string: boolean = true;
+    if (project_proposal_no_filters) {
+      if (typeof project_proposal_no_filters == "string") {
+        query += ` and project_proposal_no ilike '%${project_proposal_no_filters}%'`;
+      } else {
+        query += ` and project_proposal_no in (${joinStringValues(
+          project_proposal_no_filters
+        )})`;
+        project_proposal_no_filters_is_string = false;
+      }
+    }
+
+    const ordering = order == -1 ? "desc" : "asc";
+
+    const offset = (page - 1) * limit;
+
+    // fetch the data
+    const [records, c, project_proposal_nos] = await prisma.$transaction([
+      prisma.$queryRawUnsafe(`select p.id, p.project_proposal_no, p.proposed_date, p.title, p.ulb_id, um.ulb_name, p.type_id, case when td.status is not null then td.status else 'not-initiated' end as status, pt.name as type, ARRAY_AGG(ppwml.ward_name::text) as ward_name ${query} ${grouping} order by id ${ordering}
+        limit ${limit} offset ${offset};`),
+      prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${query}`),
+      prisma.$queryRawUnsafe<string[]>(
+        `select distinct(project_proposal_no) ${query} order by project_proposal_no asc limit 10`
+      ),
+    ]);
+
+    const result: any = {};
+    const count = Number(c[0]?.count);
+
+    result["count"] = count;
+    result["totalPage"] = Math.ceil(count / limit);
+    result["currentPage"] = page;
+    result["records"] = records;
+
+    if (project_proposal_no_filters_is_string)
+      result["project_proposal_no"] = project_proposal_nos;
+
+    return generateRes(result);
+  };
+
+  ////// Getting Inbox Data For Higher Level //////////
+  getAllForHigherLevelInbox = async (
+    filters: any,
+    page: number,
+    limit: number,
+    order: number,
+    level: number
+  ): Promise<any> => {
+    let query = `
+    from tender_form_approvals as tfa
+    left join tender_datasheets as td on td.id = tfa.tender_datasheet_id
+    left join project_proposals as pp on pp.id = td.project_proposal_id
+    left join ulb_masters um on pp.ulb_id = um.id 
+    left join project_types pt on pp.type_id = pt.id 
+    left join (
+      select ppwm.id, ppwm.ward_id, ppwm.project_proposal_id, ppuwm.ward_name from project_propo_ward_maps as ppwm
+      left join ulb_ward_masters as ppuwm on ppwm.ward_id = ppuwm.id
+    ) as ppwml on ppwml.project_proposal_id = pp.id
+    where tfa.assigned_level = ${level} and tfa.status = 'pending'
+    `;
+
+    const grouping = "group by pp.id, um.ulb_name, pt.name, tfa.status";
+
+    // add project proposal no filters to query
+    const project_proposal_no_filters = filters["project_proposal_no"];
+
+    let project_proposal_no_filters_is_string: boolean = true;
+    if (project_proposal_no_filters) {
+      if (typeof project_proposal_no_filters == "string") {
+        query += ` and project_proposal_no ilike '%${project_proposal_no_filters}%'`;
+      } else {
+        query += ` and project_proposal_no in (${joinStringValues(
+          project_proposal_no_filters
+        )})`;
+        project_proposal_no_filters_is_string = false;
+      }
+    }
+
+    const ordering = order == -1 ? "desc" : "asc";
+
+    const offset = (page - 1) * limit;
+
+    // fetch the data
+    const [records, c, project_proposal_nos] = await prisma.$transaction([
+      prisma.$queryRawUnsafe(`select pp.id, pp.project_proposal_no, pp.proposed_date, pp.title, pp.ulb_id, um.ulb_name, pp.type_id, tfa.status, pt.name as type, ARRAY_AGG(ppwml.ward_name::text) as ward_name ${query} ${grouping} order by id ${ordering}
+        limit ${limit} offset ${offset};`),
+      prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${query}`),
+      prisma.$queryRawUnsafe<string[]>(
+        `select distinct(project_proposal_no) ${query} order by project_proposal_no asc limit 10`
+      ),
+    ]);
+
+    const result: any = {};
+    const count = Number(c[0]?.count);
+
+    result["count"] = count;
+    result["totalPage"] = Math.ceil(count / limit);
+    result["currentPage"] = page;
+    result["records"] = records;
+
+    if (project_proposal_no_filters_is_string)
+      result["project_proposal_no"] = project_proposal_nos;
+
+    return generateRes(result);
+  };
+
+  ////// Getting Outbox Data For Higher Level //////////
+  getAllForAllLevelOutbox = async (
+    filters: any,
+    page: number,
+    limit: number,
+    order: number,
+    level: number
+  ): Promise<any> => {
+    let query = `
+    from tender_form_approvals as tfa
+    left join tender_datasheets as td on td.id = tfa.tender_datasheet_id
+    left join project_proposals as pp on pp.id = td.project_proposal_id
+    left join ulb_masters um on pp.ulb_id = um.id 
+    left join project_types pt on pp.type_id = pt.id 
+    left join (
+      select ppwm.id, ppwm.ward_id, ppwm.project_proposal_id, ppuwm.ward_name from project_propo_ward_maps as ppwm
+      left join ulb_ward_masters as ppuwm on ppwm.ward_id = ppuwm.id
+    ) as ppwml on ppwml.project_proposal_id = pp.id
+    where tfa.assigned_level = ${level} and tfa.status != 'rejected'
+    `;
+
+    const grouping = "group by pp.id, um.ulb_name, pt.name, tfa.status";
+
+    // add project proposal no filters to query
+    const project_proposal_no_filters = filters["project_proposal_no"];
+
+    let project_proposal_no_filters_is_string: boolean = true;
+    if (project_proposal_no_filters) {
+      if (typeof project_proposal_no_filters == "string") {
+        query += ` and project_proposal_no ilike '%${project_proposal_no_filters}%'`;
+      } else {
+        query += ` and project_proposal_no in (${joinStringValues(
+          project_proposal_no_filters
+        )})`;
+        project_proposal_no_filters_is_string = false;
+      }
+    }
+
+    const ordering = order == -1 ? "desc" : "asc";
+
+    const offset = (page - 1) * limit;
+
+    // fetch the data
+    const [records, c, project_proposal_nos] = await prisma.$transaction([
+      prisma.$queryRawUnsafe(`select pp.id, pp.project_proposal_no, pp.proposed_date, pp.title, pp.ulb_id, um.ulb_name, pp.type_id,tfa.status, pt.name as type, ARRAY_AGG(ppwml.ward_name::text) as ward_name ${query} ${grouping} order by id ${ordering}
+        limit ${limit} offset ${offset};`),
+      prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${query}`),
+      prisma.$queryRawUnsafe<string[]>(
+        `select distinct(project_proposal_no) ${query} order by project_proposal_no asc limit 10`
+      ),
+    ]);
+
+    const result: any = {};
+    const count = Number(c[0]?.count);
+
+    result["count"] = count;
+    result["totalPage"] = Math.ceil(count / limit);
+    result["currentPage"] = page;
+    result["records"] = records;
+
+    if (project_proposal_no_filters_is_string)
+      result["project_proposal_no"] = project_proposal_nos;
+
+    return generateRes(result);
+  };
+
+  ////// Getting Rejected Data For Higher Level //////////
+  getAllForAllLevelRejected = async (
+    filters: any,
+    page: number,
+    limit: number,
+    order: number,
+    level: number
+  ): Promise<any> => {
+    
+    let query = `
+    from tender_form_approvals as tfa
+    left join tender_datasheets as td on td.id = tfa.tender_datasheet_id
+    left join project_proposals as pp on pp.id = td.project_proposal_id
+    left join ulb_masters um on pp.ulb_id = um.id 
+    left join project_types pt on pp.type_id = pt.id 
+    left join (
+      select ppwm.id, ppwm.ward_id, ppwm.project_proposal_id, ppuwm.ward_name from project_propo_ward_maps as ppwm
+      left join ulb_ward_masters as ppuwm on ppwm.ward_id = ppuwm.id
+    ) as ppwml on ppwml.project_proposal_id = pp.id
+    where tfa.assigned_level = ${1} and checker_level >= ${level} and tfa.id in (select max(id) from tender_form_approvals where tender_datasheet_id = td.id) and tfa.status = 'rejected'
+    `;
+
+    const grouping = "group by pp.id, um.ulb_name, pt.name, td.status";
+
+    // add project proposal no filters to query
+    const project_proposal_no_filters = filters["project_proposal_no"];
+
+    let project_proposal_no_filters_is_string: boolean = true;
+    if (project_proposal_no_filters) {
+      if (typeof project_proposal_no_filters == "string") {
+        query += ` and project_proposal_no ilike '%${project_proposal_no_filters}%'`;
+      } else {
+        query += ` and project_proposal_no in (${joinStringValues(
+          project_proposal_no_filters
+        )})`;
+        project_proposal_no_filters_is_string = false;
+      }
+    }
+
+    const ordering = order == -1 ? "desc" : "asc";
+
+    const offset = (page - 1) * limit;
+
+    // fetch the data
+    const [records, c, project_proposal_nos] = await prisma.$transaction([
+      prisma.$queryRawUnsafe(`select pp.id, pp.project_proposal_no, pp.proposed_date, pp.title, pp.ulb_id, um.ulb_name, pp.type_id, case when td.status is not null then td.status else 'not-initiated' end as status, pt.name as type, ARRAY_AGG(ppwml.ward_name::text) as ward_name ${query} ${grouping} order by id ${ordering}
+        limit ${limit} offset ${offset};`),
+      prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${query}`),
+      prisma.$queryRawUnsafe<string[]>(
+        `select distinct(project_proposal_no) ${query} order by project_proposal_no asc limit 10`
+      ),
+    ]);
+
+    const result: any = {};
+    const count = Number(c[0]?.count);
+
+    result["count"] = count;
+    result["totalPage"] = Math.ceil(count / limit);
+    result["currentPage"] = page;
+    result["records"] = records;
+
+    if (project_proposal_no_filters_is_string)
+      result["project_proposal_no"] = project_proposal_nos;
+
+    return generateRes(result);
+  };
+
+  getComments = async (tenderDatasheetId: number) => {
+    const res = await prisma.$queryRaw`
+      select 
+      tfa.checker_id, 
+      tfa.comment, 
+      tfa.created_at, 
+      u.user_name, 
+      STRING_AGG(wr.role_name, ', ') as roles
+      from tender_form_approvals as tfa
+      left join users as u on u.id = tfa.checker_id
+      left join wf_roleusermaps as wrm on wrm.user_id = tfa.checker_id
+      left join wf_roles as wr on wr.id = wrm.wf_role_id
+      where tfa.tender_datasheet_id=${tenderDatasheetId}
+      group by tfa.checker_id, tfa.comment, tfa.created_at, u.user_name
+      order by tfa.created_at desc
+      `;
+
+    return generateRes(res);
+  };
+
+  forward = async (id: number, approvalData: approvalDataType) => {
+    const data = {
+      tender_datasheet_id: id,
+      checker_id: approvalData.user_id,
+      checker_level: approvalData.checker_level,
+      assigned_level: approvalData.assigned_level,
+      comment: approvalData.comment,
+      status: "pending",
+    };
+    const res = await prisma.$transaction(async (tx) => {
+      await tx.tender_form_approvals.create({
+        data,
+      });
+      /* Updating status */
+      return await tx.tender_form_approvals.updateMany({
+        where: {
+          tender_datasheet_id: id,
+          assigned_level: approvalData.assigned_level - 1,
+          status: "pending",
+        },
+        data: {
+          status: "approved",
+        },
+      });
+    });
+
+    return generateRes(res);
+  };
+
+  sendBack = async (id: number, approvalData: approvalDataType) => {
+    const data = {
+      tender_datasheet_id: id,
+      checker_id: approvalData.user_id,
+      checker_level : approvalData.checker_level,
+      assigned_level: approvalData.assigned_level,
+      comment: approvalData.comment,
+      status: "rejected",
+    };
+    const res = await prisma.$transaction(async (tx) => {
+      await tx.tender_form_approvals.create({
+        data,
+      });
+      /* Updating status */
+       await tx.tender_form_approvals.updateMany({
+        where: {
+          tender_datasheet_id: id,
+        },
+        data: {
+          status: "rejected",
+        },
+      });
+
+      return await tx.tender_datasheets.update({
+        where: {
+          id,
+        },
+        data: {
+          status: "rejected",
+        },
+      });
+    });
+
+    return generateRes(res);
+  };
 }
 
 export default TenderDatasheetsDao;

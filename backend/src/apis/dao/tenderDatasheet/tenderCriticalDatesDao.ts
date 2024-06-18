@@ -27,24 +27,12 @@ class TenderCriticalDatesDao {
       pre_bid_meeting_date: data.pre_bid_meeting_date,
     };
 
-    const res = await prisma.$transaction(async (tx) => {
-      /* Changing tender datasheet status */
-      // await tx.tender_datasheets.update({
-      //   where: {
-      //     id: data.tender_datasheet_id,
-      //   },
-      //   data: {
-      //     status: "draft",
-      //   },
-      // });
-
-      return await tx.tender_critical_dates.upsert({
-        where: {
-          tender_datasheet_id: data.tender_datasheet_id,
-        },
-        update: dbData,
-        create: dbData,
-      });
+    const res = await prisma.tender_critical_dates.upsert({
+      where: {
+        tender_datasheet_id: data.tender_datasheet_id,
+      },
+      update: dbData,
+      create: dbData,
     });
 
     return generateRes(res);

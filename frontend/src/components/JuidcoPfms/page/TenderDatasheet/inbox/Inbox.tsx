@@ -2,11 +2,11 @@
 
 import React from 'react'
 import HeroTenderDatasheet from '../Index'
-import { useProjectProposalList11 } from '@/hooks/data/ProjectProposalsHooks'
+import { useProjectProposalTenderList } from '@/hooks/data/tenderDatasheetHooks'
 
 const Inbox = () => {
   return (
-    <HeroTenderDatasheet useProjectProposalList={useProjectProposalList11}/>
+    <HeroTenderDatasheet useProjectProposalList={useProjectProposalTenderList}/>
   )
 }
 

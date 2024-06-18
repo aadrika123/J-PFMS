@@ -22,7 +22,11 @@ import { useWorkingAnimation } from "@/components/global/molecules/general/useWo
 import SearchPanel from "@/components/global/molecules/SearchPanel";
 import { TenderDatasheetLayout } from "./TenderDatasheetLayout";
 
-const HeroTenderDatasheet = ({useProjectProposalList}: {useProjectProposalList:any}) => {
+const HeroTenderDatasheet = ({
+  useProjectProposalList,
+}: {
+  useProjectProposalList: any;
+}) => {
   const router = useRouter();
   const [, activateWorkingAnimation] = useWorkingAnimation();
 
@@ -116,18 +120,7 @@ const HeroTenderDatasheet = ({useProjectProposalList}: {useProjectProposalList:a
 
   return (
     <TenderDatasheetLayout>
-      <div
-        hidden={!isFilterPanelOpen}
-        className="w-[25%] h-[75vh] overflow-y-auto overflow-x-hidden hide-scrollbar"
-      >
-        <SearchPanel
-          onClose={toggleFilterPanel}
-          items={searchPanelItems}
-          values={searchPanelItemValues}
-          onFilterChange={onFilterChange}
-          onNoFilter={onRemoveFilter}
-        />
-      </div>
+      
       <div className={isFilterPanelOpen ? "w-[75%]" : "w-[100%]"}>
         <section className="border bg-white shadow-xl p-6">
           <div className="flex items-center mb-4 justify-between">
@@ -164,6 +157,18 @@ const HeroTenderDatasheet = ({useProjectProposalList}: {useProjectProposalList:a
           )}
           {paginator}
         </section>
+      </div>
+      <div
+        hidden={!isFilterPanelOpen}
+        className="w-[25%] h-[75vh] overflow-y-auto overflow-x-hidden hide-scrollbar"
+      >
+        <SearchPanel
+          onClose={toggleFilterPanel}
+          items={searchPanelItems}
+          values={searchPanelItemValues}
+          onFilterChange={onFilterChange}
+          onNoFilter={onRemoveFilter}
+        />
       </div>
     </TenderDatasheetLayout>
   );

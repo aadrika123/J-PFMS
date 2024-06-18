@@ -46,6 +46,8 @@ type Urls = {
     getType?: string;
     getAllDetails?: string;
     submit?: string;
+    getProjectProposalById?: string;
+    forward?: string;
   };
 };
 
@@ -98,7 +100,10 @@ export const PFMS_URL: Urls = {
     create: "tender/datasheet/create",
     getAllDetails: "tender/datasheet/get",
     submit: "tender/datasheet/update",
-    getById: "tender/datasheet/get-by-id"
+    getById: "tender/datasheet/get-by-id",
+    getProjectProposalById: "tender/datasheet/project-proposal/get",
+    forward: "tender/datasheet/forward",
+    sendBack: "tender/datasheet/send-back"
   },
   TENDER_BASIC:{
     getById: "tender/basic-details/get",

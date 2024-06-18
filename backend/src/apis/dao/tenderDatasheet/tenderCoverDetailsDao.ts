@@ -21,16 +21,6 @@ class TenderCoverDetailsDao {
     };
 
     const res = await prisma.$transaction(async (tx) => {
-       /* Changing tender datasheet status */
-      //  await tx.tender_datasheets.update({
-      //   where: {
-      //     id: data.tender_datasheet_id,
-      //   },
-      //   data: {
-      //     status: "draft",
-      //   },
-      // });
-
       const res = await tx.tender_cover_details.upsert({
         where: {
           tender_datasheet_id: data.tender_datasheet_id,
@@ -85,6 +75,7 @@ class TenderCoverDetailsDao {
           tender_datasheet_id: id,
         },
         select: {
+          id: true,
           tender_datasheet_id: true,
           cover_no: true,
           content: true,

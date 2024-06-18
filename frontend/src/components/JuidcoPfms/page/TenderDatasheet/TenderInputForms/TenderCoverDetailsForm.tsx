@@ -54,13 +54,12 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
   const [state, setState] = useState<any>({
     tabNo: 1,
     coverNo: "1",
-    files: [],
     showWarning: false,
     triggerFun: null,
     showFinalError: false,
   });
 
-  const { tabNo, coverNo, files, showWarning, triggerFun, showFinalError } =
+  const { tabNo, coverNo, showWarning, triggerFun, showFinalError } =
     state;
 
   ///////// Fetching Data
@@ -116,6 +115,7 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
 
   /////// Handle Upload
   const handleUpload = (
+    prevFile: any,
     fileData: any,
     setFieldValue: (key: string, value: any[]) => void
   ) => {
@@ -126,19 +126,15 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
     const tabName = lists[tabNo - 1]?.toLowerCase();
 
     const tabFile: any = {
-      file_id: files[files.length - 1]?.file_id + 1 || 1,
       type: tabName,
       file_name: fileData.file_name,
       path: fileData.file,
       size: fileData.size,
     };
 
-    const newArray = [...state.files, tabFile];
+    const newArray = [...prevFile, tabFile];
+ 
     setFieldValue("files", newArray);
-    setState({
-      ...state,
-      files: newArray,
-    });
   };
 
   ////// Find Current File Tab Name
@@ -151,15 +147,12 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
 
   /////////////// Handle Delete File
   const handleDeleteFile = (
-    file_id: number,
+    files: any,
+    file: any,
     setFieldValue: (key: string, value: any) => void
   ) => {
-    const newFileList = files.filter((i: any) => i.file_id !== file_id);
 
-    setState({
-      ...state,
-      files: newFileList,
-    });
+    const newFileList = files.filter((i: any) => i.type !== file.type && i.path !== file.path );
     setFieldValue("files", newFileList);
   };
 
@@ -306,12 +299,12 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
               {/* File Upload */}
               <ImageUploadUi
                 handleUpload={(fileData: any) =>
-                  handleUpload(fileData, setFieldValue)
+                  handleUpload(values.files, fileData, setFieldValue)
                 }
-                handleDeleteFile={(file_id: number) =>
-                  handleDeleteFile(file_id, setFieldValue)
+                handleDeleteFile={(file: number) =>
+                  handleDeleteFile(values.files, file, setFieldValue)
                 }
-                files={findCurrentTabFiles(files)}
+                files={findCurrentTabFiles(values.files)}
                 readonly={readonly}
               />
 

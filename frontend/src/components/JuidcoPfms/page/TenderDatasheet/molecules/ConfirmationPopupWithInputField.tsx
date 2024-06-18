@@ -1,15 +1,17 @@
+import Button from "@/components/global/atoms/buttons/Button";
+import Popup from "@/components/global/molecules/general/Popup";
 import React, { ReactNode } from "react";
-import Button from "../atoms/buttons/Button";
-import Popup from "./general/Popup";
 
-interface ConfirmationPopupProps {
+interface ConfirmationPopupWithInputProps {
   cancel: () => void;
   continue: (data?: any) => void;
   message: string;
   inputComment?: ReactNode;
 }
 
-const ConfirmationPopup: React.FC<ConfirmationPopupProps> = (props) => {
+const ConfirmationPopupWithInput: React.FC<ConfirmationPopupWithInputProps> = (
+  props
+) => {
   const handleContinueButton = (data?: any) => {
     props.continue(data);
     props.cancel();
@@ -50,8 +52,8 @@ const ConfirmationPopup: React.FC<ConfirmationPopupProps> = (props) => {
             />
           </defs>
         </svg>
-        {props.inputComment}
-        <span className="text-[20px] text-black my-8">{props.message}</span>
+        <div className="mt-2">{props.inputComment}</div>
+        <span className="text-[20px] text-black my-2">{props.message}</span>
         <div className="flex items-center">
           <Button className="mr-2" onClick={props.cancel} variant="cancel">
             Cancel
@@ -69,4 +71,4 @@ const ConfirmationPopup: React.FC<ConfirmationPopupProps> = (props) => {
   );
 };
 
-export default ConfirmationPopup;
+export default ConfirmationPopupWithInput;
