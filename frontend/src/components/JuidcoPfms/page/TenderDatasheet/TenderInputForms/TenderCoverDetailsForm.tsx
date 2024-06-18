@@ -263,7 +263,7 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
               handleSubmit(e);
             }}
             encType="multipart/form-data"
-            className="flex flex-col justify-between h-full"
+            className="flex flex-col h-full"
           >
             <div
               className={`bg-${bg_color} p-3 shadow-xl border rounded grid gap-4`}

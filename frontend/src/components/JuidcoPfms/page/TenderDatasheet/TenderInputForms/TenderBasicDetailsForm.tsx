@@ -350,7 +350,7 @@ const TenderBasicDetailsForm: React.FC<TenderBasicDetailsFormProps> = (
               handleSubmit(e);
             }}
             encType="multipart/form-data"
-            className="flex flex-col justify-between h-full"
+            className="flex flex-col h-full"
           >
             <div className="grid grid-cols-2 gap-6 max-md:grid-cols-1">
               <div

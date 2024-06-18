@@ -222,7 +222,7 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
                   className="border-none"
                   onClick={handleOpenTenderInputForm}
                 >
-                  <b>View Prepare Tender Input Form</b>
+                  <b>View Tender Input Form</b>
                 </Button>
               )}
             </div>

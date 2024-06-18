@@ -67,6 +67,18 @@ const Action: React.FC<ActionPropsType> = (props) => {
 
     toast.success("Forwarded successfully.");
 
+    queryClient.invalidateQueries([
+      "project-proposals-outbox-tender",
+    ]);
+
+    queryClient.invalidateQueries([
+      "project-proposals-rejected-tender"
+    ]);
+
+    queryClient.invalidateQueries([
+      "project-proposals-tender"
+    ]);
+
     router.push(pathName.split("/view")[0] + '/outbox');
     return res.data.data;
   };
@@ -96,12 +108,18 @@ const Action: React.FC<ActionPropsType> = (props) => {
     toast.success("Sent Back Successfully");
     router.push(pathName.split("/view")[0] + '/rejected');
 
-    // queryClient.invalidateQueries([
-    //   PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.INBOX_LIST,
-    // ]);
-    // queryClient.invalidateQueries([
-    //   PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.INBOX_ITEM_COUNT,
-    // ]);
+    queryClient.invalidateQueries([
+      "project-proposals-outbox-tender",
+    ]);
+
+    queryClient.invalidateQueries([
+      "project-proposals-rejected-tender"
+    ]);
+
+    queryClient.invalidateQueries([
+      "project-proposals-tender"
+    ]);
+
 
     return res.data.data;
   };

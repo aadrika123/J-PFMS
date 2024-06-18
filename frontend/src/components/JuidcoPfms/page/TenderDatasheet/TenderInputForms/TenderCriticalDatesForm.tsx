@@ -185,7 +185,7 @@ const TenderCriticalDatesForm: React.FC<TenderCriticalDatesFormProps> = (
               handleSubmit(e);
             }}
             encType="multipart/form-data"
-            className="flex flex-col justify-between h-full"
+            className="flex flex-col h-full"
           >
             <div className="grid grid-cols-2 gap-6">
               <div

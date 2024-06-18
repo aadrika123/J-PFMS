@@ -12,7 +12,7 @@ const prisma = new PrismaClient();
 
 type approvalDataType = {
   user_id: number;
-  checker_level:number;
+  checker_level: number;
   assigned_level: number;
   comment: string;
 };
@@ -601,7 +601,6 @@ class TenderDatasheetsDao {
     order: number,
     level: number
   ): Promise<any> => {
-    
     let query = `
     from tender_form_approvals as tfa
     left join tender_datasheets as td on td.id = tfa.tender_datasheet_id
@@ -687,7 +686,8 @@ class TenderDatasheetsDao {
       checker_level: approvalData.checker_level,
       assigned_level: approvalData.assigned_level,
       comment: approvalData.comment,
-      status: "pending",
+      status:
+        approvalData.checker_level === 3 ? "sent for tendering" : "pending",
     };
     const res = await prisma.$transaction(async (tx) => {
       await tx.tender_form_approvals.create({
@@ -697,11 +697,18 @@ class TenderDatasheetsDao {
       return await tx.tender_form_approvals.updateMany({
         where: {
           tender_datasheet_id: id,
-          assigned_level: approvalData.assigned_level - 1,
-          status: "pending",
+          assigned_level: {
+            lte: approvalData.assigned_level - 1,
+          },
+          status: {
+            in: ["pending", "approved"],
+          },
         },
         data: {
-          status: "approved",
+          status:
+            approvalData.checker_level === 3
+              ? "sent for tendering"
+              : "approved",
         },
       });
     });
@@ -713,7 +720,7 @@ class TenderDatasheetsDao {
     const data = {
       tender_datasheet_id: id,
       checker_id: approvalData.user_id,
-      checker_level : approvalData.checker_level,
+      checker_level: approvalData.checker_level,
       assigned_level: approvalData.assigned_level,
       comment: approvalData.comment,
       status: "rejected",
@@ -723,7 +730,7 @@ class TenderDatasheetsDao {
         data,
       });
       /* Updating status */
-       await tx.tender_form_approvals.updateMany({
+      await tx.tender_form_approvals.updateMany({
         where: {
           tender_datasheet_id: id,
         },
