@@ -1,14 +1,13 @@
 ///// Managed By :- Sanjiv
 model tender_form_approvals {
-  id                        Int               @id @default(autoincrement())
+   id                        Int               @id @default(autoincrement())
   tender_datasheet_id       Int 
   checker_id                Int
-  approver_level              Int
+  checker_level             Int?
+  assigned_level            Int
   comment                   String
   status                    String
 
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @default(now()) @map("updated_at")
-
-  @@unique([tender_datasheet_id, checker_id, status])
 }
