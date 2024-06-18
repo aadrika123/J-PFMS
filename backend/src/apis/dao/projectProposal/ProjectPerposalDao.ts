@@ -86,6 +86,18 @@ class project_proposalsDao {
       await tx.project_propo_ward_maps.createMany({
         data: wardData,
       });
+
+
+      await prisma.project_proposal_checkings.create({
+        data: {
+          project_proposal_id: project_proposals_record.id,
+          checker_id: project_proposals_record.user_id,
+          comment: "Proposal Submitted!",
+          at_role_id: 2,  // JUNIOR ENGINEER
+          at_role_name: "JUNIOR ENGINEER"
+        }
+      });
+
       return project_proposals_record;
     });
   };

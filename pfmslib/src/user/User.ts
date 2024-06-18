@@ -49,6 +49,11 @@ class User {
     if (this.user?.role?.includes(ROLES.EXECUTIVE_OFFICER)) return 3;
   };
 
+  getUserLevel = () => {
+    if (this.user?.role?.includes(ROLES.JUNIOR_ENGINEER)) return 1;
+    if (this.user?.role?.includes(ROLES.ASSISTANT_ENGINEER)) return 2;
+  };
+
   getUserId = () => {
     return this.user.id;
   }

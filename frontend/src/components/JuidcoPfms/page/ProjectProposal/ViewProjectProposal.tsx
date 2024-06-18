@@ -23,7 +23,7 @@ import Image from "next/image";
 import BoxContainer from "../../projectProposalMolecules/BoxContainer";
 import Steps from "../../projectProposalMolecules/Steps";
 import ViewDetails from "../../projectProposalMolecules/ViewDetails";
-import ProjectProposalApprovalStepper from "../../projectProposalMolecules/ProjectProposalApprovalStepper";
+// import ProjectProposalApprovalStepper from "../../projectProposalMolecules/ProjectProposalApprovalStepper";
 
 const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
   const user = useUser();
@@ -36,74 +36,74 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
   });
 
   const { activeStep, showPopup, docData } = state;
-  const items = [
-    {
-      info: "BACK OFFICE",
-      img: admi,
-      level: 0,
-      approvalAmount: 100,
-    },
-    {
-      info: "TECHNICAL DEPARTMENT",
-      img: admi,
-      level: 1,
-      others: [
-        {
-          info: "JUNIOR ENGINEER",
-          img: admi,
-          approvalAmount: 200,
-        },
-        {
-          info: "ASSISTANT ENGINEER",
-          img: admi,
-          approvalAmount: 300,
-        },
-        {
-          info: "EXECUTIVE ENGINEER",
-          img: admi,
-          approvalAmount: 400,
-        },
-        {
-          info: "SUPERINTENDENT ENGINEER",
-          img: admi,
-          approvalAmount: 400,
-        },
+  // const items = [
+  //   {
+  //     info: "BACK OFFICE",
+  //     img: admi,
+  //     level: 0,
+  //     approvalAmount: 100,
+  //   },
+  //   {
+  //     info: "TECHNICAL DEPARTMENT",
+  //     img: admi,
+  //     level: 1,
+  //     others: [
+  //       {
+  //         info: "JUNIOR ENGINEER",
+  //         img: admi,
+  //         approvalAmount: 200,
+  //       },
+  //       {
+  //         info: "ASSISTANT ENGINEER",
+  //         img: admi,
+  //         approvalAmount: 300,
+  //       },
+  //       {
+  //         info: "EXECUTIVE ENGINEER",
+  //         img: admi,
+  //         approvalAmount: 400,
+  //       },
+  //       {
+  //         info: "SUPERINTENDENT ENGINEER",
+  //         img: admi,
+  //         approvalAmount: 400,
+  //       },
 
-        {
-          info: "CHIEF ENGINEER",
-          img: admi,
-          approvalAmount: 400,
-        },
-      ],
-    },
-    {
-      info: "ADMINISTRATIVE DEPARTMENT",
-      img: admi,
-      level: 2,
-      others: [
-        {
-          info: "DEPARTMENTAL SECRETARY",
-          img: admi,
-          approvalAmount: 200,
-        },
-        {
-          info: "DEPARTMENTAL MINISTER",
-          img: admi,
-          approvalAmount: 300,
-        },
-        {
-          info: "YOJNA PRADHIKRIT SAMITI",
-          img: admi,
-          approvalAmount: 400,
-        },
-        {
-          info: "CABINET",
-          img: admi,
-          approvalAmount: 400,
-        },
-      ],
-    },
-  ];
+  //       {
+  //         info: "CHIEF ENGINEER",
+  //         img: admi,
+  //         approvalAmount: 400,
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     info: "ADMINISTRATIVE DEPARTMENT",
+  //     img: admi,
+  //     level: 2,
+  //     others: [
+  //       {
+  //         info: "DEPARTMENTAL SECRETARY",
+  //         img: admi,
+  //         approvalAmount: 200,
+  //       },
+  //       {
+  //         info: "DEPARTMENTAL MINISTER",
+  //         img: admi,
+  //         approvalAmount: 300,
+  //       },
+  //       {
+  //         info: "YOJNA PRADHIKRIT SAMITI",
+  //         img: admi,
+  //         approvalAmount: 400,
+  //       },
+  //       {
+  //         info: "CABINET",
+  //         img: admi,
+  //         approvalAmount: 400,
+  //       },
+  //     ],
+  //   },
+  // ];
 
   ///////// Fetching Data
   const fetch = async () => {
@@ -121,21 +121,21 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
 
   /////// View Button
   const ViewButton = (id: number | string) => {
-    const doc = data?.files.find((item: any) => item.id === id);
+    // const doc = data?.files.find((item: any) => item.id === id);
     const handleClick = () => {
       setState((prev: any) => ({
         ...prev,
         showPopup: !showPopup,
-        docData: doc,
+        docData: data.file,
       }));
     };
 
     return (
       <div onClick={handleClick}>
-        {doc?.path.split(".")[1] !== "pdf" ? (
+        {data.file?.path.split(".")[1] !== "pdf" ? (
           <img
             className="w-12 h-12"
-            src={`${process.env.img_base}${doc?.path}`}
+            src={`${data.file?.path}`}
             alt=""
           />
         ) : (
@@ -170,6 +170,7 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
       caption: "Remarks",
     },
   ];
+  
   return (
     <>
       {showPopup && (
@@ -177,7 +178,7 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
           <iframe
             width={1000}
             height={570}
-            src={`${process.env.img_base}${docData?.path}`}
+            src={`${docData?.path}`}
           ></iframe>
           <div className="flex items-center absolute bottom-3 self-center">
             <Button
@@ -202,12 +203,12 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
           <Loader />
         ) : (
           <>
-            <ProjectProposalApprovalStepper
+            {/* <ProjectProposalApprovalStepper
               level={1}
               subLevel={1}
               budget={400}
               items={items}
-            />
+            /> */}
             <BoxContainer projectDetails={data} />
             <Steps
               handleClick={handleStepClick}
@@ -219,7 +220,7 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
             ) : (
               activeStep === 1 && (
                 <div className="mt-4">
-                  <Table columns={columns} data={data?.files} center />
+                  <Table columns={columns} data={[data?.file]} center />
                 </div>
               )
             )}
