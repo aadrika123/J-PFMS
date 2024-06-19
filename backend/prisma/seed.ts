@@ -28,7 +28,7 @@ async function main() {
   // await prisma.$queryRaw`DROP TABLE wf_roleusermaps cascade`;
   await project_type_seeder();
   setTimeout(async () => {
-    await project_proposal_seeder();
+    // await project_proposal_seeder();
     await doc_type_seeder();
 
     await bank_seeder();

@@ -153,7 +153,7 @@ export const sidebarLinks: SidebarLinksProps = {
           roles: [
             ROLES.JUNIOR_ENGINEER,
             ROLES.EXECUTIVE_ENGINEER,
-            ROLES.EXECUTIVE_OFFICER,
+            ROLES.MUNICIPAL_COMMISSIONER,
           ],
           subModules: [
             {
