@@ -52,7 +52,7 @@ const Action: React.FC<ActionPropsType> = (props) => {
   const [sendBackPopupVisible, setSendBackPopupVisible] = useState<boolean>(false);
   const [sendForwardPopupVisible, setSendForwardPopupVisible] = useState<boolean>(false);
 
-  const { isLoading: isLoadingCommentList, data: commentList } = useCommentList(props.proposalId);
+  const { data: commentList } = useCommentList(props.proposalId);
 
 
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] = useWorkingAnimation();
@@ -98,7 +98,7 @@ const Action: React.FC<ActionPropsType> = (props) => {
     queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.OUTBOX_LIST]);
     queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.OUTBOX_ITEM_COUNT]);
     queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.PROPOSAL]);
-    
+
     router.push(pathName + '?section=outbox&viewMode=list');
     return res.data.data;
 
@@ -148,7 +148,7 @@ const Action: React.FC<ActionPropsType> = (props) => {
 
 
       <Toaster />
-      <div className="flex mt-4">
+      <div className="flex mt-4 justify-between">
         <div className="bg-[#f9fafc]">
           {!props.readOnly && (<div className="p-4">
             <span className="mt-4 text-secondary_black">Comments</span>
@@ -180,42 +180,47 @@ const Action: React.FC<ActionPropsType> = (props) => {
           </div>)}
 
 
-          <div>
-            Comments:
-            {commentList?.map((item: any, index: number) => {
-              return (
-                <>
-                  <hr className="mb-4" />
-
-                  <div className="bg-[#e0f2fe] p-4 mt-4 rounded-lg flex relative w-full">
-                    <div className="h-5 w-5 bg-[#3abdf3] rounded-full text-white flex items-center justify-center absolute top-0 left-0">
-                      {index + 1}
-                    </div>
-                    <div>
-                      <Image src={admi} alt="admi" />
-                    </div>
-
-                    <div>
-                      <div className="flex gap-2">
-                        <div className="whitespace-nowrap font-bold ">{item?.user_name ? item?.user_name : "No Name"}</div>
-                        <div className="whitespace-nowrap">({item?.role})</div>
-                      </div>
-                      <div>
-                        <div>{item?.comment}</div>
-                        <div>{DateFormatter(item?.created_at)}</div>
-                      </div>
-                    </div>
 
 
+
+
+
+        </div>
+
+        <div>
+          Comments:
+          {commentList?.map((item: any, index: number) => {
+            return (
+              <>
+                <hr className="mb-4" />
+
+                <div className={item?.last_action == "forwarded"?
+                "bg-green-100 p-4 mt-4 rounded-lg flex relative w-full":
+                "bg-red-100 p-4 mt-4 rounded-lg flex relative w-full"
+                  }>
+                  <div className="h-5 w-5 bg-[#3abdf3] rounded-full text-white flex items-center justify-center absolute top-0 left-0">
+                    {index + 1}
                   </div>
-                </>
-              );
-            })}
-          </div>
+                  <div>
+                    <Image src={admi} alt="admi" />
+                  </div>
+
+                  <div>
+                    <div className="flex gap-2">
+                      <div className="whitespace-nowrap font-bold ">{item?.user_name ? item?.user_name : "No Name"}</div>
+                      <div className="whitespace-nowrap">({item?.role})</div>
+                    </div>
+                    <div>
+                      <div>{item?.comment}</div>
+                      <div>{DateFormatter(item?.created_at)}</div>
+                    </div>
+                  </div>
 
 
-
-
+                </div>
+              </>
+            );
+          })}
         </div>
 
       </div>
@@ -606,7 +611,7 @@ const ProjectApprovalViewComponent = ({ ProProposalId, readOnly }: ProjectApprov
                       }} />
                     </div>
 
-                    <MeasurementReferenceDocs proposalId={projectProposalDetails.id}/>
+                    <MeasurementReferenceDocs proposalId={projectProposalDetails.id} />
 
                   </>
                 ) : (

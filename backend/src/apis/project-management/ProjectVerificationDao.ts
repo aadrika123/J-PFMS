@@ -530,18 +530,6 @@ class ProjectVerificationDao {
 
   };
 
-  // approveProposal = async (data: any) => {
-  //   return new Promise((resolve, reject) => {
-  //     prisma.project_proposal_checkings.create({
-  //       data,
-  //     }).then((result) => {
-  //       resolve(result);
-  //     }).catch((error) => {
-  //       reject(error);
-  //     });
-  //   });
-  // };
-
 
 
 
@@ -708,108 +696,6 @@ class ProjectVerificationDao {
     });
   };
 
-
-
-  // sendBackProposal = async (data: any) => {
-  //   const { project_proposal_id, approval_stage_id, comment, checker_id } = data;
-  //   // await prisma.project_proposals.update({
-  //   //   where: {
-  //   //     id: bill_id,
-  //   //   },
-  //   //   data: {
-  //   //     status: "rejected",
-  //   //   },
-  //   // });
-  //   if (approval_stage_id == 1) {
-  //     const res = await prisma.project_proposal_checkings.create({
-  //       data: {
-  //         project_proposal_id,
-  //         checker_id: checker_id,
-  //         comment,
-  //         at_role_id: 1,
-  //         at_role_name: "BACK OFFICE",
-  //       },
-  //     });
-
-  //     return generateRes(res);
-
-  //     // console.log("send back by junior engineer");
-  //     // return [];
-  //   }
-  //   else if (approval_stage_id === 2) {
-  //     const res = await prisma.project_proposal_checkings.deleteMany({
-  //       where: {
-  //         project_proposal_id,
-  //         // approval_stage_id: approval_stage_id - 1,
-  //       },
-  //     });
-
-  //     await prisma.project_proposals.update({
-  //       where: {
-  //         id: project_proposal_id,
-  //       },
-  //       data: {
-  //         remarks: comment,
-  //       },
-  //     });
-  //     return generateRes(res);
-  //   } else {
-  //     const biiCheck: any = await prisma.project_proposal_checkings.findFirst({
-  //       where: {
-  //         project_proposal_id,
-  //         // approval_stage_id: approval_stage_id - 1,
-  //       },
-  //     });
-
-  //     const res = await prisma.project_proposal_checkings.create({
-  //       data: {
-  //         project_proposal_id,
-  //         checker_id: biiCheck.checker_id,
-  //         comment,
-  //         // status: "rejected",
-  //         // approval_stage_id: approval_stage_id - 2,``
-  //         at_role_id: 1,
-  //         at_role_name: "JUNIOR ENGINEER"
-  //       },
-  //     });
-  //     return generateRes(res);
-  //   }
-  // };
-
-
-
-
-
-  getInboxItemCount = async (ulbId: number, roles: string[]) => {
-    return new Promise((resolve, reject) => {
-      this.getInbox({}, ulbId, 1, 1, -1, roles).then((data) => {
-        resolve(data.count);
-      }).catch((error) => {
-        reject(error);
-      });
-    });
-  }
-
-
-  getReturnedBackItemCount = async (ulbId: number, roles: string[]) => {
-    return new Promise((resolve, reject) => {
-      this.getReturnedProposals({}, ulbId, 1, 1, -1, roles).then((data) => {
-        resolve(data.count);
-      }).catch((error) => {
-        reject(error);
-      });
-    });
-  }
-
-  getOutboxItemCount = async (ulbId: number, roles: string[]) => {
-    return new Promise((resolve, reject) => {
-      this.getOutbox({}, ulbId, 1, 1, -1, roles).then((data) => {
-        resolve(data.count);
-      }).catch((error) => {
-        reject(error);
-      });
-    });
-  }
 
 
   recordMeasurements = async (data: measurements[], ref_doc_records: any[]) => {
@@ -995,7 +881,7 @@ class ProjectVerificationDao {
     return new Promise((resolve, reject) => {
       prisma.$queryRaw`
 
-      select c.checker_id, c.comment, c.created_at, uu.user_name, uu.roles as "role"
+      select c.checker_id, c.comment, c.last_action, c.created_at, uu.user_name, uu.roles as "role"
       from project_proposal_checkings c
       left join 
       (
@@ -1012,7 +898,7 @@ class ProjectVerificationDao {
       ) uu
       on c.checker_id = uu.id
       where c.project_proposal_id=${proposalId}
-      order by c.created_at
+      order by c.created_at desc
 
       `.then((result) => {
 
@@ -1039,7 +925,6 @@ class ProjectVerificationDao {
   ): Promise<any> => {
     return new Promise((resolve, reject) => {
       // console.log(level);
-
 
       let filterCondition = `b.ulb_id = ${ulbId}`;
 
@@ -1073,7 +958,9 @@ class ProjectVerificationDao {
       const queryWithoutFieldsAndPagination = `from project_proposal_checkings c 
       left join project_proposals b on c.project_proposal_id = b.id 
       left join ulb_masters um on b.ulb_id = um.id
-      left join project_types pt on b.type_id = pt.id left join ulb_ward_masters as uwm on uwm.id = b.ward_id
+      left join project_types pt on b.type_id = pt.id 
+      left join project_propo_ward_maps as ppwm on ppwm.project_proposal_id = b.id
+      left join ulb_ward_masters uwm on uwm.id = ppwm.ward_id
       
       
       where c.at_role_id in (
@@ -1082,18 +969,32 @@ class ProjectVerificationDao {
         select max(id) from project_proposal_checkings c2 group by c2.project_proposal_id
       ) and c.last_action='forwarded' and ${filterCondition}`;
 
+      const queryForCount = `
+      from project_proposal_checkings c
+      left join project_proposals b on c.project_proposal_id = b.id 
+      where c.at_role_id in (
+        select authority_level from roles_in_order where name in (${roles.map(function (p) { return '\'' + p + '\''; }).join(',')})
+      ) and c.id in (
+        select max(id) from project_proposal_checkings c2 group by c2.project_proposal_id
+      ) and c.last_action='forwarded' and ${filterCondition}
+      `
+
       const ordering = order == -1 ? "desc" : "asc";
 
       const offset = (page - 1) * limit;
 
-      const query = `select b.id, b.project_proposal_no, b.proposed_date, b.title, b.ulb_id, um.ulb_name, b.type_id, pt.name as type, b.ward_id, uwm.ward_name ${queryWithoutFieldsAndPagination} 
-      order by b.id ${ordering}
+      const grouping = "group by b.id, um.ulb_name, pt.name";
+
+      const query = `select b.id, b.project_proposal_no, b.proposed_date, b.title, b.ulb_id, um.ulb_name, b.type_id, pt.name as type, ARRAY_AGG(uwm.ward_name::text) as ward_name ${queryWithoutFieldsAndPagination} 
+      ${grouping} order by b.id ${ordering}
       limit ${limit} offset ${offset};`;
+
+
 
       // fetch the data
       prisma.$transaction([
         prisma.$queryRawUnsafe<[]>(query),
-        prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${queryWithoutFieldsAndPagination}`),
+        prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${queryForCount}`),
         prisma.$queryRawUnsafe<string[]>(`select distinct(project_proposal_no) ${queryWithoutFieldsAndPagination} order by project_proposal_no asc limit 10`),
         prisma.$queryRawUnsafe<string[]>(`select distinct(ulb_name) ${queryWithoutFieldsAndPagination} order by ulb_name asc limit 10`)
 

@@ -32,8 +32,8 @@ const projectProposalsReturnedBackAPI = `${baseURL}/project-verification/returne
 const projectProposalsReturnedBackItemCountAPI = `${baseURL}/project-verification/returned-back/count`;
 
 
-const projectProposalOutboxItemCountApi = `${baseURL}/project-verification/get-outbox-item-count`;
-const projectProposalInboxItemCountApi = `${baseURL}/project-verification/get-inbox-item-count`;
+// const projectProposalOutboxItemCountApi = `${baseURL}/project-verification/get-outbox-item-count`;
+// const projectProposalInboxItemCountApi = `${baseURL}/project-verification/get-inbox-item-count`;
 const measurementListAPI = `${baseURL}/project-verification/measurements/get`;
 const sorListAPI = `${baseURL}/project-verification/schedule-of-rates/get`;
 
@@ -152,62 +152,62 @@ export const useProjectProposalDetails = (proposalId: number) => {
 
 
 
-interface ItemCountAPIResponse {
-  count: number;
-}
+// interface ItemCountAPIResponse {
+//   count: number;
+// }
 
-export const useProjectProposalOutboxItemCount = () => {
-  return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.OUTBOX_ITEM_COUNT], (): Promise<ItemCountAPIResponse> => {
-    return new Promise((resolve, reject) => {
-      axios.get(`${projectProposalOutboxItemCountApi}`).then(resp => {
-        console.log(resp.data.message);
-        if (!resp.data.status) {
-          reject(resp.data.message);
-        } else {
-          resolve(resp.data.data);
-        }
-      }).catch((reason) => {
-        reject(reason);
-      });
-    });
-  });
-}
-
-
-export const useProjectProposalInboxItemCount = () => {
-  return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.INBOX_ITEM_COUNT], (): Promise<ItemCountAPIResponse> => {
-    return new Promise((resolve, reject) => {
-      axios.get(`${projectProposalInboxItemCountApi}`).then(resp => {
-        console.log(resp.data.message);
-        if (!resp.data.status) {
-          reject(resp.data.message);
-        } else {
-          resolve(resp.data.data);
-        }
-      }).catch((reason) => {
-        reject(reason);
-      });
-    });
-  });
-}
+// export const useProjectProposalOutboxItemCount = () => {
+//   return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.OUTBOX_ITEM_COUNT], (): Promise<ItemCountAPIResponse> => {
+//     return new Promise((resolve, reject) => {
+//       axios.get(`${projectProposalOutboxItemCountApi}`).then(resp => {
+//         console.log(resp.data.message);
+//         if (!resp.data.status) {
+//           reject(resp.data.message);
+//         } else {
+//           resolve(resp.data.data);
+//         }
+//       }).catch((reason) => {
+//         reject(reason);
+//       });
+//     });
+//   });
+// }
 
 
-export const useProjectProposalReturnedBackItemCount = () => {
-  return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.RETURNED_BACK_ITEM_COUNT], (): Promise<ItemCountAPIResponse> => {
-    return new Promise((resolve, reject) => {
-      axios.get(`${projectProposalsReturnedBackItemCountAPI}`).then(resp => {
-        console.log(resp.data.message);
-        if (!resp.data.status) {
-          reject(resp.data.message);
-        } else {
-          resolve(resp.data.data);
-        }
-      }).catch((reason) => {
-        reject(reason);
-      });
-    });
-  });
-}
+// export const useProjectProposalInboxItemCount = () => {
+//   return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.INBOX_ITEM_COUNT], (): Promise<ItemCountAPIResponse> => {
+//     return new Promise((resolve, reject) => {
+//       axios.get(`${projectProposalInboxItemCountApi}`).then(resp => {
+//         console.log(resp.data.message);
+//         if (!resp.data.status) {
+//           reject(resp.data.message);
+//         } else {
+//           resolve(resp.data.data);
+//         }
+//       }).catch((reason) => {
+//         reject(reason);
+//       });
+//     });
+//   });
+// }
+
+
+// export const useProjectProposalReturnedBackItemCount = () => {
+//   return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.RETURNED_BACK_ITEM_COUNT], (): Promise<ItemCountAPIResponse> => {
+//     return new Promise((resolve, reject) => {
+//       axios.get(`${projectProposalsReturnedBackItemCountAPI}`).then(resp => {
+//         console.log(resp.data.message);
+//         if (!resp.data.status) {
+//           reject(resp.data.message);
+//         } else {
+//           resolve(resp.data.data);
+//         }
+//       }).catch((reason) => {
+//         reject(reason);
+//       });
+//     });
+//   });
+// }
 
 export const useMeasurementList = (proposalId: number, searchQuery: string, limit: number, page: number) => {
   return useQuery(["measurements", proposalId, searchQuery, limit, page], (): Promise<any> => {

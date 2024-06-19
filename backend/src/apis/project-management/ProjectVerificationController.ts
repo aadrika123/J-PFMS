@@ -2,7 +2,7 @@ import { APIv1Response } from "../APIv1";
 import { Request } from "express";
 import ProjectVerificationDao from "./ProjectVerificationDao";
 import * as Yup from "yup";
-import { MeasurementRecordValidation, ProjectProposalStages, } from "pfmslib";
+import { MeasurementRecordValidation, } from "pfmslib";
 import { decryptV1, encryptV1 } from "../../util/cryptographyV1";
 
 
@@ -131,48 +131,6 @@ class ProjectVerificationController {
 
     });
   };
-
-
-  // getInbox = async (req: Request): Promise<APIv1Response> => {
-
-
-  //   console.log("Inbox");
-  //   return new Promise((resolve, reject) => {
-
-  //     const user = req.body.user;
-
-  //     if (user.isJuniorEngineer()) {
-  //       console.log(user.getRole() + " Inbox");
-
-  //       this.commonCallFunction(
-  //         req,
-  //         ProjectProposalStages.ApprovedByBackOffice,
-  //         this.dao.getLevel0JuniorEngineerInbox
-  //       ).then((data: any) => {
-  //         resolve(data);
-  //       }).catch((error) => {
-  //         reject(error);
-  //       })
-
-  //     } else if (user.isAssistantEngineer()) {
-  //       // reject("Assistant Engineer inbox Not supported Yet!");
-
-  //       this.commonCallFunction(
-  //         req,
-  //         ProjectProposalStages.ApprovedByJuniorEngineer,
-  //         this.dao.getHigherLevelInbox
-  //       ).then((data: any) => {
-  //         resolve(data);
-  //       }).catch((error) => {
-  //         reject(error);
-  //       })
-
-  //     } else {
-  //       console.log(user.getRole());
-  //       reject(`${user.getRole()} inbox is not supported yet`);
-  //     }
-  //   });
-  // }
 
 
 
@@ -304,30 +262,6 @@ class ProjectVerificationController {
 
 
 
-
-  // getOutbox = async (req: Request): Promise<APIv1Response> => {
-  //   return new Promise((resolve, reject) => {
-  //     const user = req.body.user;
-  //     if (user.isJuniorEngineer()) {
-  //       console.log("Junior Engineer Output");
-  //       this.commonCallFunction(req, ProjectProposalStages.ApprovedByJuniorEngineer, this.dao.getHigherLevelOutbox)
-  //         .then((data: any) => {
-  //           resolve(data);
-  //         }).catch((error) => {
-  //           reject(error);
-  //         })
-
-  //     } else if (user.isCityManager()) {
-  //       console.log("City Manager");
-  //       reject("City Manager Outbox Not supported Yet!");
-  //     } else {
-  //       console.log(user.getRole());
-  //       reject(`${user.getRole()} outbox is not supported yet`);
-  //     }
-  //   });
-  // }
-
-
   getArchive = async (req: Request): Promise<APIv1Response> => {
     return new Promise((resolve, reject) => {
       const user = req.body.user;
@@ -364,55 +298,6 @@ class ProjectVerificationController {
       });
     });
   }
-
-  // approveProposal = (req: Request): Promise<APIv1Response> => {
-  //   return new Promise((resolve, reject) => {
-  //     // validate
-  //     const { data, user } = req.body;
-  //     let approval_stage_id: number = ProjectProposalStages.ApprovedByJuniorEngineer;
-
-  //     Yup.object({
-  //       proposalId: Yup.number().required("proposalId is required"),
-  //     }).validate(data).then(() => {
-
-  //       this.dao.getLastProposalCheckingRecordByProposalId(
-  //         data?.proposalId
-  //       ).then((lastRecord) => {
-
-  //         if (!lastRecord && !user.isJuniorEngineer()) {
-  //           reject(new Error("You are not allowed to approve the project."));
-  //         } else {
-  //           if (user.isAssistantEngineer())
-  //             approval_stage_id = ProjectProposalStages.ApprovedByAssistantEngineer;
-
-  //           const reqData = {
-  //             project_proposal_id: data?.proposalId,
-  //             checker_id: user?.getUserId(),
-  //             comment: data?.comment,
-  //             approval_stage_id: approval_stage_id,
-  //           };
-
-  //           this.dao.approveProposal(reqData).then((result) => {
-  //             const d = { status: true, code: 200, message: "Success", data: result };
-  //             resolve(d);
-  //           }).catch((error) => {
-  //             reject(error);
-  //           });
-  //         }
-
-  //       }).catch((error) => {
-  //         reject(error);
-  //       });
-
-
-
-  //     }).catch((error) => {
-  //       reject(error);
-  //     });
-
-
-  //   });
-  // }
 
 
 
@@ -521,51 +406,6 @@ class ProjectVerificationController {
 
   //   });
   // }
-
-
-
-  getOutboxItemCount = (req: Request): Promise<APIv1Response> => {
-    return new Promise((resolve, reject) => {
-      const { user } = req.body;
-      const ulbId = user.getUlbId();
-
-      this.dao.getOutboxItemCount(ulbId, user.getRoles()).then((count: any) => {
-        const result = { status: true, code: 200, message: "Not Found", data: { count: count } };
-        resolve(result);
-      }).catch((error) => {
-        reject(error);
-      });
-    });
-  }
-
-  getInboxItemCount = (req: Request): Promise<APIv1Response> => {
-    return new Promise((resolve, reject) => {
-      const { user } = req.body;
-      const ulbId = user.getUlbId();
-
-      this.dao.getInboxItemCount(ulbId, user.getRoles()).then((count: any) => {
-        const result = { status: true, code: 200, message: "Not Found", data: { count: count } };
-        resolve(result);
-      }).catch((error) => {
-        reject(error);
-      });
-    });
-  }
-
-
-  getReturnedBackItemCount = (req: Request): Promise<APIv1Response> => {
-    return new Promise((resolve, reject) => {
-      const { user } = req.body;
-      const ulbId = user.getUlbId();
-
-      this.dao.getReturnedBackItemCount(ulbId, user.getRoles()).then((count: any) => {
-        const result = { status: true, code: 200, message: "Not Found", data: { count: count } };
-        resolve(result);
-      }).catch((error) => {
-        reject(error);
-      });
-    });
-  }
 
 
   measurementRecordingTask = async (req: Request) => {

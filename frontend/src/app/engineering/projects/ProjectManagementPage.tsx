@@ -2,7 +2,7 @@
 
 import { Icons } from "@/assets/svg/icons";
 import Button from "@/components/global/atoms/buttons/Button";
-import { useProjectProposalInboxItemCount, useProjectProposalOutboxItemCount, useProjectProposalReturnedBackItemCount, useProjectProposalsInboxList, useProjectProposalsOutboxList, useProjectProposalsReturnedList } from "@/hooks/data/ProjectProposalsHooks";
+import {useProjectProposalsInboxList, useProjectProposalsOutboxList, useProjectProposalsReturnedList } from "@/hooks/data/ProjectProposalsHooks";
 import goBack from "@/utils/helper";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -23,9 +23,11 @@ import ProjectApprovalViewComponent from "./ProjectApprovalViewComponent";
 
 
 
+interface InboxPageProps {
+  onItemCountReceived: (count: number) => void
+}
 
-
-const InboxPage = () => {
+const InboxPage = (props: InboxPageProps) => {
   const searchParams = useSearchParams();
   const pathName = usePathname();
   const router = useRouter();
@@ -63,6 +65,7 @@ const InboxPage = () => {
     console.log(projectProposalData);
 
     setTotalResults(projectProposalData?.count);
+    props.onItemCountReceived(projectProposalData?.count);
 
     //update the items for the table
     setProjectProposals(projectProposalData?.records);
@@ -214,9 +217,13 @@ const InboxPage = () => {
   );
 }
 
+interface OutboxPageProps {
+  onItemCountReceived: (count: number) => void
+}
 
 
-const OutboxPage = () => {
+
+const OutboxPage = (props: OutboxPageProps) => {
   const searchParams = useSearchParams();
   const pathName = usePathname();
   const router = useRouter();
@@ -251,6 +258,7 @@ const OutboxPage = () => {
     console.log(projectProposalData);
 
     setTotalResults(projectProposalData?.count);
+    props.onItemCountReceived(projectProposalData?.count);
 
     //update the items for the table
     setProjectProposals(projectProposalData?.records);
@@ -403,7 +411,13 @@ const OutboxPage = () => {
 }
 
 
-const ReturnedBackPage = () => {
+interface ReturnedBackPageProps {
+  onItemCountReceived: (count: number) => void
+}
+
+
+
+const ReturnedBackPage = (props: ReturnedBackPageProps) => {
   const searchParams = useSearchParams();
   const pathName = usePathname();
   const router = useRouter();
@@ -438,6 +452,8 @@ const ReturnedBackPage = () => {
     console.log(projectProposalData);
 
     setTotalResults(projectProposalData?.count);
+    props.onItemCountReceived(projectProposalData?.count);
+
 
     //update the items for the table
     setProjectProposals(projectProposalData?.records);
@@ -594,12 +610,9 @@ export const ProjectManagementPage = () => {
   const searchParams = useSearchParams();
   const pathName = usePathname();
   const [currentSection, setCurrentSection] = useState<string>("inbox");
-
-
-  const { data: outboxItemCount } = useProjectProposalOutboxItemCount();
-  const { data: inboxItemCount } = useProjectProposalInboxItemCount();
-  const { data: returnedBackItemCount} = useProjectProposalReturnedBackItemCount();
-
+  const [inboxItemCount, setInboxItemCount] = useState<number>();
+  const [outboxItemCount, setOutboxItemCount] = useState<number>();
+  const [returnedBackItemCount, setReturnedBackItemCount] = useState<number>();
 
   useEffect(() => {
     const section = searchParams.get('section');
@@ -642,7 +655,7 @@ export const ProjectManagementPage = () => {
           >
             {Icons.outbox}
             Inbox
-            <div className="badge badge-secondary">({inboxItemCount?.count})</div>
+            <div className="badge badge-secondary">({inboxItemCount})</div>
           </Button>
         </Link>
         <Link href={pathName + '?section=outbox'}>
@@ -652,7 +665,7 @@ export const ProjectManagementPage = () => {
           >
             {Icons.outbox}
             Outbox
-            <div className="badge badge-secondary">({outboxItemCount?.count})</div>
+            <div className="badge badge-secondary">({outboxItemCount})</div>
           </Button>
         </Link>
 
@@ -663,7 +676,7 @@ export const ProjectManagementPage = () => {
           >
             {Icons.outbox}
             Received Back
-            <div className="badge badge-secondary">({returnedBackItemCount?.count})</div>
+            <div className="badge badge-secondary">({returnedBackItemCount})</div>
           </Button>
         </Link>
 
@@ -671,11 +684,11 @@ export const ProjectManagementPage = () => {
 
       <div className="w-full mt-4 flex gap-2 justify-center">
 
-        {currentSection === "inbox" && <InboxPage />}
+        {currentSection === "inbox" && <InboxPage onItemCountReceived={(count) => setInboxItemCount(count)}/>}
 
-        {currentSection === "outbox" && <OutboxPage />}
+        {currentSection === "outbox" && <OutboxPage onItemCountReceived={(count) => setOutboxItemCount(count)}/>}
 
-        {currentSection === "returned" && <ReturnedBackPage />}
+        {currentSection === "returned" && <ReturnedBackPage onItemCountReceived={(count) => setReturnedBackItemCount(count)}/>}
 
 
       </div>

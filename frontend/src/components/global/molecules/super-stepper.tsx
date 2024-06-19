@@ -297,7 +297,8 @@ const SuperStepper = ({ items, activeStep }: SuperStepperProps) => {
                             return (
                                 <div key={index} className="flex justify-center items-center">
                                     <div className="flex flex-col justify-center">
-                                        <div className="text-center">{items[groupName].length==1?"":groupName}</div>
+                                        {/* <div className="text-center">{items[groupName].length==1?"":groupName}</div> */}
+                                        <div className="text-center">{groupName}</div>
                                         <div className={
                                             index <= currentStep[0] ?
                                                 "border-4  border-indigo-400 justify-center items-center p-2 rounded-lg" :
