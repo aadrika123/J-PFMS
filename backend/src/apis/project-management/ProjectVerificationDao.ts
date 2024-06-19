@@ -82,6 +82,11 @@ class ProjectVerificationDao {
           where true
       `;
 
+      const queryForCount = `
+      from project_proposals b 
+      where true
+      `
+
       const grouping = "group by b.id, um.ulb_name, pt.name";
 
       // add project proposal no filters to query
@@ -108,7 +113,7 @@ class ProjectVerificationDao {
       prisma.$transaction([
         prisma.$queryRawUnsafe(`select b.id, b.project_proposal_no, b.proposed_date, b.title, b.ulb_id, um.ulb_name, b.type_id, pt.name as type, ARRAY_AGG(ppwml.ward_name::text) as ward_name ${query} ${grouping} order by id ${ordering}
         limit ${limit} offset ${offset};`),
-        prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${query}`),
+        prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${queryForCount}`),
         prisma.$queryRawUnsafe<string[]>(`select distinct(project_proposal_no) ${query} order by project_proposal_no asc limit 10`)
       ]).then(([records, c, project_proposal_nos]) => {
 
@@ -144,6 +149,11 @@ class ProjectVerificationDao {
           where true
       `;
 
+      const queryForCount = `
+      from project_proposals b 
+      where true
+      `
+
       const grouping = "group by b.id, um.ulb_name, pt.name, td.status";
 
       // add project proposal no filters to query
@@ -170,7 +180,7 @@ class ProjectVerificationDao {
       prisma.$transaction([
         prisma.$queryRawUnsafe(`select b.id, b.project_proposal_no, b.proposed_date, b.title, b.ulb_id, um.ulb_name, b.type_id, case when td.status is not null then td.status else 'not-initiated' end as status, pt.name as type, ARRAY_AGG(ppwml.ward_name::text) as ward_name ${query} ${grouping} order by id ${ordering}
         limit ${limit} offset ${offset};`),
-        prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${query}`),
+        prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${queryForCount}`),
         prisma.$queryRawUnsafe<string[]>(`select distinct(project_proposal_no) ${query} order by project_proposal_no asc limit 10`)
       ]).then(([records, c, project_proposal_nos]) => {
 

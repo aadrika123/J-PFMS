@@ -9,7 +9,6 @@ export const ROLES = Object.freeze({
     JUNIOR_ENGINEER: "JUNIOR ENGINEER",
     ASSISTANT_ENGINEER: "ASSISTANT ENGINEER",
     EXECUTIVE_ENGINEER: "EXECUTIVE ENGINEER",
-    EXECUTIVE_OFFICER: "EXECUTIVE OFFICER",
     SUPERINTENDENT_ENGINEER: "SUPERINTENDENT ENGINEER",
     CHIEF_ENGINEER: "CHIEF ENGINEER",
     DEPUTY_MUNICIPAL_COMMISSIONER: "DEPUTY MUNICIPAL COMMISSIONER",
@@ -35,18 +34,18 @@ class User {
     return this.user?.role?.includes(ROLES.ASSISTANT_ENGINEER);
   }
 
-  isExecutiveOfficer = () => {
-    return this.user?.role?.includes(ROLES.EXECUTIVE_OFFICER);
-  }
-
   isExecutiveEngineer = () => {
     return this.user?.role?.includes(ROLES.EXECUTIVE_ENGINEER);
+  }
+
+  isMuncipalComissioner = () => {
+    return this.user?.role?.includes(ROLES.MUNICIPAL_COMMISSIONER);
   }
 
   getUserLevelForTenderApproval = () => {
     if (this.user?.role?.includes(ROLES.JUNIOR_ENGINEER)) return 1;
     if (this.user?.role?.includes(ROLES.EXECUTIVE_ENGINEER)) return 2;
-    if (this.user?.role?.includes(ROLES.EXECUTIVE_OFFICER)) return 3;
+    if (this.user?.role?.includes(ROLES.MUNICIPAL_COMMISSIONER)) return 3;
   };
 
   getUserLevel = () => {

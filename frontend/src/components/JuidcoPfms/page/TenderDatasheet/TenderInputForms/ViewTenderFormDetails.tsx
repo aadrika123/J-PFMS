@@ -79,9 +79,11 @@ const ViewTenderFormDetails: React.FC<ViewTenderFormDetailsProps> = (props) => {
   /* Handle Submit */
   const handleSubmit = async () => {
     try {
-      await tenderDatasheetSchema.validate(data);
-
       activateWorkingAnimation();
+
+      const updatedData ={...data, basic_details: {...data.basic_details, bank_id: data.basic_details.bank.id}}
+      delete updatedData.basic_details.bank;
+      await tenderDatasheetSchema.validate(updatedData);
 
       const res = await axios({
         url: `${PFMS_URL.TENDER_FORM.submit}/${tenderFormId}`,

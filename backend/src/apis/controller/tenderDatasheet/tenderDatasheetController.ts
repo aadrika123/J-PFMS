@@ -7,7 +7,7 @@
 import { Request } from "express";
 import { APIv1Response } from "../../APIv1";
 import TenderDatasheetsDao from "../../dao/tenderDatasheet/tenderDatasheetDao";
-import { tenderDatasheetSchema, User } from "pfmslib";
+import { User } from "pfmslib";
 import * as Yup from "yup";
 
 class TenderDatasheetsController {
@@ -18,6 +18,8 @@ class TenderDatasheetsController {
 
   create = async (req: Request): Promise<APIv1Response> => {
     const requestData = req.body.data;
+
+    // await tenderDatasheetSchema.validate(requestData);
 
     const data = await this.dao.create(requestData);
 

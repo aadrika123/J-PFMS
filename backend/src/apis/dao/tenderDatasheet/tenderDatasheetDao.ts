@@ -413,10 +413,16 @@ class TenderDatasheetsDao {
           ) as ppwml on ppwml.project_proposal_id = p.id
           left join tender_datasheets as td on td.project_proposal_id = p.id
           left join tender_form_approvals as tfa on tfa.tender_datasheet_id = td.id
-          where p.fully_approved = true and td.status != 'submitted' and td.status != 'rejected'
+          where p.fully_approved = true and case when td.status is not null then td.status != 'submitted' and td.status != 'rejected' else true end
       `;
 
     const grouping = "group by p.id, um.ulb_name, pt.name, td.status";
+
+    const queryForCount = `
+    from project_proposals p 
+    left join tender_datasheets as td on td.project_proposal_id = p.id
+    where p.fully_approved = true and case when td.status is not null then td.status != 'submitted' and td.status != 'rejected' else true end
+    `
 
     // add project proposal no filters to query
     const project_proposal_no_filters = filters["project_proposal_no"];
@@ -441,7 +447,7 @@ class TenderDatasheetsDao {
     const [records, c, project_proposal_nos] = await prisma.$transaction([
       prisma.$queryRawUnsafe(`select p.id, p.project_proposal_no, p.proposed_date, p.title, p.ulb_id, um.ulb_name, p.type_id, case when td.status is not null then td.status else 'not-initiated' end as status, pt.name as type, ARRAY_AGG(ppwml.ward_name::text) as ward_name ${query} ${grouping} order by id ${ordering}
         limit ${limit} offset ${offset};`),
-      prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${query}`),
+      prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${queryForCount}`),
       prisma.$queryRawUnsafe<string[]>(
         `select distinct(project_proposal_no) ${query} order by project_proposal_no asc limit 10`
       ),
@@ -482,6 +488,12 @@ class TenderDatasheetsDao {
     where tfa.assigned_level = ${level} and tfa.status = 'pending'
     `;
 
+    const queryForCount = `
+    from tender_form_approvals as tfa
+    left join tender_datasheets as td on td.id = tfa.tender_datasheet_id
+    where tfa.assigned_level = ${level} and tfa.status = 'pending'
+    `
+
     const grouping = "group by pp.id, um.ulb_name, pt.name, tfa.status";
 
     // add project proposal no filters to query
@@ -507,7 +519,7 @@ class TenderDatasheetsDao {
     const [records, c, project_proposal_nos] = await prisma.$transaction([
       prisma.$queryRawUnsafe(`select pp.id, pp.project_proposal_no, pp.proposed_date, pp.title, pp.ulb_id, um.ulb_name, pp.type_id, tfa.status, pt.name as type, ARRAY_AGG(ppwml.ward_name::text) as ward_name ${query} ${grouping} order by id ${ordering}
         limit ${limit} offset ${offset};`),
-      prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${query}`),
+      prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${queryForCount}`),
       prisma.$queryRawUnsafe<string[]>(
         `select distinct(project_proposal_no) ${query} order by project_proposal_no asc limit 10`
       ),
@@ -548,6 +560,12 @@ class TenderDatasheetsDao {
     where tfa.assigned_level = ${level} and tfa.status != 'rejected'
     `;
 
+    const queryForCount = `
+    from tender_form_approvals as tfa
+    left join tender_datasheets as td on td.id = tfa.tender_datasheet_id
+    where tfa.assigned_level = ${level} and tfa.status != 'rejected'
+    `
+
     const grouping = "group by pp.id, um.ulb_name, pt.name, tfa.status";
 
     // add project proposal no filters to query
@@ -573,7 +591,7 @@ class TenderDatasheetsDao {
     const [records, c, project_proposal_nos] = await prisma.$transaction([
       prisma.$queryRawUnsafe(`select pp.id, pp.project_proposal_no, pp.proposed_date, pp.title, pp.ulb_id, um.ulb_name, pp.type_id,tfa.status, pt.name as type, ARRAY_AGG(ppwml.ward_name::text) as ward_name ${query} ${grouping} order by id ${ordering}
         limit ${limit} offset ${offset};`),
-      prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${query}`),
+      prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${queryForCount}`),
       prisma.$queryRawUnsafe<string[]>(
         `select distinct(project_proposal_no) ${query} order by project_proposal_no asc limit 10`
       ),
@@ -614,6 +632,12 @@ class TenderDatasheetsDao {
     where tfa.assigned_level = ${1} and checker_level >= ${level} and tfa.id in (select max(id) from tender_form_approvals where tender_datasheet_id = td.id) and tfa.status = 'rejected'
     `;
 
+    const queryForCount = `
+    from tender_form_approvals as tfa
+    left join tender_datasheets as td on td.id = tfa.tender_datasheet_id
+    where tfa.assigned_level = ${1} and checker_level >= ${level} and tfa.id in (select max(id) from tender_form_approvals where tender_datasheet_id = td.id) and tfa.status = 'rejected'
+    `
+
     const grouping = "group by pp.id, um.ulb_name, pt.name, td.status";
 
     // add project proposal no filters to query
@@ -639,7 +663,7 @@ class TenderDatasheetsDao {
     const [records, c, project_proposal_nos] = await prisma.$transaction([
       prisma.$queryRawUnsafe(`select pp.id, pp.project_proposal_no, pp.proposed_date, pp.title, pp.ulb_id, um.ulb_name, pp.type_id, case when td.status is not null then td.status else 'not-initiated' end as status, pt.name as type, ARRAY_AGG(ppwml.ward_name::text) as ward_name ${query} ${grouping} order by id ${ordering}
         limit ${limit} offset ${offset};`),
-      prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${query}`),
+      prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${queryForCount}`),
       prisma.$queryRawUnsafe<string[]>(
         `select distinct(project_proposal_no) ${query} order by project_proposal_no asc limit 10`
       ),

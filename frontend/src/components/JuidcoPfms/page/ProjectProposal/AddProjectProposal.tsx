@@ -15,7 +15,7 @@ const ProjectProposalForm = lazy(() =>
 );
 import { FormikValues } from "formik";
 import axios from "@/lib/axiosConfig";
-import { QueryClient, useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { PFMS_URL } from "@/utils/api/urls";
 import SuccesfullConfirmPopup from "@/components/global/molecules/general/SuccesfullConfirmPopup";
 import goBack from "@/utils/helper";
@@ -33,7 +33,7 @@ type StateTypes = {
 };
 
 const AddProjectProposal = () => {
-  const queryClient = new QueryClient();
+  const queryClient = useQueryClient();
   const user = useUser();
   const [workingAnimation, activateWorkingAnimation, hideWorkingAnimation] =
     useWorkingAnimation();

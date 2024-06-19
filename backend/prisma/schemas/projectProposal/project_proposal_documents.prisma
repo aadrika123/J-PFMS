@@ -6,7 +6,7 @@ model project_proposal_documents {
 
   description String
   path        String
-  size        String
+  size        String?
   approved    String @default("pending")
 
   approved_by_id Int?

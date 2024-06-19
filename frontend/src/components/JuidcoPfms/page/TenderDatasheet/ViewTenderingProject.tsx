@@ -33,7 +33,7 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
   const router = useRouter();
   const user = useUser();
   const queryClient = useQueryClient();
-  const [, activateWorkingAnimation] = useWorkingAnimation();
+  const [workingAnimation, activateWorkingAnimation] = useWorkingAnimation();
 
   const pathName = usePathname();
   const [state, setState] = useState<any>({
@@ -61,21 +61,21 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
 
   /////// View Button
   const ViewButton = (id: number | string) => {
-    const doc = data?.files.find((item: any) => item.id === id);
+    console.log(`d3f${id}dsf3`)
     const handleClick = () => {
       setState((prev: any) => ({
         ...prev,
         showPopup: !showPopup,
-        docData: doc,
+        docData: data.file,
       }));
     };
 
     return (
       <div onClick={handleClick}>
-        {doc?.path.split(".")[1] !== "pdf" ? (
+        {data.file?.path.split(".")[1] !== "pdf" ? (
           <img
             className="w-12 h-12"
-            src={`${process.env.img_base}${doc?.path}`}
+            src={`${data.file?.path}`}
             alt=""
           />
         ) : (
@@ -174,12 +174,13 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
   ];
   return (
     <>
+      {workingAnimation}
       {showPopup && (
         <Popup padding="0">
           <iframe
             width={1000}
             height={570}
-            src={`${process.env.img_base}${docData?.path}`}
+            src={`${docData?.path}`}
           ></iframe>
           <div className="flex items-center absolute bottom-3 self-center">
             <Button
@@ -244,7 +245,7 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
                 <ViewDetails projectDetails={data} />
               ) : activeStep === 1 ? (
                 <div className="mt-4">
-                  <Table columns={columns} data={data?.files} center />
+                  <Table columns={columns} data={[data?.file]} center />
                 </div>
               ) : (
                 activeStep === 2 && (

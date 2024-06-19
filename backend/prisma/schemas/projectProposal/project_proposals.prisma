@@ -31,7 +31,7 @@ model project_proposals {
   tender_datasheets          tender_datasheets[]
   measurement_ref_docs       measurement_ref_docs[]
 
-  checklist                 String @default("[\"BACK OFFICE\", \"JUNIOR ENGINEER\", \"DEPUTY MUNICIPAL COMMISSIONER\", \"READY FOR RENDERING\"]")
+  checklist                 String @default("[\"BACK OFFICE\", \"JUNIOR ENGINEER\", \"DEPUTY MUNICIPAL COMMISSIONER\", \"READY FOR TENDERING\"]")
   department_wise_checklist String @default("{\"BACK OFFICE\": [\"BACK OFFICE\"],\"TECHNICAL APPROVAL\": [\"JUNIOR ENGINEER\"],\"ADMINISTRATIVE APPROVAL\": [\"DEPUTY MUNICIPAL COMMISSIONER\"],\"FINISHED\": [\"READY FOR TENDERING\"]}")
 
   created_at DateTime @default(now()) @map("created_at")

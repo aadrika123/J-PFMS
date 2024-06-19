@@ -69,6 +69,7 @@ class TenderBasicDetailsDao {
 
   /* Get Tender Basic Detail By Tender Datasheet Id */
   async getByTenderDatasheetId(id: number) {
+    
     const res = await prisma.$transaction(async (tx) => {
       const res: any = await tx.tender_basic_details.findFirst({
         where: {

@@ -75,6 +75,7 @@ class project_proposalsDao {
       const project_proposals_record = await tx.project_proposals.create({
         data: data,
       });
+
       if (docRecord) {
         await tx.project_proposal_documents.create({
           data: {...docRecord, project_proposal_id: project_proposals_record.id},
@@ -209,7 +210,10 @@ class project_proposalsDao {
         },
       });
 
-      const docData = { ...docRecord, project_proposal_id: id }
+      const docData = {
+        ...docRecord, project_proposal_id: id
+      }
+      
       await tx.project_proposal_documents.create({
         data: docData,
       });
