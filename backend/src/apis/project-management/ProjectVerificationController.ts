@@ -261,6 +261,49 @@ class ProjectVerificationController {
   }
 
 
+  getFullyApproved = async (req: Request): Promise<APIv1Response> => {
+    return new Promise((resolve, reject) => {
+      const { data, user } = req.body;
+
+      const query = req.query;
+
+      // validate
+      Yup.object({
+        page: Yup.number().required("page is required."),
+        limit: Yup.number().required("limit is required."),
+        order: Yup.number().required("order is required.").oneOf([1, -1])
+      }).validate(req.query).then(() => {
+
+        //collect data
+        const page: number = Number(req.query.page);
+        const limit: number = Number(req.query.limit);
+        const order: number = Number(req.query.order);
+        const ulbId = user.getUlbId();
+
+        const roles = user.getRoles();
+
+
+
+        this.dao.getFullyApproved(query, ulbId, page, limit, order, roles).then((data) => {
+
+          const result = { status: true, code: 200, message: "Found", data: data };
+          resolve(result);
+
+        }).catch((error) => {
+          reject(error);
+        });
+
+
+
+      }).catch((error) => {
+        reject(error);
+      })
+
+    });
+  }
+
+
+
 
   getArchive = async (req: Request): Promise<APIv1Response> => {
     return new Promise((resolve, reject) => {

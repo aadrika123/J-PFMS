@@ -597,8 +597,10 @@ class ProjectVerificationDao {
           data: checkingRecord,
         });
 
-        console.log({currentTablesRoleIndex, "length: ": checkList.length}, "goo");
-        if (currentTablesRoleIndex == checkList.length - 2)
+
+        let fully_approved = false;
+
+        if (currentTablesRoleIndex == checkList.length - 2){
           await tx.project_proposals.update({
             where: {
               id: data?.proposalId
@@ -608,8 +610,11 @@ class ProjectVerificationDao {
             }
           });
 
+          fully_approved = true;
+        }
+          
 
-        return result;
+        return {...result, fully_approved};
 
       }).then((d) => {
         resolve(d);
@@ -885,7 +890,7 @@ class ProjectVerificationDao {
       from project_proposal_checkings c
       left join 
       (
-        select u.id, STRING_AGG(u.user_name, ', ') as user_name, STRING_AGG(r.role_name, ', ') as roles 
+        select u.id, STRING_AGG(u.name, ', ') as user_name, STRING_AGG(r.role_name, ', ') as roles 
         from users u 
         left join
         (
@@ -1025,6 +1030,108 @@ class ProjectVerificationDao {
 
   }
 
+
+
+  getFullyApproved = async (
+    filters: any,
+    ulbId: number,
+    page: number,
+    limit: number,
+    order: number,
+    roles: string[]
+  ): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      // console.log(level);
+
+      let filterCondition = `b.ulb_id = ${ulbId}`;
+
+
+      // generate the filter condition for project proposal no
+      const project_proposal_no_filters = filters['project_proposal_no'];
+
+      let project_proposal_no_filters_is_string: boolean = true;
+      if (project_proposal_no_filters) {
+        if (typeof project_proposal_no_filters == 'string') {
+          filterCondition += ` and project_proposal_no ilike '%${project_proposal_no_filters}%'`;
+        }
+        else {
+          filterCondition += ` and project_proposal_no in (${joinStringValues(project_proposal_no_filters)})`;
+          project_proposal_no_filters_is_string = false;
+        }
+      }
+
+      // generate the filter condition for ulb name
+      const ulb_name_filters = filters['ulb_name'];
+      let ulb_name_filters_is_string: boolean = true;
+      if (ulb_name_filters) {
+        if (typeof ulb_name_filters == 'string') {
+          filterCondition += ` and ulb_name ilike '%${ulb_name_filters}%'`;
+        } else {
+          filterCondition += ` and ulb_name in (${joinStringValues(ulb_name_filters)})`;
+          ulb_name_filters_is_string = false;
+        }
+      }
+
+      const queryWithoutFieldsAndPagination = `from project_proposal_checkings c 
+      left join project_proposals b on c.project_proposal_id = b.id 
+      left join ulb_masters um on b.ulb_id = um.id
+      left join project_types pt on b.type_id = pt.id 
+      left join project_propo_ward_maps as ppwm on ppwm.project_proposal_id = b.id
+      left join ulb_ward_masters uwm on uwm.id = ppwm.ward_id
+      
+      
+      where b.fully_approved=true and ${filterCondition}`;
+
+      const queryForCount = `
+      from project_proposals b 
+      where b.fully_approved=true and ${filterCondition}
+      `
+
+      const ordering = order == -1 ? "desc" : "asc";
+
+      const offset = (page - 1) * limit;
+
+      const grouping = "group by b.id, um.ulb_name, pt.name";
+
+      const query = `select b.id, b.project_proposal_no, b.proposed_date, b.title, b.ulb_id, um.ulb_name, b.type_id, pt.name as type, ARRAY_AGG(uwm.ward_name::text) as ward_name ${queryWithoutFieldsAndPagination} 
+      ${grouping} order by b.id ${ordering}
+      limit ${limit} offset ${offset};`;
+
+
+
+      // fetch the data
+      prisma.$transaction([
+        prisma.$queryRawUnsafe<[]>(query),
+        prisma.$queryRawUnsafe<[CountQueryResult]>(`select count(*) ${queryForCount}`),
+        prisma.$queryRawUnsafe<string[]>(`select distinct(project_proposal_no) ${queryWithoutFieldsAndPagination} order by project_proposal_no asc limit 10`),
+        prisma.$queryRawUnsafe<string[]>(`select distinct(ulb_name) ${queryWithoutFieldsAndPagination} order by ulb_name asc limit 10`)
+
+      ]).then(([records, c, project_proposal_nos, ulb_names]) => {
+
+
+        const result: any = {};
+        const count = Number(c[0]?.count);
+
+        result['count'] = count;
+        result['totalPage'] = Math.ceil(count / limit)
+        result['currentPage'] = page;
+        result['records'] = records;
+
+        if (project_proposal_no_filters_is_string)
+          result['project_proposal_no'] = project_proposal_nos;
+
+        if (ulb_name_filters_is_string)
+          result['ulb_name'] = ulb_names;
+
+        // console.log(result);
+        resolve(result);
+      }).catch((error) => {
+        reject(error);
+      });
+
+    });
+
+  }
 
 
   getReturnedProposals = async (
@@ -1181,7 +1288,7 @@ class ProjectVerificationDao {
       left join project_types pt on b.type_id = pt.id left join ulb_ward_masters as uwm on uwm.id = b.ward_id
       
       
-      where c.at_role_id > (
+      where b.fully_approved=false and c.at_role_id > (
         select max(authority_level) from roles_in_order where name in (${roles.map(function (p) { return '\'' + p + '\''; }).join(',')})
       ) and c.id in (
         select max(id) from project_proposal_checkings c2 group by c2.project_proposal_id

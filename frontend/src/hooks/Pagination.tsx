@@ -1,7 +1,7 @@
 import React, { ReactNode, useState } from "react";
 
-const defaultPage = 1;
-const defaultLimit = 10;
+export const defaultPage = 1;
+export const defaultLimit = 10;
 
 export function usePagination(): [number, number, ReactNode, () => void] {
   const [page, setPage] = useState<number>(defaultPage);

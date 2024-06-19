@@ -22,6 +22,8 @@ class ProjectVerificationRoute extends APIv1_New {
     this.addGetRoute(`inbox`, this.controller.getInbox);
     this.addGetRoute(`outbox`, this.controller.getOutbox);
     this.addGetRoute(`returned-back`, this.controller.getReturnedBackItems);
+    this.addGetRoute(`fully-approved`, this.controller.getFullyApproved);
+
 
 
     this.addGetRoute(`archive`, this.controller.getArchive);
