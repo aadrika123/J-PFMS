@@ -131,6 +131,7 @@ class TenderDatasheetsDao {
       project_propo_ward_maps as ppwm
       left join
       ulb_ward_masters as puwm on puwm.id = ppwm.ward_id
+      order by puwm.ward_name desc
     ) as ppwms on ppwms.project_proposal_id = pp.id
     where pp.id=${id}
     GROUP BY

@@ -9,7 +9,7 @@ import Button from "@/components/global/atoms/buttons/Button";
 
 type ImageUploadUiPropType = {
   handleUpload: (file: any) => void;
-  handleDeleteFile: (file: any) => void;
+  handleDeleteFile: (index: number) => void;
   files: any;
   readonly: boolean;
 };
@@ -183,7 +183,7 @@ const ImageUploadUi: React.FC<ImageUploadUiPropType> = (props) => {
               {!readonly && (
                 <ImBin
                   className="cursor-pointer"
-                  onClick={() => handleDeleteFile(file)}
+                  onClick={() => handleDeleteFile(index)}
                 />
               )}
             </div>

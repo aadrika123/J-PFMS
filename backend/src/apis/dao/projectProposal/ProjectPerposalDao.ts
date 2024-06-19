@@ -152,6 +152,7 @@ class project_proposalsDao {
       project_propo_ward_maps as ppwm
       left join
       ulb_ward_masters as puwm on puwm.id = ppwm.ward_id
+      order by puwm.ward_name desc
     ) as ppwms on ppwms.project_proposal_id = pp.id
     where pp.id=${id}
     GROUP BY
@@ -174,7 +175,8 @@ class project_proposalsDao {
     uwm.ward_name,
     dm.department_name,
     td.id,
-    dm.id`;
+    dm.id
+    `;
     const data: any = await prisma.$queryRawUnsafe<[]>(query);
     const doc: any = await prisma.$queryRaw`
     select

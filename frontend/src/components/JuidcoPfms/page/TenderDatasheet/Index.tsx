@@ -54,6 +54,7 @@ const HeroTenderDatasheet = ({
 
   const columns = [
     { name: "id", caption: "Sr. No." },
+    { name: "project_proposal_no", caption: "Project Proposal No" },
     { name: "title", caption: "Project Title" },
     { name: "status", caption: "Status" },
     { name: "type", caption: "Project Type" },

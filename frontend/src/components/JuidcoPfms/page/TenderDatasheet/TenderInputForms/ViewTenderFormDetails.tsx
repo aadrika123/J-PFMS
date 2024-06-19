@@ -14,6 +14,7 @@ import { useReactToPrint } from "react-to-print";
 import { useUser } from "@/components/global/molecules/general/useUser";
 import Input from "@/components/global/atoms/Input";
 import ConfirmationPopupWithInput from "../molecules/ConfirmationPopupWithInputField";
+import { Icons } from "@/assets/svg/icons";
 
 type ViewTenderFormDetailsProps = {
   handleTabChange: (type: string) => void;
@@ -81,7 +82,13 @@ const ViewTenderFormDetails: React.FC<ViewTenderFormDetailsProps> = (props) => {
     try {
       activateWorkingAnimation();
 
-      const updatedData ={...data, basic_details: {...data.basic_details, bank_id: data.basic_details.bank.id}}
+      const updatedData = {
+        ...data,
+        basic_details: {
+          ...data.basic_details,
+          bank_id: data.basic_details.bank.id,
+        },
+      };
       delete updatedData.basic_details.bank;
       await tenderDatasheetSchema.validate(updatedData);
 
@@ -122,6 +129,25 @@ const ViewTenderFormDetails: React.FC<ViewTenderFormDetailsProps> = (props) => {
   const handlePrint = useReactToPrint({
     content: () => componentRef?.current,
   });
+
+  ///////// Get Visibal Image /////
+  const getVisibleImage = (path: any): any => {
+    return (
+      <div onClick={() => handleViewDoc(path)}>
+        {String(path).includes(".pdf") ? (
+          Icons.pdf
+        ) : (
+          <img
+            src={path}
+            height={50}
+            width={50}
+            alt="t"
+            className="max-h-20 w-full object-contain"
+          />
+        )}
+      </div>
+    );
+  };
 
   return (
     <>
@@ -263,14 +289,7 @@ const ViewTenderFormDetails: React.FC<ViewTenderFormDetailsProps> = (props) => {
                     key={index}
                     className="flex flex-col items-center justify-center"
                   >
-                    <img
-                      onClick={() => handleViewDoc(file?.path)}
-                      src={file.path}
-                      height={50}
-                      width={50}
-                      alt="cover-1"
-                      className="max-h-12 object-cover"
-                    />
+                    {getVisibleImage(file?.path)}
                     <span>Cover 0{index + 1}</span>
                   </div>
                 ))}
@@ -307,7 +326,7 @@ const ViewTenderFormDetails: React.FC<ViewTenderFormDetailsProps> = (props) => {
                 <span className="font-medium">
                   Location(Work/Item/Service):&nbsp;
                   <span className="text-gray-500 text-xs">
-                    {work_details?.location ?? "Nill"}
+                    {work_details?.work_location ?? "Nill"}
                   </span>
                 </span>
                 <span className="font-medium">
@@ -467,7 +486,11 @@ const ViewTenderFormDetails: React.FC<ViewTenderFormDetailsProps> = (props) => {
               <span className="font-medium">
                 EMD Fee :&nbsp;
                 <span className="text-gray-500 text-xs">
-                  {fee_details?.emd_fee_type ?? "Nill"}
+                  {fee_details?.percentage_emd_fee
+                    ? `${fee_details?.percentage_emd_fee} %`
+                    : fee_details.fixed_emd_fee
+                      ? fee_details.fixed_emd_fee
+                      : "Nill"}
                 </span>
               </span>
               <span className="font-medium">
@@ -611,14 +634,7 @@ const ViewTenderFormDetails: React.FC<ViewTenderFormDetailsProps> = (props) => {
                   </span>
                 </div>
                 <div className="flex flex-col items-center justify-center">
-                  <img
-                    onClick={() => handleViewDoc(file.path)}
-                    src={file?.path}
-                    height={50}
-                    width={50}
-                    alt={`bo-${index}`}
-                    className="max-h-12 object-cover"
-                  />
+                  {getVisibleImage(file?.path)}
                   <span>B0{index + 1}</span>
                 </div>
               </div>

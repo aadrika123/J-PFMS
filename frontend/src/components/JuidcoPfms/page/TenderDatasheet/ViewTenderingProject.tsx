@@ -72,7 +72,7 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
 
     return (
       <div onClick={handleClick}>
-        {data.file?.path.split(".")[1] !== "pdf" ? (
+        {!data.file?.path.includes(".pdf") ? (
           <img
             className="w-12 h-12"
             src={`${data.file?.path}`}
