@@ -29,6 +29,7 @@ export function usePagination(): [number, number, ReactNode, () => void] {
             width: "100px",
             padding: "20px",
             borderRadius: "10px",
+            backgroundColor: "#ffffff",
             // marginBottom: "60px"
           }}
           defaultValue={defaultPage}
@@ -36,7 +37,7 @@ export function usePagination(): [number, number, ReactNode, () => void] {
         />
       </div>
       <div>
-        <button className="flex justify-between " onClick={() => {
+        <button className="flex justify-between mr-2" onClick={() => {
           if (pageFieldValue) setPage(pageFieldValue);
         }}>
           <svg

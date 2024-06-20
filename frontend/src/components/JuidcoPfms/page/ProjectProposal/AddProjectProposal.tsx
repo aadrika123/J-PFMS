@@ -45,7 +45,6 @@ const AddProjectProposal = () => {
     type_id: 0,
     district_id: user?.getDistrict()?.id,
     ulb_id: user?.getUlb()?.id,
-    ward_id: 0,
     wards: [],
     pin_code: "",
     file: {

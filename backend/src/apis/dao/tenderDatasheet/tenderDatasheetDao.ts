@@ -92,13 +92,11 @@ class TenderDatasheetsDao {
     pp.type_id,
     pp.state_id,
     pp.ulb_id,
-    pp.ward_id,
     pp.district_id,
     pt.name as type,
     ms.name as state_name,
     tfa.assigned_level,
     um.ulb_name,
-    uwm.ward_name,
     dm.department_name as execution_body_name,
     dm.id as execution_body,
     td.id as tender_datasheet_id,
@@ -114,8 +112,6 @@ class TenderDatasheetsDao {
     m_states as ms on ms.id = pp.state_id
     left join
     ulb_masters as um on um.id = pp.ulb_id
-    left join
-    ulb_ward_masters as uwm on uwm.id = pp.ward_id
     left join
     department_masters as dm on dm.id = pp.execution_body
     left join
@@ -146,12 +142,10 @@ class TenderDatasheetsDao {
     pp.type_id,
     pp.state_id,
     pp.ulb_id,
-    pp.ward_id,
     pp.district_id,
     pt.name,
     ms.name,
     um.ulb_name,
-    uwm.ward_name,
     dm.department_name,
     td.id,
     tfa.assigned_level,

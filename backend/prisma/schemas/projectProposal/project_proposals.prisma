@@ -13,7 +13,6 @@ model project_proposals {
   description         String
   state_id            Int
   district_id         Int
-  ward_id             Int?
   address             String
   pin_code            Int
   user_id             Int

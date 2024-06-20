@@ -36,15 +36,12 @@ class project_proposalsDao {
     pp.proposed_by,
     pt.name as type,
     s.name as state_name,
-    um.ulb_name,
-    uwm.ward_name
+    um.ulb_name
     from project_proposals as pp 
     left join 
     m_states as s on s.id = pp.state_id
     left join
     ulb_masters as um on um.id = pp.ulb_id
-    left join
-    ulb_ward_masters as uwm on uwm.id = pp.ward_id
     left join
     project_types as pt on pt.id = pp.type_id
     where (true ${searchCondition})
@@ -71,6 +68,7 @@ class project_proposalsDao {
   createOne = async (data: any, docRecord: any) => {
     const wards = data.wards;
     delete data.wards;
+
     return prisma.$transaction(async (tx) => {
       const project_proposals_record = await tx.project_proposals.create({
         data: data,
@@ -78,7 +76,10 @@ class project_proposalsDao {
 
       if (docRecord) {
         await tx.project_proposal_documents.create({
-          data: {...docRecord, project_proposal_id: project_proposals_record.id},
+          data: {
+            ...docRecord,
+            project_proposal_id: project_proposals_record.id,
+          },
         });
       }
       const wardData = wards.map((i: number) => {
@@ -88,15 +89,14 @@ class project_proposalsDao {
         data: wardData,
       });
 
-
       await tx.project_proposal_checkings.create({
         data: {
           project_proposal_id: project_proposals_record.id,
           checker_id: project_proposals_record.user_id,
           comment: "Proposal Submitted!",
-          at_role_id: 2,  // JUNIOR ENGINEER
-          at_role_name: "JUNIOR ENGINEER"
-        }
+          at_role_id: 2, // JUNIOR ENGINEER
+          at_role_name: "JUNIOR ENGINEER",
+        },
       });
 
       return project_proposals_record;
@@ -116,12 +116,10 @@ class project_proposalsDao {
     pp.type_id,
     pp.state_id,
     pp.ulb_id,
-    pp.ward_id,
     pp.district_id,
     pt.name as type,
     ms.name as state_name,
     um.ulb_name,
-    uwm.ward_name,
     dm.department_name as execution_body_name,
     dm.id as execution_body,
     td.id as tender_datasheet_id,
@@ -137,8 +135,6 @@ class project_proposalsDao {
     m_states as ms on ms.id = pp.state_id
     left join
     ulb_masters as um on um.id = pp.ulb_id
-    left join
-    ulb_ward_masters as uwm on uwm.id = pp.ward_id
     left join
     department_masters as dm on dm.id = pp.execution_body
     left join
@@ -167,12 +163,10 @@ class project_proposalsDao {
     pp.type_id,
     pp.state_id,
     pp.ulb_id,
-    pp.ward_id,
     pp.district_id,
     pt.name,
     ms.name,
     um.ulb_name,
-    uwm.ward_name,
     dm.department_name,
     td.id,
     dm.id
@@ -213,9 +207,10 @@ class project_proposalsDao {
       });
 
       const docData = {
-        ...docRecord, project_proposal_id: id
-      }
-      
+        ...docRecord,
+        project_proposal_id: id,
+      };
+
       await tx.project_proposal_documents.create({
         data: docData,
       });

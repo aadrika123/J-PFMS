@@ -53,7 +53,6 @@ export type ProjectProposalSchema = {
   proposed_by: string;
   execution_body: number;
   ulb_id: number;
-  ward_id: number;
   user_id: number;
   address: string;
   pin_code: number | string;
