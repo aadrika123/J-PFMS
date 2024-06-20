@@ -136,6 +136,10 @@ export const useProjectProposalsOutboxList = (searchQuery: string, limit: number
 export const useProjectProposalDetails = (proposalId: number) => {
   return useQuery([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.PROPOSAL, proposalId], (): Promise<any> => {
     return new Promise((resolve, reject) => {
+      
+      console.log("ProposalId", proposalId);
+      if(!proposalId) resolve(undefined);
+
       axios.get(`${projectProposalApi}/${proposalId}`).then(resp => {
         console.log(resp.data.message);
         if (!resp.data.status) {

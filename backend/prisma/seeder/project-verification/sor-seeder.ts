@@ -17,7 +17,7 @@ export const sorSeeder = async () => {
         if(row[0] == null || row[0].toString().trim().length == 0 )
           continue;
   
-        console.log(row);
+        // console.log(row);
   
         await prisma.schedule_of_rates.create({
           data: {

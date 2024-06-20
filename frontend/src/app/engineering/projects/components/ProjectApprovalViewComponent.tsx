@@ -1,5 +1,5 @@
 "use client";
-import React, {useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 // import { usePathname } from "next/navigation";
 import Button from "@/components/global/atoms/buttons/Button";
 import ConfirmationPopup from "@/components/global/molecules/ConfirmationPopup";
@@ -9,8 +9,6 @@ import Image from "next/image";
 import home from "@/assets/svg/list.svg";
 
 import { DateFormatter } from "@/utils/helper";
-import Table from "@/components/global/molecules/Table";
-import pdfIcon from "@/assets/svg/pdf_icon.svg";
 import { PFMS_URL } from "@/utils/api/urls";
 import axios from "@/lib/axiosConfig";
 
@@ -26,19 +24,7 @@ import { useQuery } from "react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import MeasurementReferenceDocs from "../measurement-reference-docs";
 import { ActionComponent } from "./action-component";
-
-
-
-
-
-
-
-
-
-
-
-
-
+import { ProposalDocumentListComponent } from "./proposal-document-list-component";
 
 const Title = ({ title }: { title: string }) => {
   return <b>{title}</b>;
@@ -70,7 +56,6 @@ interface ProjectApprovalViewComponent {
   ProProposalId: number | undefined;
   readOnly: boolean;
 }
-
 
 const ProjectApprovalViewComponent = ({ ProProposalId, readOnly }: ProjectApprovalViewComponent) => {
   if (!ProProposalId) return <>Error! Project proposal id not provided</>;
@@ -144,55 +129,6 @@ const ProjectApprovalViewComponent = ({ ProProposalId, readOnly }: ProjectApprov
 
   const { data: data }: any = useQuery(["pro-proposal", ProProposalId], fetch);
 
-  /////// View Button
-  const ViewButton = (id: number | string) => {
-    const doc = data?.files.find((item: any) => item.id === id);
-    const handleClick = () => {
-      setState((prev: any) => ({
-        ...prev,
-        showPopup: !showPopup,
-        docData: doc,
-      }));
-    };
-
-    return (
-      <div onClick={handleClick}>
-        {doc?.path.split(".")[1] !== "pdf" ? (
-          <img
-            className="w-12 h-12"
-            src={`${process.env.img_base}${doc?.path}`}
-            alt=""
-          />
-        ) : (
-          <Image src={pdfIcon} width={30} height={30} alt="pdf-icon" />
-        )}
-      </div>
-    );
-  };
-
-
-
-  const columns = [
-    { name: "id", caption: "Sr. No.", width: "w-[5%]" },
-    {
-      name: "file_name",
-      caption: "Document Name",
-    },
-    {
-      name: "path",
-      caption: "View",
-      value: ViewButton,
-    },
-    {
-      name: "approved",
-      caption: "Status",
-    },
-    {
-      name: "remarks",
-      caption: "Remarks",
-    },
-  ];
-
   const createQueryString = useCallback(
     (newParams: any) => {
       const params = new URLSearchParams(searchParams.toString())
@@ -205,19 +141,6 @@ const ProjectApprovalViewComponent = ({ ProProposalId, readOnly }: ProjectApprov
     },
     [searchParams]
   )
-
-
-
-
-  //// handling comming comment stage
-  // const getCurrentState = (proposalDetails: any) => {
-  //   if (proposalDetails?.status === "rejected")
-  //     return proposalDetails?.approval_stage_id ? user?.getProjectProposalStage(proposalDetails?.approval_stage_id + 2) : user?.getProjectProposalStage(2);
-  //   if (!proposalDetails?.approval_stage_id) return "Vendor";
-  //   if (!user?.getProjectProposalStage(proposalDetails?.approval_stage_id)) return user?.getProjectProposalStage(proposalDetails?.approval_stage_id + 1)
-  //   return user?.getProjectProposalStage(proposalDetails?.approval_stage_id)
-  // };
-
 
 
   return (
@@ -238,10 +161,7 @@ const ProjectApprovalViewComponent = ({ ProProposalId, readOnly }: ProjectApprov
             <div>
               {projectProposalDetails?.acknowledged ? (
                 <>
-                  {/* <div className="flex gap-2 justify-end">
-                    <Button variant="primary">Add BOQ</Button>
-                    <Button variant="primary">Upload</Button>
-                  </div> */}
+                  
                 </>
               ) : (
                 <>
@@ -401,9 +321,8 @@ const ProjectApprovalViewComponent = ({ ProProposalId, readOnly }: ProjectApprov
               </TabPanel>
 
               <TabPanel>
-                <div className="mt-4">
-                  <Table columns={columns} data={data?.files} center />
-                </div>
+                {/* Document List */}
+                <ProposalDocumentListComponent proposalId={projectProposalDetails?.id} />
               </TabPanel>
 
               <TabPanel>

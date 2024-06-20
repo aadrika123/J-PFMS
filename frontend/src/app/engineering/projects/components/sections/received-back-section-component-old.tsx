@@ -12,14 +12,11 @@ import SimpleTable from "@/components/global/atoms/SimpleTable";
 import ProjectApprovalViewComponent from "../ProjectApprovalViewComponent";
 import qs from "qs";
 import { FilterButton } from "@/components/global/atoms/FilterButton";
-import { UseQueryResult } from "react-query";
-
-interface ProjectProposalPageSectionComponentProps {
-    queryHook: (searchQuery: string, limit: number, page: number) => UseQueryResult<any>
-}
+import { useProjectProposalsReturnedList } from "@/hooks/data/ProjectProposalsHooks";
 
 
-export const ProjectProposalPageSectionComponent = ({ queryHook }: ProjectProposalPageSectionComponentProps) => {
+
+export const ReceivedBackComponent = () => {
     const searchParams = useSearchParams();
     const pathName = usePathname();
     const router = useRouter();
@@ -28,13 +25,11 @@ export const ProjectProposalPageSectionComponent = ({ queryHook }: ProjectPropos
 
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [limit, page, paginator, resetPaginator] = usePagination();
-    const { isFetching, isLoading, data: projectProposalData } = queryHook(searchQuery, limit, page);
+    const { isFetching, isLoading, data: projectProposalData } = useProjectProposalsReturnedList(searchQuery, limit, page);
 
     const [projectProposals, setProjectProposals] = useState<[]>();
     const [searchPanelItemValues, setSearchPanelItemValues] = useState<any>({});
     const [totalResults, setTotalResults] = useState<number>();
-
-
 
     const [selectedProposalId, setSelectedProposalId] = useState<number>();
 
@@ -56,6 +51,7 @@ export const ProjectProposalPageSectionComponent = ({ queryHook }: ProjectPropos
         console.log(projectProposalData);
 
         setTotalResults(projectProposalData?.count);
+
 
         //update the items for the table
         setProjectProposals(projectProposalData?.records);
@@ -133,6 +129,9 @@ export const ProjectProposalPageSectionComponent = ({ queryHook }: ProjectPropos
 
     return (
         <>
+            <div hidden={!isFilterPanelOpen} className="w-[25%] h-[75vh] overflow-y-auto overflow-x-hidden hide-scrollbar">
+                <SearchPanel onClose={toggleFilterPanel} items={searchPanelItems} values={searchPanelItemValues} onFilterChange={onFilterChange} onNoFilter={onRemoveFilter} />
+            </div>
 
             <div className={isFilterPanelOpen ? 'w-[75%]' : 'w-[98%]'}>
                 <section className="border bg-white shadow-xl p-6 px-10">
@@ -197,9 +196,6 @@ export const ProjectProposalPageSectionComponent = ({ queryHook }: ProjectPropos
                 </section>
             </div>
 
-            <div hidden={!isFilterPanelOpen} className="w-[25%] h-[75vh] overflow-y-auto overflow-x-hidden hide-scrollbar">
-                <SearchPanel onClose={toggleFilterPanel} items={searchPanelItems} values={searchPanelItemValues} onFilterChange={onFilterChange} onNoFilter={onRemoveFilter} />
-            </div>
 
 
         </>

@@ -811,6 +811,17 @@ class ProjectVerificationController {
       });
     });
   }
+
+  getDocumentList = async (req: Request): Promise<APIv1Response> => {
+    await Yup.object({
+      proposalId: Yup.number().required("proposal_id is required"),
+    }).validate(req.query);
+    const { proposalId } = req.query;
+    const data = await this.dao.getDocumentList(
+      Number(proposalId)
+    );
+    return { status: true, code: 200, message: "OK", data: data };
+  }
 }
 
 export default ProjectVerificationController;

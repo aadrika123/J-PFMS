@@ -42,6 +42,9 @@ class ProjectVerificationRoute extends APIv1_New {
     this.addGetRoute('comments/get/:proposalId', this.controller.getComments);
 
 
+    this.addGetRoute('documents/get-list', this.controller.getDocumentList);
+
+
     this.addFormDataPostRoute('measurements/ref-doc-upload', this.controller.referenceDocUpload, [
       { name: 'doc', maxCount: 1},
     ]);

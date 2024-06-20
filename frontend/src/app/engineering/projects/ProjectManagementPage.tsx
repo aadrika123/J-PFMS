@@ -7,14 +7,14 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-import { InboxComponent } from "./components/sections/inbox-section-component";
-import { OutboxComponent } from "./components/sections/outbox-section-component";
-import { ReceivedBackComponent } from "./components/sections/received-back-section-component";
+import { InboxSectionComponent } from "./components/sections/inbox-section-component";
+import { OutboxSectionComponent } from "./components/sections/outbox-section-component";
 import { defaultLimit, defaultPage } from "@/hooks/Pagination";
-import { useProjectProposalsInboxList, useProjectProposalsOutboxList, useProjectProposalsReturnedList } from "@/hooks/data/ProjectProposalsHooks";
+import { useProjectProposalDetails, useProjectProposalsInboxList, useProjectProposalsOutboxList, useProjectProposalsReturnedList } from "@/hooks/data/ProjectProposalsHooks";
 import { LoadingCircleSmall } from "@/components/global/atoms/loading-circles";
 import { ReadyForTenderingSectionComponent } from "./components/sections/ready-for-tendering-section-component";
 import { useProjectProposalsFullyApprovedList } from "./data-hooks/ready-for-tendering-data";
+import { ReceivedBackSectionComponent } from "./components/sections/received-back-section-component";
 
 
 export const ProjectManagementPage = () => {
@@ -22,6 +22,9 @@ export const ProjectManagementPage = () => {
   const pathName = usePathname();
   const [currentSection, setCurrentSection] = useState<string>("inbox");
 
+  // It is important to keep these data hooks in order in which we want to seed the data on screen
+
+  const {data: projectProposalDetails } = useProjectProposalDetails(Number(searchParams?.get("proposalId")));
   const { data: projectProposalInboxData } = useProjectProposalsInboxList("", defaultLimit, defaultPage);
   const { data: projectProposalOutboxData } = useProjectProposalsOutboxList("", defaultLimit, defaultPage);
   const { data: projectProposalReceivedBackData } = useProjectProposalsReturnedList("", defaultLimit, defaultPage);
@@ -137,11 +140,11 @@ export const ProjectManagementPage = () => {
 
       <div className="w-full mt-4 flex gap-2 justify-center">
 
-        {currentSection === "inbox" && <InboxComponent />}
+        {currentSection === "inbox" && <InboxSectionComponent />}
 
-        {currentSection === "outbox" && <OutboxComponent />}
+        {currentSection === "outbox" && <OutboxSectionComponent />}
 
-        {currentSection === "returned" && <ReceivedBackComponent />}
+        {currentSection === "returned" && <ReceivedBackSectionComponent />}
 
         {currentSection === "ready_for_tendering" && <ReadyForTenderingSectionComponent />}
 

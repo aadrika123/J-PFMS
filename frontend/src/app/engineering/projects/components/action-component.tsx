@@ -76,21 +76,22 @@ export const ActionComponent: React.FC<ActionComponentPropsType> = (props) => {
 
     toast.success("Forwarded successfully.");
 
-    queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.INBOX_LIST]);
-    queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.PROPOSAL]);
-    queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.COMMENT_LIST]);
 
 
 
     console.log("funny", res.data.data);
     if(res?.data?.data?.fully_approved){
-      queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.OUTBOX_LIST]);
+      queryClient.invalidateQueries([PROJECT_PROPOSAL_FULLY_APPROVED_API]);
       router.push(pathName + '?section=ready_for_tendering&viewMode=list');
     }
     else {
-      queryClient.invalidateQueries([PROJECT_PROPOSAL_FULLY_APPROVED_API]);
+      queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.OUTBOX_LIST]);
       router.push(pathName + '?section=outbox&viewMode=list');
     }
+
+    queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.INBOX_LIST]);
+    queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.PROPOSAL]);
+    queryClient.invalidateQueries([PROJECT_PROPOSAL_VERIFICATION_QUERY_KEYS.COMMENT_LIST]);
 
     return res.data.data;
 

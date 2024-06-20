@@ -881,6 +881,10 @@ class ProjectVerificationDao {
     });
   }
 
+  getDocumentList = async (proposalId: number) => {
+      const result = await prisma.$queryRaw`select * from project_proposal_documents where project_proposal_id=${proposalId}`;
+      return result;
+  }
 
   getComments = async (proposalId: number) => {
     return new Promise((resolve, reject) => {
