@@ -33,12 +33,12 @@ const project_proposal_seeder = async () => {
           {
             project_proposal_id: proposal.id,
             description: "Proposal Information Document 1",
-            path: "fdsf"
+            path: "https://jharkhandegovernance.com/dms/uploads/1718084860108-186940269.pdf"
           },
           {
             project_proposal_id: proposal.id,
             description: "Proposal Document 2",
-            path: "fdsf"
+            path: "https://jharkhandegovernance.com/dms/uploads/1718084860108-186940269.pdf"
           }
         ]
       });

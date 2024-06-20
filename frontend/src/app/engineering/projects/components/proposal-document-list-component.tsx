@@ -1,10 +1,36 @@
-import React from "react";
+import React, { useState } from "react";
 import Table from "@/components/global/molecules/Table";
 import pdfIcon from "@/assets/svg/pdf_icon.svg";
 import Image from "next/image";
 import { useProposalDocumentListData } from "../data-hooks/proposal-document-list-data-hook";
+import Popup from "@/components/global/molecules/Popup";
+import Button from "@/components/global/atoms/buttons/Button";
 
 
+interface DocumentPopupViewProps {
+    docUrl: string;
+    hideAction: () => void;
+}
+
+const DocumentPopupView = (props: DocumentPopupViewProps) => {
+    return (
+        <Popup padding="0">
+            <iframe
+                width={1000}
+                height={570}
+                src={props.docUrl}
+            ></iframe>
+            <div className="flex items-center absolute bottom-3 self-center">
+                <Button
+                    onClick={() => props.hideAction()}
+                    variant="cancel"
+                >
+                    Close
+                </Button>
+            </div>
+        </Popup>
+    );
+}
 
 
 
@@ -13,18 +39,16 @@ interface ProposalDocumentListComponentProps {
 }
 
 export const ProposalDocumentListComponent = ({ proposalId }: ProposalDocumentListComponentProps) => {
-    
-    const {data: data} = useProposalDocumentListData(proposalId);
+
+    const { data: data } = useProposalDocumentListData(proposalId);
+    const [docToViewOnPopup, setDocToViewOnPopup] = useState<string | null>(null);
+
 
     /////// View Button
     const ViewButton = (id: number | string) => {
         const doc = data.find((item: any) => item.id === id);
         const handleClick = () => {
-            // setState((prev: any) => ({
-            //   ...prev,
-            //   showPopup: !showPopup,
-            //   docData: doc,
-            // }));
+            setDocToViewOnPopup(doc?.path);
         };
 
         return (
@@ -32,7 +56,7 @@ export const ProposalDocumentListComponent = ({ proposalId }: ProposalDocumentLi
                 {doc?.path.split(".")[1] !== "pdf" ? (
                     <img
                         className="w-12 h-12"
-                        src={`${process.env.img_base}${doc?.path}`}
+                        src={`${doc?.path}`}
                         alt=""
                     />
                 ) : (
@@ -46,8 +70,8 @@ export const ProposalDocumentListComponent = ({ proposalId }: ProposalDocumentLi
     const columns = [
         { name: "id", caption: "Sr. No.", width: "w-[5%]" },
         {
-            name: "file_name",
-            caption: "Document Name",
+            name: "description",
+            caption: "Description",
         },
         {
             name: "path",
@@ -66,9 +90,17 @@ export const ProposalDocumentListComponent = ({ proposalId }: ProposalDocumentLi
 
 
     return (
-        <div className="mt-4">
-            <Table columns={columns} data={data} center />
-        </div>
+        <>
+            {docToViewOnPopup && (
+                <DocumentPopupView docUrl={docToViewOnPopup} hideAction={() => setDocToViewOnPopup(null)} />
+            )}
+
+            <div className="mt-4">
+                <Table columns={columns} data={data} center />
+            </div>
+        </>
+
+
     );
 }
 
