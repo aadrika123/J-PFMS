@@ -111,7 +111,7 @@ export const sidebarLinks: SidebarLinksProps = {
           roles: [],
         },
         {
-          moduleName: "Contract Management",
+          moduleName: "Contractor Management",
           icon: (
             <Image
               src={contract}
@@ -120,8 +120,59 @@ export const sidebarLinks: SidebarLinksProps = {
               height={100}
             />
           ),
-          path: "/contract-management",
-          roles: [],
+          path: "/contractor-management",
+          roles: [ROLES.MUNICIPAL_COMMISSIONER],
+          subModules: [
+            {
+              moduleName: "Projects",
+              icon: (
+                <Image
+                  src={houseIcons}
+                  alt="projects"
+                  width={100}
+                  height={100}
+                />
+              ),
+              path: "/contractor-management/projects",
+            },
+            {
+              moduleName: "Request",
+              icon: (
+                <Image
+                  src={houseIcons}
+                  alt="e-measurement"
+                  width={100}
+                  height={100}
+                />
+              ),
+              path: "/engineering/e-measurement-book",
+            },
+            {
+              moduleName: "Running Bills",
+              icon: (
+                <Image
+                  src={houseIcons}
+                  alt="running-bills"
+                  width={100}
+                  height={100}
+                />
+              ),
+              path: "/engineering/running-bills",
+            },
+            {
+              moduleName: "Schedule Of Rates",
+              icon: (
+                <Image
+                  src={houseIcons}
+                  alt="running-bills"
+                  width={100}
+                  height={100}
+                />
+              ),
+              path: "/engineering/schedule-of-rates",
+            },
+          ],
+
         },
         {
           moduleName: "Adminstrative Section",

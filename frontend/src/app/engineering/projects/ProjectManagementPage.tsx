@@ -125,6 +125,7 @@ export const ProjectManagementPage = () => {
           >
             {Icons.outbox}
             Ready For Tendering
+            
             {projectProposalFullyApprovedData ? (
               <div className="badge badge-secondary">
                 {projectProposalFullyApprovedData?.count}
