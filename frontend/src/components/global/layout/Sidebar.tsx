@@ -113,7 +113,7 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
                                                   >
                                                     <LinkWithLoader
                                                       className={`text-[0.9375rem] p-2 ${
-                                                        pathName === link.path
+                                                        pathName === link.path || pathName.includes(link.path)
                                                           ? "text-black font-medium bg-primary_bg_indigo bg-opacity-20"
                                                           : "text-primary"
                                                       } `}

@@ -51,7 +51,7 @@ type TenderWorkDetailsFormProps = {
   project_proposal: {
     title: string;
     description: string;
-  }
+  };
 };
 
 const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (props) => {
@@ -107,7 +107,7 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (props) => {
     inviting_officer_name: data?.inviting_officer_name || "",
     inviting_officer_address: data?.inviting_officer_address || "",
     inviting_officer_contact: data?.inviting_officer_contact || "",
-  }
+  };
 
   ///// handlBackAndReset
   const handleBackAndReset = (trigger?: () => void) => {
@@ -196,6 +196,7 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (props) => {
           handleSubmit,
           dirty,
           handleReset,
+          setFieldValue,
         }: any) => (
           <form
             ref={formRef}
@@ -308,16 +309,40 @@ const TenderWorkDetailsForm: React.FC<TenderWorkDetailsFormProps> = (props) => {
                     readonly={readonly}
                     name="tender_value"
                   />
-                  <RadioComponent
-                    checkList={bid_validity}
-                    onBlur={handleBlur}
-                    value={values.bid_validity}
-                    error={errors.bid_validity}
-                    touched={touched.bid_validity}
-                    required
-                    readonly={readonly}
-                    name="bid_validity"
-                  />
+                  {/* <div className="flex items-end"> */}
+                    <RadioComponent
+                      checkList={bid_validity}
+                      onBlur={handleBlur}
+                      // value={
+                      //   !bid_validity.options.find(
+                      //     (i) => i.value === values.bid_validity
+                      //   )
+                      //     ? "others"
+                      //     : values.bid_validity
+                      // }
+                      value={values.bid_validity}
+                      error={errors.bid_validity}
+                      touched={touched.bid_validity}
+                      required
+                      readonly={readonly}
+                      name="bid_validity"
+                    />
+                    {/* {(bid_validity.options.find(
+                      (i) => i.value === values.bid_validity
+                    )?.value === "others" ||
+                      !bid_validity.options.find(
+                        (i) => i.value === values.bid_validity
+                      )) && (
+                      <input
+                        onBlur={handleBlur}
+                        value={values.bid_validity === "others" ? "" : values.bid_validity}
+                        onChange={(e) =>
+                          setFieldValue("bid_validity", e.target.value)
+                        }
+                        className="bg-white border border-gray-400 rounded-lg h-6 w-20 mb-2"
+                      />
+                    )} */}
+                  {/* </div> */}
                 </div>
               </div>
               <div

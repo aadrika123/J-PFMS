@@ -49,6 +49,7 @@ const HeroProjectProposal = () => {
 
   const columns = [
     { name: "id", caption: "Sr. No." },
+    { name: "project_proposal_no", caption: "Proposal No" },
     { name: "title", caption: "Project Title" },
     { name: "type", caption: "Project Type" },
     { name: "proposed_date", caption: "Proposed Date", type: "date" },
@@ -111,11 +112,6 @@ const HeroProjectProposal = () => {
         {/* <ProjectManagementInboxPage /> */}
 
         <div className="w-full mt-4 flex gap-2 justify-center">
-
-        <div hidden={!isFilterPanelOpen} className="w-[25%] h-[75vh] overflow-y-auto overflow-x-hidden hide-scrollbar">
-          <SearchPanel onClose={toggleFilterPanel} items={searchPanelItems} values={searchPanelItemValues} onFilterChange={onFilterChange} onNoFilter={onRemoveFilter} />
-        </div>
-
         <div className={isFilterPanelOpen ? 'w-[75%]' : 'w-[98%]'}>
         <section className="border bg-white shadow-xl p-6 px-10">
             <div className="flex items-center mb-4 justify-between">
@@ -153,15 +149,10 @@ const HeroProjectProposal = () => {
 
           </section>
         </div>
-
+        <div hidden={!isFilterPanelOpen} className="w-[25%] h-[75vh] overflow-y-auto overflow-x-hidden hide-scrollbar">
+          <SearchPanel onClose={toggleFilterPanel} items={searchPanelItems} values={searchPanelItemValues} onFilterChange={onFilterChange} onNoFilter={onRemoveFilter} />
+        </div>
       </div>
-
-        {/* <TableWithFeatures
-          center
-          columns={columns}
-          api={`${PFMS_URL.PROJ_RPOPOSAL_URL.get}`}
-          numberOfRowsPerPage={10}
-        /> */}
     </>
   );
 };

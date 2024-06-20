@@ -72,7 +72,7 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
 
     return (
       <div onClick={handleClick}>
-        {data.file?.path.split(".")[1] !== "pdf" ? (
+        {!data.file?.path.includes(".pdf") ? (
           <img
             className="w-12 h-12"
             src={`${data.file?.path}`}
@@ -239,7 +239,7 @@ const ViewTenderingProject = ({ ProProposalId }: { ProProposalId: number }) => {
                 handleClick={handleStepClick}
                 activeStep={activeStep}
                 className="mt-4"
-                level={data.assigned_level - 1}
+                level={data.assigned_level}
               />
               {activeStep === 0 ? (
                 <ViewDetails projectDetails={data} />

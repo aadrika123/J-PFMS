@@ -5,6 +5,38 @@ import Image from "next/image";
 import { useProposalDocumentListData } from "../data-hooks/proposal-document-list-data-hook";
 import Popup from "@/components/global/molecules/Popup";
 import Button from "@/components/global/atoms/buttons/Button";
+import { Icons } from "@/assets/svg/icons";
+
+
+
+///////// Get Visibal Image /////
+const getVisibleImage = (path: any): any => {
+    if (!String(path).includes("https")) {
+      return path.name.includes(".pdf") ? (
+        Icons.pdf
+      ) : (
+        <img
+          src={URL.createObjectURL(path)}
+          height={50}
+          width={50}
+          alt="t"
+          className="max-h-20 w-20 object-cover"
+        />
+      );
+    } else {
+      return String(path).includes(".pdf") ? (
+        Icons.pdf
+      ) : (
+        <img
+          src={path}
+          height={50}
+          width={50}
+          alt="t"
+          className="max-h-20 w-20 object-cover"
+        />
+      );
+    }
+  };
 
 
 interface DocumentPopupViewProps {
@@ -53,15 +85,7 @@ export const ProposalDocumentListComponent = ({ proposalId }: ProposalDocumentLi
 
         return (
             <div onClick={handleClick}>
-                {doc?.path.split(".")[1] !== "pdf" ? (
-                    <img
-                        className="w-12 h-12"
-                        src={`${doc?.path}`}
-                        alt=""
-                    />
-                ) : (
-                    <Image src={pdfIcon} width={30} height={30} alt="pdf-icon" />
-                )}
+                {getVisibleImage(doc?.path)}
             </div>
         );
     };

@@ -18,7 +18,7 @@ import { HeaderWidget } from "./HeaderWidget";
 import Popup from "@/components/global/molecules/Popup";
 import Button from "@/components/global/atoms/buttons/Button";
 import Loader from "@/components/global/atoms/Loader";
-import pdfIcon from "@/assets/svg/pdf_icon.svg";
+import { Icons } from "@/assets/svg/icons";
 import Image from "next/image";
 import BoxContainer from "../../projectProposalMolecules/BoxContainer";
 import Steps from "../../projectProposalMolecules/Steps";
@@ -132,14 +132,14 @@ const ViewProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
 
     return (
       <div onClick={handleClick}>
-        {data.file?.path.split(".")[1] !== "pdf" ? (
+        {!data.file?.path.includes(".pdf") ? (
           <img
             className="w-12 h-12"
             src={`${data.file?.path}`}
             alt=""
           />
         ) : (
-          <Image src={pdfIcon} width={30} height={30} alt="pdf-icon" />
+          Icons.pdf
         )}
       </div>
     );

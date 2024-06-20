@@ -19,8 +19,6 @@ const project_proposal_seeder = async () => {
         description: faker.lorem.words(100),
         state_id: 16,
         district_id: 20,
-        ward_id: 31,
-        // wards: "{31}",
         user_id: 172,
         pin_code: 234565,
         execution_body: 1,

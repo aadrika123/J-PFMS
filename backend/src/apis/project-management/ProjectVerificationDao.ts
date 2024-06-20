@@ -259,14 +259,14 @@ class ProjectVerificationDao {
         )
       ) x on b.id = x.project_proposal_id
       left join ulb_masters um on b.ulb_id = um.id
-      left join project_types pt on b.type_id = pt.id left join ulb_ward_masters as uwm on uwm.id = b.ward_id
+      left join project_types pt on b.type_id = pt.id 
       where ${filterCondition}`;
 
       const ordering = order == -1 ? "desc" : "asc";
 
       const offset = (page - 1) * limit;
 
-      const query = `select b.id, b.project_proposal_no, b.proposed_date, b.title, b.ulb_id, um.ulb_name, b.type_id, pt.name as type, b.ward_id, uwm.ward_name ${queryWithoutFieldsAndPagination} 
+      const query = `select b.id, b.project_proposal_no, b.proposed_date, b.title, b.ulb_id, um.ulb_name, b.type_id, pt.name as type ${queryWithoutFieldsAndPagination} 
       order by b.id ${ordering}
       limit ${limit} offset ${offset};`;
 
@@ -354,14 +354,14 @@ class ProjectVerificationDao {
         )
       ) x on b.id = x.project_proposal_id 
       left join ulb_masters um on b.ulb_id = um.id
-      left join project_types pt on b.type_id = pt.id left join ulb_ward_masters as uwm on uwm.id = b.ward_id
+      left join project_types pt on b.type_id = pt.id 
       where ${filterCondition}`;
 
       const ordering = order == -1 ? "desc" : "asc";
 
       const offset = (page - 1) * limit;
 
-      const query = `select b.id, b.project_proposal_no, b.proposed_date, b.title, b.ulb_id, um.ulb_name, b.type_id, pt.name as type, b.ward_id, uwm.ward_name ${queryWithoutFieldsAndPagination} 
+      const query = `select b.id, b.project_proposal_no, b.proposed_date, b.title, b.ulb_id, um.ulb_name, b.type_id, pt.name as type ${queryWithoutFieldsAndPagination} 
       order by b.id ${ordering}
       limit ${limit} offset ${offset};`;
 
@@ -1182,7 +1182,7 @@ class ProjectVerificationDao {
       const queryWithoutFieldsAndPagination = `from project_proposal_checkings c 
       left join project_proposals b on c.project_proposal_id = b.id 
       left join ulb_masters um on b.ulb_id = um.id
-      left join project_types pt on b.type_id = pt.id left join ulb_ward_masters as uwm on uwm.id = b.ward_id
+      left join project_types pt on b.type_id = pt.id
       
       
       where c.at_role_id in (
@@ -1195,7 +1195,7 @@ class ProjectVerificationDao {
 
       const offset = (page - 1) * limit;
 
-      const query = `select b.id, b.project_proposal_no, b.proposed_date, b.title, b.ulb_id, um.ulb_name, b.type_id, pt.name as type, b.ward_id, uwm.ward_name ${queryWithoutFieldsAndPagination} 
+      const query = `select b.id, b.project_proposal_no, b.proposed_date, b.title, b.ulb_id, um.ulb_name, b.type_id, pt.name as type ${queryWithoutFieldsAndPagination} 
       order by b.id ${ordering}
       limit ${limit} offset ${offset};`;
 
@@ -1289,7 +1289,7 @@ class ProjectVerificationDao {
       const queryWithoutFieldsAndPagination = `from project_proposal_checkings c 
       left join project_proposals b on c.project_proposal_id = b.id 
       left join ulb_masters um on b.ulb_id = um.id
-      left join project_types pt on b.type_id = pt.id left join ulb_ward_masters as uwm on uwm.id = b.ward_id
+      left join project_types pt on b.type_id = pt.id 
       
       
       where b.fully_approved=false and c.at_role_id > (
@@ -1302,7 +1302,7 @@ class ProjectVerificationDao {
 
       const offset = (page - 1) * limit;
 
-      const query = `select b.id, b.project_proposal_no, b.proposed_date, b.title, b.ulb_id, um.ulb_name, b.type_id, pt.name as type, b.ward_id, uwm.ward_name ${queryWithoutFieldsAndPagination} 
+      const query = `select b.id, b.project_proposal_no, b.proposed_date, b.title, b.ulb_id, um.ulb_name, b.type_id, pt.name as type ${queryWithoutFieldsAndPagination} 
       order by b.id ${ordering}
       limit ${limit} offset ${offset};`;
 

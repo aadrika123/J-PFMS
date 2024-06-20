@@ -59,8 +59,7 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
     showFinalError: false,
   });
 
-  const { tabNo, coverNo, showWarning, triggerFun, showFinalError } =
-    state;
+  const { tabNo, coverNo, showWarning, triggerFun, showFinalError } = state;
 
   ///////// Fetching Data
   const fetch = async () => {
@@ -133,7 +132,7 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
     };
 
     const newArray = [...prevFile, tabFile];
- 
+
     setFieldValue("files", newArray);
   };
 
@@ -148,11 +147,25 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
   /////////////// Handle Delete File
   const handleDeleteFile = (
     files: any,
-    file: any,
+    index: number,
     setFieldValue: (key: string, value: any) => void
   ) => {
+    ////// Getting the Current Selected Tab //////
+    const currentTab = coverList?.options?.find(
+      (cover: any) => cover.value === coverNo
+    )?.list[tabNo - 1];
 
-    const newFileList = files.filter((i: any) => i.type !== file.type && i.path !== file.path );
+    /////// Filtering the files except currentTabFiles
+    const restFiles = files.filter((i: any) => i.type !== currentTab?.toLowerCase())
+
+    ////// Getting the Current Tab Files /////// 
+    const currentTabFiles = files.filter((i: any) => i.type === currentTab?.toLowerCase());
+   
+    ////// Removing the purticular file from current tab ///////
+    const restCurrentTabFiles = currentTabFiles.filter((i: any, idx: number) => idx !== index);
+
+    ////// Colleting the Remaining file After deletion of file //////
+    const newFileList=[...restFiles, ...restCurrentTabFiles]
     setFieldValue("files", newFileList);
   };
 
@@ -301,8 +314,12 @@ const TenderCoverDetailsForm: React.FC<TenderCoverDetailsFormProps> = (
                 handleUpload={(fileData: any) =>
                   handleUpload(values.files, fileData, setFieldValue)
                 }
-                handleDeleteFile={(file: number) =>
-                  handleDeleteFile(values.files, file, setFieldValue)
+                handleDeleteFile={(index: number) =>
+                  handleDeleteFile(
+                    values.files,
+                    index,
+                    setFieldValue
+                  )
                 }
                 files={findCurrentTabFiles(values.files)}
                 readonly={readonly}

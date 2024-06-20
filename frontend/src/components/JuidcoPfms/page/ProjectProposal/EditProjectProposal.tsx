@@ -145,7 +145,6 @@ const EditProjectProposal = ({ ProProposalId }: { ProProposalId: number }) => {
             type_id: data?.type_id,
             district_id: data?.district_id,
             ulb_id: data?.ulb_id,
-            ward_id: data?.ward_id,
             pin_code: data?.pin_code,
             file: {
               file_name: data?.file?.file_name ?? "",
