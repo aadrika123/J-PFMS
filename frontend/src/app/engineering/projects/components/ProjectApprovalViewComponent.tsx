@@ -25,6 +25,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import MeasurementReferenceDocs from "../measurement-reference-docs";
 import { ActionComponent } from "./action-component";
 import { ProposalDocumentListComponent } from "./proposal-document-list-component";
+import LoaderSkeleton from "@/components/global/atoms/LoaderSkeleton";
 
 const Title = ({ title }: { title: string }) => {
   return <b>{title}</b>;
@@ -161,7 +162,7 @@ const ProjectApprovalViewComponent = ({ ProProposalId, readOnly }: ProjectApprov
             <div>
               {projectProposalDetails?.acknowledged ? (
                 <>
-                  
+
                 </>
               ) : (
                 <>
@@ -322,7 +323,8 @@ const ProjectApprovalViewComponent = ({ ProProposalId, readOnly }: ProjectApprov
 
               <TabPanel>
                 {/* Document List */}
-                <ProposalDocumentListComponent proposalId={projectProposalDetails?.id} />
+                  <ProposalDocumentListComponent proposalId={projectProposalDetails?.id} />
+
               </TabPanel>
 
               <TabPanel>

@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import Table from "@/components/global/molecules/Table";
-import pdfIcon from "@/assets/svg/pdf_icon.svg";
-import Image from "next/image";
 import { useProposalDocumentListData } from "../data-hooks/proposal-document-list-data-hook";
 import Popup from "@/components/global/molecules/Popup";
 import Button from "@/components/global/atoms/buttons/Button";
 import { Icons } from "@/assets/svg/icons";
+import LoaderSkeleton from "@/components/global/atoms/LoaderSkeleton";
 
 
 
@@ -72,7 +71,7 @@ interface ProposalDocumentListComponentProps {
 
 export const ProposalDocumentListComponent = ({ proposalId }: ProposalDocumentListComponentProps) => {
 
-    const { data: data } = useProposalDocumentListData(proposalId);
+    const { data: data , isLoading, isFetching} = useProposalDocumentListData(proposalId);
     const [docToViewOnPopup, setDocToViewOnPopup] = useState<string | null>(null);
 
 
@@ -115,13 +114,18 @@ export const ProposalDocumentListComponent = ({ proposalId }: ProposalDocumentLi
 
     return (
         <>
+        
             {docToViewOnPopup && (
                 <DocumentPopupView docUrl={docToViewOnPopup} hideAction={() => setDocToViewOnPopup(null)} />
             )}
 
+            {isLoading || isFetching ? 
+            <LoaderSkeleton rowCount={3}/>
+            :
             <div className="mt-4">
                 <Table columns={columns} data={data} center />
             </div>
+            }
         </>
 
 
