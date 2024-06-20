@@ -166,7 +166,7 @@ export const sidebarLinks: SidebarLinksProps = {
                   height={100}
                 />
               ),
-              path: "/tender-datasheet",
+              path: "/tender-datasheet/tender-form",
             },
             {
               moduleName: "Awarded Tenders",

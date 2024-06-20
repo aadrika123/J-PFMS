@@ -36,7 +36,7 @@ export const TenderDatasheetLayout = ({
         </h2>
       </div>
       <div className="flex items-center mb-2 gap-2">
-        <LinkWithLoader href={`/tender-datasheet`}>
+        <LinkWithLoader href={`/tender-datasheet/tender-form`}>
           <Button
             variant="primary"
             className={`${(pathName.includes("outbox") || pathName.includes("rejected")) && "bg-gray-200 text-gray-500"}`}
@@ -48,7 +48,7 @@ export const TenderDatasheetLayout = ({
             </div>
           </Button>
         </LinkWithLoader>
-        <LinkWithLoader href={`/tender-datasheet/outbox`}>
+        <LinkWithLoader href={`/tender-datasheet/tender-form/outbox`}>
           <Button
             variant="primary"
             className={`${!pathName.includes("outbox") && "bg-gray-200 text-gray-500"}`}
@@ -61,7 +61,7 @@ export const TenderDatasheetLayout = ({
           </Button>
         </LinkWithLoader>
 
-        {user && user?.getUserLevelForTenderApproval() < 3 && <LinkWithLoader href={"/tender-datasheet/rejected"}>
+        {user && user?.getUserLevelForTenderApproval() < 3 && <LinkWithLoader href={"/tender-datasheet/tender-form/rejected"}>
           <Button
             variant="primary"
             className={`${!pathName.includes("rejected") && "bg-gray-200 text-gray-500"}`}

@@ -1,9 +1,9 @@
 "use client";
 /**
  * | Author- Sanjiv Kumar
- * | Created On- 28-05-2024
- * | Created for- Tender Datasheet
- * | Status- done
+ * | Created On- 20-06-2024
+ * | Created for- Awarded Tender
+ * | Status- open
  */
 
 import React, { useEffect, useState } from "react";
@@ -20,13 +20,9 @@ import { usePagination } from "@/hooks/Pagination";
 import LoaderSkeleton from "@/components/global/atoms/LoaderSkeleton";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 import SearchPanel from "@/components/global/molecules/SearchPanel";
-import { TenderDatasheetLayout } from "./TenderDatasheetLayout";
+import { useProjectProposalList } from "@/hooks/data/ProjectProposalsHooks";
 
-const HeroTenderDatasheet = ({
-  useProjectProposalList,
-}: {
-  useProjectProposalList: any;
-}) => {
+const HeroAwardedTenders = () => {
   const router = useRouter();
   const [, activateWorkingAnimation] = useWorkingAnimation();
 
@@ -65,7 +61,7 @@ const HeroTenderDatasheet = ({
 
   const onViewButtonClick = (id: number) => {
     activateWorkingAnimation();
-    router.push(`${pathName}/view/${id}?mode=view`);
+    router.push(`${pathName}/add/${id}`);
   };
 
   useEffect(() => {
@@ -120,8 +116,7 @@ const HeroTenderDatasheet = ({
   };
 
   return (
-    <TenderDatasheetLayout>
-      
+    <>
       <div className={isFilterPanelOpen ? "w-[75%]" : "w-[100%]"}>
         <section className="border bg-white shadow-xl p-6">
           <div className="flex items-center mb-4 justify-between">
@@ -171,8 +166,8 @@ const HeroTenderDatasheet = ({
           onNoFilter={onRemoveFilter}
         />
       </div>
-    </TenderDatasheetLayout>
+    </>
   );
 };
 
-export default HeroTenderDatasheet;
+export default HeroAwardedTenders;
