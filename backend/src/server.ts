@@ -96,12 +96,12 @@ const q1Data = [44000, 55000, 41000, 67000, 22000];
 const q2Data = [20000, 40000, 25000, 10000, 12000];
 
 // Endpoint to fetch Q1 data
-app.get("/api/q1-data", (req, res) => {
+app.get('/api/q1-data', (req, res) => {
   res.json(q1Data);
 });
 
 // Endpoint to fetch Q2 data
-app.get("/api/q2-data", (req, res) => {
+app.get('/api/q2-data', (req, res) => {
   res.json(q2Data);
 });
 // .....................
