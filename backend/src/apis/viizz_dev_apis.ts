@@ -1,6 +1,7 @@
 import express from "express";
 import TestRoute from "./viizz_dev_test/ViizzDevTestRoute";
 import ProjectVerificationRoute from "./project-management/ProjectVerificationRoute";
+import ContractManagementRoute from "./contract-management/contract-management-route";
 
 
 export default class ViizzDevApis{
@@ -24,5 +25,6 @@ export default class ViizzDevApis{
     register(): void {
         (new TestRoute(`${this.getNextRouteId()}`, "viizz-dev-test", this.app)).configure();
         (new ProjectVerificationRoute(`${this.getNextRouteId()}`, "project-verification", this.app)).configure();        
+        (new ContractManagementRoute(`${this.getNextRouteId()}`, this.app)).configure();
     }
 }
