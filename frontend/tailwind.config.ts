@@ -3,7 +3,7 @@ import daisyui from 'daisyui';
 
 const config: Config = {
   plugins: [daisyui],
-
+  darkMode: ["class"],
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -64,7 +64,7 @@ const config: Config = {
           "--border-btn": "1px", // border width of buttons
           "--tab-border": "1px", // border width of tabs
           "--tab-radius": "0.5rem", // border radius of tabs
-          "--tab-bg": "green"
+          "--tab-bg": "green",
         },
       },
       "light",

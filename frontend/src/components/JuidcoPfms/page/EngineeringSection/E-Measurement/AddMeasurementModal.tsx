@@ -7,7 +7,7 @@
 //    Component  - AddMeasurementModal
 //    DESCRIPTION - AddMeasurementModal
 //////////////////////////////////////////////////////////////////////////////////////
-
+"use client"
 import React, { useEffect, useState } from "react";
 import { Formik, Field, Form, FieldArray, ErrorMessage } from "formik";
 import * as Yup from "yup";
