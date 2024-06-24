@@ -1,7 +1,7 @@
 import { useQuery } from "react-query";
 import axios, { baseURL } from "@/lib/axiosConfig";
 
-const contractManagementInboxDataAPI = `${baseURL}/contract-management/get-inbox-data`;
+const contractManagementInboxDataAPI = `${baseURL}/contractor-management/get-inbox-data`;
 const CONTRACT_MANAGEMENT_INBOX_DATA_QUERY_KEY = contractManagementInboxDataAPI;
 
 export const useContractManagementInboxData = (searchQuery: string, limit: number, page: number) => {

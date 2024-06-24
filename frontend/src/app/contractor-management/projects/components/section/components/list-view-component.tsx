@@ -39,11 +39,12 @@ export const ProjectListComponent = ({projectProposalData, page, limit}: Project
         // { name: "ulb_name", caption: "Ulb Name", width: "w-[20%]" },
         // { name: "summary", caption: "Summary", width: "w-[20%]", align: "left" }
         { name: "id", caption: "Sr. No." },
-        { name: "project_proposal_no", caption: "Project Proposal No.", width: "w-[20%]" },
-        { name: "title", caption: "Project Title" },
-        { name: "type", caption: "Project Type" },
-        { name: "proposed_date", caption: "Proposed Date", type: "date" },
-        { name: "ward_name", caption: "Ward No" },
+        { name: "title", caption: "Project Title", width: "w-[20%]" },
+        { name: "quoted_amount", caption: "Quoted Amount" },
+        { name: "tender_ref_no", caption: "Tender Reference Number" },
+        { name: "commencement_date", caption: "Commencement Date", type: "date" },
+        { name: "completion_date", caption: "Completion Date", type: "date" },
+        { name: "status", caption: "Status" },
     ];
 
 

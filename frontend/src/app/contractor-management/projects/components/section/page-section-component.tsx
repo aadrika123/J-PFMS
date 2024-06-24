@@ -56,9 +56,12 @@ export const ContractorManagementPageSectionComponent = ({ queryHook }: Contract
     useEffect(() => {
         const viewMode = searchParams.get('viewMode');
         if (viewMode) setCurrentViewMode(viewMode);
+        else setCurrentViewMode("list");
 
         const proposalId = searchParams.get("proposalId");
         if (proposalId) setSelectedProposalId(Number(proposalId));
+
+        console.log("viewMode", currentViewMode);
 
     }, [searchParams]);
 
