@@ -39,7 +39,7 @@ interface SelectProps {
 }
 
 const SelectForNoApi: React.FC<SelectProps> = (props) => {
-  const {labelColor = "secondary"} = props;
+  const { labelColor = "secondary" } = props;
   const [, , helpers] = useField(props.name);
   const [, , helpers1] = useField(`${props.name}_name`);
 
@@ -63,7 +63,9 @@ const SelectForNoApi: React.FC<SelectProps> = (props) => {
 
   return (
     <>
-      <div className={`flex flex-col gap-1 ${props.readonly && 'dropdown-container'}`}>
+      <div
+        className={`flex flex-col gap-1 ${props.readonly && "dropdown-container"}`}
+      >
         <label className={`text-${labelColor} text-sm`} htmlFor={fieldId}>
           {props.label}
           {props.required ? <span className="text-red-600 ">*</span> : ""}
@@ -73,34 +75,37 @@ const SelectForNoApi: React.FC<SelectProps> = (props) => {
           onChange={(event) => handleChange(event)}
           onBlur={props.onBlur}
           value={props.value}
-          className={`text-primary h-[40px] pl-3 rounded-lg border shadow-lg bg-transparent border-zinc-400 ${props.className}`}
+          className={`text-primary h-[40px] pl-3 rounded-lg border shadow-lg border-zinc-400 ${props.className} ${props.readonly ? "bg-gray-200 cursor-not-allowed" : "bg-transparent"}`}
           name={props.name}
           id={fieldId}
         >
-          {props.placeholder && <option selected value={0}>
-            {props.placeholder}
-          </option>}
-          {props?.data?.length && props?.data.map((d: Option) => (
-            <option
-              key={d?.id}
-              value={d?.value ? d?.value : d?.id}
-              data-name={
-                d?.name ||
-                d?.type ||
-                (d?.code && d?.description
-                  ? `${d.code}-${d?.description}`
-                  : d?.code) ||
-                d?.ulbs
-              }
-            >
-              {d?.name ||
-                d?.type ||
-                (d?.code && d?.description
-                  ? `${d.code}-${d?.description}`
-                  : d?.code) ||
-                d?.ulbs}
+          {props.placeholder && (
+            <option selected value={0}>
+              {props.placeholder}
             </option>
-          ))}
+          )}
+          {props?.data?.length &&
+            props?.data.map((d: Option) => (
+              <option
+                key={d?.id}
+                value={d?.value ? d?.value : d?.id}
+                data-name={
+                  d?.name ||
+                  d?.type ||
+                  (d?.code && d?.description
+                    ? `${d.code}-${d?.description}`
+                    : d?.code) ||
+                  d?.ulbs
+                }
+              >
+                {d?.name ||
+                  d?.type ||
+                  (d?.code && d?.description
+                    ? `${d.code}-${d?.description}`
+                    : d?.code) ||
+                  d?.ulbs}
+              </option>
+            ))}
         </select>
 
         {props.touched && props.error && (

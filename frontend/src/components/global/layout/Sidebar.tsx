@@ -25,7 +25,6 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
     setData(localStorage.getItem("openPage"));
     // setSidebar(getSidebar(userData.role));
     setUser(userData);
-
   }, []);
   const handleClick = (moduleName: string) => {
     localStorage.setItem("openPage", moduleName);

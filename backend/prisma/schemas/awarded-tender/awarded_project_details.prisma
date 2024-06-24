@@ -1,0 +1,10 @@
+///// Managed By :- Sanjiv
+model awarded_project_details {
+  id                Int             @id @default(autoincrement())
+  awarded_tender_id Int             @unique
+  awarded_tender    awarded_tenders @relation(fields: [awarded_tender_id], references: [id])
+  project_cost      Float
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @map("updated_at")
+}

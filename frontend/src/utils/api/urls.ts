@@ -21,7 +21,8 @@ type PfmsUrlKeys =
   | "TENDER_BASIC"
   | "TENDER_FEE"
   | "TENDER_CRITICAL_DATES"
-  | "TENDER_BID_OPENERS";
+  | "TENDER_BID_OPENERS"
+  | "AWARDED_TENDER_FORM";
 
 type Urls = {
   [key in PfmsUrlKeys]: {
@@ -128,5 +129,12 @@ export const PFMS_URL: Urls = {
   TENDER_BID_OPENERS:{
     getById: "tender/bid-openers/get",
     create :"tender/bid-openers/create"
-  }
+  },
+  AWARDED_TENDER_FORM:{
+    create: "tender/datasheet/create",
+    getAllDetails: "tender/datasheet/get",
+    submit: "tender/datasheet/update",
+    getById: "tender/datasheet/get-by-id",
+    getProjectProposalById: "tender/datasheet/project-proposal/get",
+  },
 };

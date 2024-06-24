@@ -17,6 +17,12 @@ import TenderCriticalDatesRoute from "./apis/route/tenderDatasheet/tenderCritica
 import TenderBidOpenersRoute from "./apis/route/tenderDatasheet/tenderBidOpenersRoute";
 import DMSFileHandlerRoute from "./apis/route/dmsFileHandlerRoute";
 import PreparedEstimatedRoute from "./apis/prepared-estimated/PreparedEstimatedRoute";
+import AwardedTenderRoute from "./apis/route/awardedTender/awardedTenderRoute";
+import AwardedProjectDetailsRoute from "./apis/route/awardedTender/awardedProjectDetailsRoute";
+import AwardedTenderDetailsRoute from "./apis/route/awardedTender/awardedTenderDetailsRoute";
+import AwardedProjectDurationRoute from "./apis/route/awardedTender/awardedProjectDurationsRoute";
+import AwardedBoqsRoute from "./apis/route/awardedTender/awardedBoqsRoute";
+import AwardedProjectMilestonesRoute from "./apis/route/awardedTender/awardedProjectMilestonesRoute";
 
 /*
 |--------------------------------------------------------------------------
@@ -63,6 +69,18 @@ class PFMSRoute {
     new TenderBidOpenersRoute("12", app).configure(); //12
 
     new DMSFileHandlerRoute("13", app).configure(); //13
+
+    new AwardedTenderRoute("14", app).configure(); //14
+
+    new AwardedProjectDetailsRoute("15", app).configure(); //15
+
+    new AwardedTenderDetailsRoute("16", app).configure(); //16
+
+    new AwardedProjectDurationRoute("17", app).configure(); //17
+
+    new AwardedBoqsRoute("18", app).configure(); //18
+
+    new AwardedProjectMilestonesRoute("19", app).configure(); //19
 
     new BillsRoute("50", app).configure();
 

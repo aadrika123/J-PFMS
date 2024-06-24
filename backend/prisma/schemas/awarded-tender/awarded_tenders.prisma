@@ -1,0 +1,15 @@
+///// Managed By :- Sanjiv
+model awarded_tenders {
+  id                  Int               @id @default(autoincrement())
+  tender_datasheet_id Int
+  tender_datasheet    tender_datasheets @relation(fields: [tender_datasheet_id], references: [id])
+  status              String            @default("draft")
+
+  created_at                 DateTime                     @default(now()) @map("created_at")
+  updated_at                 DateTime                     @default(now()) @map("updated_at")
+  awarded_project_details    awarded_project_details[]
+  awarded_tender_details     awarded_tender_details[]
+  awarded_project_durations  awarded_project_durations[]
+  awarded_boqs               awarded_boqs[]
+  awarded_project_milestones awarded_project_milestones[]
+}

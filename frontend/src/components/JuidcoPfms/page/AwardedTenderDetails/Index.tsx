@@ -11,9 +11,7 @@ import Image from "next/image";
 import list from "@/assets/svg/list.svg";
 import details from "@/assets/svg/details.svg";
 import { usePathname, useRouter } from "next/navigation";
-
 import SimpleTable from "@/components/global/atoms/SimpleTable";
-
 import { FilterButton } from "@/components/global/atoms/FilterButton";
 import qs from "qs";
 import { usePagination } from "@/hooks/Pagination";
@@ -21,9 +19,13 @@ import LoaderSkeleton from "@/components/global/atoms/LoaderSkeleton";
 import { useWorkingAnimation } from "@/components/global/molecules/general/useWorkingAnimation";
 import SearchPanel from "@/components/global/molecules/SearchPanel";
 import { useProjectProposalList } from "@/hooks/data/ProjectProposalsHooks";
+import Button from "@/components/global/atoms/buttons/Button";
+import goBack from "@/utils/helper";
+import { Icons } from "@/assets/svg/icons";
 
 const HeroAwardedTenders = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const [, activateWorkingAnimation] = useWorkingAnimation();
 
   const pathName = usePathname();
@@ -61,7 +63,7 @@ const HeroAwardedTenders = () => {
 
   const onViewButtonClick = (id: number) => {
     activateWorkingAnimation();
-    router.push(`${pathName}/add/${id}`);
+    router.push(`${pathName}/view/${id}`);
   };
 
   useEffect(() => {
@@ -117,54 +119,65 @@ const HeroAwardedTenders = () => {
 
   return (
     <>
-      <div className={isFilterPanelOpen ? "w-[75%]" : "w-[100%]"}>
-        <section className="border bg-white shadow-xl p-6">
-          <div className="flex items-center mb-4 justify-between">
-            <div className="flex">
-              <div
-                className={`flex items-center  mr-3 pb-1 w-20 justify-center border-b-2 border-b-black`}
-              >
-                <Image src={list} height={20} width={20} alt="pro-1" />
-                <span className="ml-2 text-gray-500">List</span>
-              </div>
-              <div className={`flex items-center  pb-1 w-28 justify-center`}>
-                <Image src={details} height={20} width={20} alt="pro-1" />
-                <span className="ml-2 text-gray-500">Details</span>
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-center">
-              <FilterButton
-                onClick={toggleFilterPanel}
-                active={isFilterPanelOpen}
-              />
-            </div>
-          </div>
-          Total Results: {totalResults}
-          {isFetching || isLoading ? (
-            <LoaderSkeleton rowCount={limit} />
-          ) : (
-            <SimpleTable
-              columns={columns}
-              data={projectProposals}
-              onViewButtonClick={onViewButtonClick}
-              rowIndexStart={(page - 1) * limit + 1}
-            />
-          )}
-          {paginator}
-        </section>
+      <div className="flex items-center justify-between border-b-2 pb-4 mb-4">
+        <Button
+          variant="cancel"
+          className="border-none text-primary_bg_indigo hover:text-primary_bg_indigo hover:bg-inherit"
+          onClick={goBack}
+        >
+          {Icons.back}
+          <b>Back</b>
+        </Button>
+        <h2 className="text-black">
+          <b>Project List</b>
+        </h2>
       </div>
-      <div
-        hidden={!isFilterPanelOpen}
-        className="w-[25%] h-[75vh] overflow-y-auto overflow-x-hidden hide-scrollbar"
-      >
-        <SearchPanel
-          onClose={toggleFilterPanel}
-          items={searchPanelItems}
-          values={searchPanelItemValues}
-          onFilterChange={onFilterChange}
-          onNoFilter={onRemoveFilter}
-        />
+      <div className="flex gap-4">
+        <div className={isFilterPanelOpen ? "w-[75%]" : "w-[100%]"}>
+          <section className="border bg-white shadow-xl p-6">
+            <div className="flex items-center mb-4 justify-between">
+              <div className="flex">
+                <div
+                  className={`flex items-center  mr-3 pb-1 w-20 justify-center border-b-2 border-b-black`}
+                >
+                  <Image src={list} height={20} width={20} alt="pro-1" />
+                  <span className="ml-2 text-gray-500">List</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col justify-center">
+                <FilterButton
+                  onClick={toggleFilterPanel}
+                  active={isFilterPanelOpen}
+                />
+              </div>
+            </div>
+            Total Results: {totalResults}
+            {isFetching || isLoading ? (
+              <LoaderSkeleton rowCount={limit} />
+            ) : (
+              <SimpleTable
+                columns={columns}
+                data={projectProposals}
+                onViewButtonClick={onViewButtonClick}
+                rowIndexStart={(page - 1) * limit + 1}
+              />
+            )}
+            {paginator}
+          </section>
+        </div>
+        <div
+          hidden={!isFilterPanelOpen}
+          className="w-[25%] h-[75vh] overflow-y-auto overflow-x-hidden hide-scrollbar"
+        >
+          <SearchPanel
+            onClose={toggleFilterPanel}
+            items={searchPanelItems}
+            values={searchPanelItemValues}
+            onFilterChange={onFilterChange}
+            onNoFilter={onRemoveFilter}
+          />
+        </div>
       </div>
     </>
   );

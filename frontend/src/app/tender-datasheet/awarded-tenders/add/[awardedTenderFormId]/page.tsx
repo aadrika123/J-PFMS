@@ -1,13 +1,13 @@
-import TenderInputForm from '@/components/JuidcoPfms/page/TenderDatasheet/TenderInputForm'
+import AwardedTendersInputForm from '@/components/JuidcoPfms/page/AwardedTenderDetails/AwardedTenderInputForm';
 import PageLayout from '@/components/Layouts/PageLayout'
 import React from 'react'
 
-const page = ({params}: {params :{tenderFormId: number}}) => {
-  const {tenderFormId} = params;
+const page = ({params}: {params :{awardedTenderFormId: number}}) => {
+  const {awardedTenderFormId} = params;
    
   return (
     <PageLayout>
-        <TenderInputForm tenderFormId={Number(tenderFormId)} />
+        <AwardedTendersInputForm awardedTenderFormId={Number(awardedTenderFormId)} />
     </PageLayout>
   )
 }

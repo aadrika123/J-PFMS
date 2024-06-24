@@ -1,0 +1,10 @@
+///// Managed By :- Sanjiv
+model agreement_types {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @map("updated_at")
+
+  awarded_tender_details awarded_tender_details[]
+}

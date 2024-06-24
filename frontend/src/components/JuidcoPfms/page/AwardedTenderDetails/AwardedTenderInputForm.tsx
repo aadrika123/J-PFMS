@@ -7,15 +7,9 @@
  */
 
 import React, { useRef } from "react";
-import TenderBasicDetailsForm from "./AwardedTenderInputForms/TenderBasicDetailsForm";
 import Image from "next/image";
-import TenderIcon from "@/assets/svg/tender_form.svg";
+import AwardedTender from "@/assets/svg/awarde-tender.svg";
 import { tabList } from "./molecules/StaticList";
-import TenderCoverDetailsForm from "./AwardedTenderInputForms/TenderCoverDetailsForm";
-import TenderWorkDetailsForm from "./AwardedTenderInputForms/TenderWorkDetailsForm";
-import TenderFeeDetailsForm from "./AwardedTenderInputForms/TenderFeeDetailsForm";
-import TenderCriticalDatesForm from "./AwardedTenderInputForms/TenderCriticalDatesForm";
-import TenderBidOpenerForm from "./AwardedTenderInputForms/TenderBidOpenersForm";
 import ViewTenderFormDetails from "./AwardedTenderInputForms/ViewTenderFormDetails";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import axios from "@/lib/axiosConfig";
@@ -25,8 +19,17 @@ import { useWorkingAnimation } from "@/components/global/molecules/general/useWo
 import Button from "@/components/global/atoms/buttons/Button";
 import { useReactToPrint } from "react-to-print";
 import { useQuery } from "react-query";
+import ProjectDetailsForm from "./AwardedTenderInputForms/ProjectDetailsForm";
+import TenderDetailsForm from "./AwardedTenderInputForms/TenderDetailsForm";
+import ProjectMilestonesForm from "./AwardedTenderInputForms/ProjectMilestonesForm";
+import ProjectDurationForm from "./AwardedTenderInputForms/ProjectDurationForm";
+import BillsQuantityForm from "./AwardedTenderInputForms/BillsQuantityForm";
 
-const AwardedTendersInputForm = ({ awardedTenderFormId }: { awardedTenderFormId: number }) => {
+const AwardedTendersInputForm = ({
+  awardedTenderFormId,
+}: {
+  awardedTenderFormId: number;
+}) => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -50,7 +53,10 @@ const AwardedTendersInputForm = ({ awardedTenderFormId }: { awardedTenderFormId:
     return res.data.data;
   };
 
-  const { data: data }: any = useQuery(["tender-form", awardedTenderFormId], fetch);
+  const { data: data }: any = useQuery(
+    ["tender-form", awardedTenderFormId],
+    fetch
+  );
 
   //////////// Handle Tab Jump //////////
   const handleTabJump = (tabNo: number) => {
@@ -81,14 +87,14 @@ const AwardedTendersInputForm = ({ awardedTenderFormId }: { awardedTenderFormId:
           <div className="bg-white shadow-lg p-4 flex justify-between items-center rounded mb-6">
             <div className="flex items-center">
               <Image
-                src={TenderIcon}
+                src={AwardedTender}
                 height={30}
                 width={30}
                 alt="tender-icon"
               />
-              <header className="font-bold ml-2">{`Tender Input Form ${pageNo === 7 ? " - Preview Details" : ""}`}</header>
+              <header className="font-bold ml-2">{`Tendering and Contractor Details ${pageNo === 6 ? " - Preview Details" : ""}`}</header>
             </div>
-            {pageNo === 7 ? (
+            {pageNo === 6 ? (
               <Button onClick={handlePrint} variant="primary">
                 Print
               </Button>
@@ -96,11 +102,11 @@ const AwardedTendersInputForm = ({ awardedTenderFormId }: { awardedTenderFormId:
               <div className="flex items-center w-1/4">
                 <progress
                   className="progress progress-primary primary  w-56"
-                  value={pageNo * (100 / 6)}
+                  value={pageNo * (100 / 5)}
                   max="100"
                 ></progress>
                 <span className="text-xs text-nowrap ml-2">
-                  Steps-{pageNo}/6
+                  Steps-{pageNo}/5
                 </span>
               </div>
             )}
@@ -133,37 +139,37 @@ const AwardedTendersInputForm = ({ awardedTenderFormId }: { awardedTenderFormId:
 
             {/* Tender Forms */}
             {pageNo === 1 ? (
-              <TenderBasicDetailsForm
+              <ProjectDetailsForm
                 handleTabChange={handleTabChange}
                 tenderFormId={awardedTenderFormId}
-                readonly={data.status === "submitted"}
+                readonly={data.status !== "submitted"}
               />
             ) : pageNo === 2 ? (
-              <TenderCoverDetailsForm
+              <TenderDetailsForm
                 handleTabChange={handleTabChange}
                 tenderFormId={awardedTenderFormId}
-                readonly={data.status === "submitted"}
-              />
-            ) : pageNo === 3 ? (
-              <TenderWorkDetailsForm
-                handleTabChange={handleTabChange}
-                tenderFormId={awardedTenderFormId}
-                readonly={data.status === "submitted"}
+                readonly={data.status !== "submitted"}
                 project_proposal={data.project_proposal}
               />
-            ) : pageNo === 4 ? (
-              <TenderFeeDetailsForm
+            ) : pageNo === 3 ? (
+              <ProjectDurationForm
                 handleTabChange={handleTabChange}
                 tenderFormId={awardedTenderFormId}
-                readonly={data.status === "submitted"}
+                readonly={data.status !== "submitted"}
+              />
+            ) : pageNo === 4 ? (
+              <BillsQuantityForm
+                handleTabChange={handleTabChange}
+                tenderFormId={awardedTenderFormId}
+                readonly={data.status !== "submitted"}
               />
             ) : pageNo === 5 ? (
-              <TenderCriticalDatesForm
+              <ProjectMilestonesForm
                 handleTabChange={handleTabChange}
                 tenderFormId={awardedTenderFormId}
-                readonly={data.status === "submitted"}
+                readonly={data.status !== "submitted"}
               />
-            ): (
+            ) : (
               pageNo === 6 && (
                 <ViewTenderFormDetails
                   componentRef={componentRef}

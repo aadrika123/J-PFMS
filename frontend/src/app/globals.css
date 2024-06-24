@@ -35,6 +35,9 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
+::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
 
 /* Shadow Bottom */
 .bottom-shadow{

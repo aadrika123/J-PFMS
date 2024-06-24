@@ -28,6 +28,7 @@ import { tenderCriticalDateSchema, tenderCriticalDatesType } from "./validations
 import { tenderBidDetailsSchema, tenderBidOpenersType } from "./validations/TenderInputFormValidation/TenderBidDetailsValidation";
 import MeasurementRecordValidation from "./validations/MeasurementRecordValidation";
 import {tenderApprovalRoleLevels} from "./validations/TenderInputFormValidation/tenderApprovalRoleLevel"
+import * as awardedTenderValidation from "./validations/AwardedInputFormValidation/Index"
 
 // escape input string for in regular expressions
 const escapeRegExp = (text: string): string => {
@@ -68,6 +69,7 @@ export {
   tenderBidDetailsSchema,
   tenderBidOpenersType,
   tenderApprovalRoleLevels,
+  awardedTenderValidation,
   docType,
   executionBody,
   MeasurementRecordValidation,

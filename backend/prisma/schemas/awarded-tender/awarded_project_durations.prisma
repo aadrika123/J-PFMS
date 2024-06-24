@@ -1,0 +1,13 @@
+///// Managed By :- Sanjiv
+model awarded_project_durations {
+  id                Int             @id @default(autoincrement())
+  awarded_tender_id Int             @unique
+  awarded_tender    awarded_tenders @relation(fields: [awarded_tender_id], references: [id])
+  start_date        DateTime        @db.Date
+  end_date          DateTime        @db.Date
+  wp_in_month       Int?
+  wp_in_day         Int?
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @map("updated_at")
+}

@@ -1,0 +1,13 @@
+///// Managed By :- Sanjiv
+model awarded_project_milestones {
+  id                Int             @id @default(autoincrement())
+  awarded_tender_id Int
+  awarded_tender    awarded_tenders @relation(fields: [awarded_tender_id], references: [id])
+  start_date        DateTime        @db.Date
+  end_date          DateTime        @db.Date
+  amount            Float
+  percentage        Float
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @map("updated_at")
+}

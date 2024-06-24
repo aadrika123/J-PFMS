@@ -1,0 +1,18 @@
+///// Managed By :- Sanjiv
+model awarded_tender_details {
+  id                 Int             @id @default(autoincrement())
+  awarded_tender_id  Int             @unique
+  awarded_tender     awarded_tenders @relation(fields: [awarded_tender_id], references: [id])
+  contractor_name    String
+  agreement_type_id  Int
+  agreement_type     agreement_types @relation(fields: [agreement_type_id], references: [id])
+  agreement_no       String
+  agreement_date     String
+  work_order_no      String
+  awarding_authority String
+  quoted_amount      Float
+  quoted_percentage  Int
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @map("updated_at")
+}
